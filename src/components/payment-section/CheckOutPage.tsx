@@ -17,8 +17,7 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [clientSecret, setClientSecret] = useState('')
-  const [paymentRequest, setPaymentRequest] =
-    useState<any>(null)
+  const [paymentRequest, setPaymentRequest] = useState<any>(null)
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
 
   useEffect(() => {
@@ -122,14 +121,25 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
         </div>
       )}
 
-      {clientSecret && <PaymentElement options={{ layout: 'tabs' }} />}
+      {clientSecret && <PaymentElement options={{ layout: 'accordion' }} />}
       {errorMessage && <div>{errorMessage}</div>}
-      <button
-        className='text-white w-full p-5 bg-black mt-2 rounded-md font-bold disabled:opacity-50 disabled:animate-pulse'
-        disabled={isProcessing || !stripe}
-      >
-        {isProcessing ? 'Processing...' : `Pay $${amount}`}
-      </button>
+      <hr className='my-4 border-gray-300' />
+      <div className='flex items-center justify-between p-4 bg-white'>
+        {/* Total Price */}
+        <div>
+          <p className='text-gray-500 text-sm'>Total</p>
+          <p className='text-2xl font-bold'>£{amount}</p>
+        </div>
+
+        {/* Pay Button */}
+        <button
+          className='bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg flex items-center space-x-2 disabled:opacity-50 disabled:animate-pulse'
+          disabled={isProcessing || !stripe}
+        >
+          <span>Pay by card</span>
+          <span>→</span>
+        </button>
+      </div>
     </form>
   )
 }
