@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -17,7 +18,7 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [clientSecret, setClientSecret] = useState('')
   const [paymentRequest, setPaymentRequest] =
-    useState<stripe.PaymentRequest | null>(null)
+    useState<any>(null)
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
 
   useEffect(() => {
