@@ -52,7 +52,6 @@ const PaymentSection = () => {
         <div className='container max-w-6xl mx-auto'>
           <div className='grid lg:grid-cols-2  md:gap-10 gap-3  md:px-10 px-5'>
             <div className=''>
-              {/* Header */}
               <div className='flex items-start space-x-2'>
                 <span className='text-2xl'>👇</span>
                 <h2 className='text-2xl font-semibold'>
