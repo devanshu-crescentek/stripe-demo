@@ -50,7 +50,7 @@ const PaymentSection = () => {
     <div>
       <div className='w-full py-10 sm:py-20'>
         <div className='container max-w-6xl mx-auto'>
-          <div className='grid lg:grid-cols-2 gap-10  md:px-10 px-5'>
+          <div className='grid lg:grid-cols-2  md:gap-10 gap-3  md:px-10 px-5'>
             <div className=''>
               {/* Header */}
               <div className='flex items-start space-x-2'>
