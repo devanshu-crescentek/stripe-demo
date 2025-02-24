@@ -4,14 +4,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+
+import useDeviceType from '@/hooks/use-device-type'
 
 const TenureInfo = () => {
   const {
@@ -19,10 +21,13 @@ const TenureInfo = () => {
     setValue,
     control,
     watch,
-    handleSubmit
+    handleSubmit,
   } = useFormContext()
 
   const selectedTenure = watch('tenure')
+
+  const deviceType = useDeviceType()
+
   return (
     <>
       <Card className='mb-4'>
@@ -124,9 +129,52 @@ const TenureInfo = () => {
           </div>
         </CardContent>
       </Card>
-      <Card>
-        <CardContent className='p-6'>
-          <div className='flex flex-col gap-2 items-start justify-start mb-6'>
+
+      {deviceType === 'desktop' && (
+        <Card>
+          <CardContent className='p-6'>
+            <div className='flex flex-col gap-2 items-start justify-start mb-6'>
+              <FormField
+                control={control}
+                name='agreeTerms'
+                render={({ field }) => (
+                  <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border'>
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className='space-y-1 leading-none'>
+                      <FormLabel>
+                        I agree to the{' '}
+                        <span className='text-black'>
+                          Terms and Privacy Policy
+                        </span>
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              {errors.agreeTerms && (
+                <p className='text-red-500 text-xs'>
+                  {errors.agreeTerms.message as string}
+                </p>
+              )}
+            </div>
+            <Button
+              type='button'
+              onClick={handleSubmit((data) => console.log(data))}
+              className='w-full bg-green-600 hover:bg-green-700'
+            >
+              Find Title Documents Now →
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+      {deviceType === 'mobile' && (
+        <div className='fixed bottom-0 left-0 w-full bg-white shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] p-4 border-t flex flex-col items-start rounded-t-[12px] '>
+          <div className='flex flex-col gap-2 items-start justify-start '>
             <FormField
               control={control}
               name='agreeTerms'
@@ -155,6 +203,7 @@ const TenureInfo = () => {
               </p>
             )}
           </div>
+          <div className='border-t w-full border-[#000000] opacity-10 my-4'></div>
           <Button
             type='button'
             onClick={handleSubmit((data) => console.log(data))}
@@ -162,8 +211,8 @@ const TenureInfo = () => {
           >
             Find Title Documents Now →
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </>
   )
 }
