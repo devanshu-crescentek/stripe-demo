@@ -76,3 +76,14 @@
 .focus-visible\:ring-offset-2:focus-visible {
   --tw-ring-offset-width: 0px !important;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
