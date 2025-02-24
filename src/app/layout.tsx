@@ -1,4 +1,4 @@
-import Header from '@/components/header'
+import Header from '@/components/shared/header'
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 import './globals.css'

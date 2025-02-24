@@ -6,12 +6,13 @@ import convertToSubCurrency from '@/lib/convertToSubCurrency'
 import {
   PaymentElement,
   PaymentRequestButtonElement,
+  ExpressCheckoutElement,
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
-// import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-// import PaypalButton from './paypal-button'
+import PaypalButton from './paypal-button'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -25,12 +26,12 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import Image from 'next/image'
-import { Card, CardContent } from '../ui/card'
+import { Card, CardContent } from '../../../components/ui/card'
 
 const CheckOutPage = ({ amount }: { amount: number }) => {
   const stripe = useStripe()
   const elements = useElements()
-  // const router = useRouter()
+  const router = useRouter()
 
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
@@ -87,6 +88,13 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
       })
   }, [amount])
 
+  const onClick = ({ resolve: resolve }: any) => {
+    const options = {
+      emailRequired: true,
+    }
+    resolve(options)
+  }
+
   const handleSubmit = async () => {
     setIsProcessing(true)
 
@@ -114,6 +122,23 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
       setErrorMessage(error.message!)
     }
     setIsProcessing(false)
+    // const {error} = await stripe.confirmPayment({
+    //   // `Elements` instance that's used to create the Express Checkout Element.
+    //   elements,
+    //   // `clientSecret` from the created PaymentIntent
+    //   clientSecret,
+    //   confirmParams: {
+    //     return_url: 'https://example.com/order/123/complete',
+    //   },
+    //   // Uncomment below if you only want redirect for redirect-based payments.
+    //   // redirect: 'if_required',
+    // });
+
+    // if (error) {
+    //   // This point is reached only if there's an immediate error when confirming the payment. Show the error to your customer (for example, payment details incomplete).
+    // } else {
+    //   // Your customer will be redirected to your `return_url`.
+    // }
   }
 
   if (!clientSecret || !stripe || !elements) {
@@ -131,10 +156,18 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
     )
   }
 
-  // const handlePaypalSuccess = (details: any) => {
-  //   console.log('🚀 ~ Paypal success:', details)
-  //   router.push('/payment-success?amount=' + amount)
+  const handlePaypalSuccess = (details: any) => {
+    console.log('🚀 ~ Paypal success:', details)
+    router.push('/payment-success?amount=' + amount)
+  }
+
+  // const handlePaymentRequest = (result: any) => {
+  //   return false
   // }
+
+  const expressCheckoutOptions = {
+    buttonHeight: 40,
+  }
 
   return (
     <>
@@ -294,16 +327,22 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
                 deviceType == 'desktop' && (
                   <div className='mb-4 justify-center gap-4 hidden md:flex'>
                     <div className='w-full'>
-                      <PaymentRequestButtonElement
+                      {/* <PaymentRequestButtonElement
                         options={{ paymentRequest }}
+                        onClick={handlePaymentRequest}
+                      /> */}
+                      <ExpressCheckoutElement
+                        onClick={onClick}
+                        onConfirm={handleSubmit}
+                        options={expressCheckoutOptions}
                       />
                     </div>
-                    {/* <div className='w-full'>
+                    <div className='w-full'>
                       <PaypalButton
                         amount={amount.toString()}
                         onSuccess={handlePaypalSuccess}
                       />
-                    </div> */}
+                    </div>
                   </div>
                 )}
               <div className='hidden md:flex items-center justify-between'>
@@ -461,12 +500,12 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
             <div className='w-full'>
               <PaymentRequestButtonElement options={{ paymentRequest }} />
             </div>
-            {/* <div className='w-full'>
+            <div className='w-full'>
               <PaypalButton
                 amount={amount.toString()}
                 onSuccess={handlePaypalSuccess}
               />
-            </div> */}
+            </div>
           </div>
 
           {/* Total & Pay Button */}

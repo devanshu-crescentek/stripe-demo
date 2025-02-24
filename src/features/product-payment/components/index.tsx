@@ -6,14 +6,14 @@ import convertToSubCurrency from '@/lib/convertToSubCurrency'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { Edit } from 'lucide-react'
-import { Button } from '../ui/button'
+import { Button } from '../../../components/ui/button'
 import CheckOutPage from './CheckOutPage'
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Input } from '../ui/input'
+import { Input } from '../../../components/ui/input'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -340,6 +340,9 @@ const PaymentSection = () => {
               options={{
                 appearance: {
                   theme: 'stripe',
+                  variables:{
+                     borderRadius: '4px'
+                  }
                 },
                 amount: convertToSubCurrency(totalAmount ? totalAmount : 1), //cents
                 currency: 'usd',
