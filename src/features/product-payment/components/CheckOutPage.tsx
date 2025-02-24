@@ -4,14 +4,16 @@
 import useDeviceType from '@/hooks/use-device-type'
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
 import {
-  PaymentElement,
-  PaymentRequestButtonElement,
   ExpressCheckoutElement,
+  PaymentElement,
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+
+import { useFormContext } from 'react-hook-form'
+
 import PaypalButton from './paypal-button'
 
 import { Button } from '@/components/ui/button'
@@ -23,7 +25,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from '@/components/ui/drawer'
 import Image from 'next/image'
 import { Card, CardContent } from '../../../components/ui/card'
@@ -33,43 +34,24 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
   const elements = useElements()
   const router = useRouter()
 
+  const { handleSubmit } = useFormContext()
+
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [clientSecret, setClientSecret] = useState('')
-  const [paymentRequest, setPaymentRequest] = useState<any>(null)
+  // const [paymentRequest, setPaymentRequest] = useState<any>(null)
+  const [isOpen, setIsOpen] = useState(false)
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
 
   const deviceType = useDeviceType()
 
   useEffect(() => {
-    if (!stripe) return
-
-    const pr = stripe.paymentRequest({
-      country: 'US',
-      currency: 'usd',
-      total: {
-        label: 'Total',
-        amount: convertToSubCurrency(amount),
-      },
-      requestPayerName: true,
-      requestPayerEmail: true,
-    })
-
-    pr.canMakePayment()
-      .then((result) => {
-        if (result) {
-          setPaymentRequest(pr)
-          setPaymentRequestAvailable(true)
-        } else {
-          console.warn('Google Pay / Apple Pay not available')
-        }
-      })
-      .catch((error) => {
-        console.warn('Error checking for Google Pay / Apple Pay', error)
-      })
+    if (!stripe || !amount) return
+    setPaymentRequestAvailable(true)
   }, [stripe, amount])
 
   useEffect(() => {
+    if (!amount) return
     fetch('/api/create-payment-intent', {
       method: 'POST',
       headers: {
@@ -95,7 +77,11 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
     resolve(options)
   }
 
-  const handleSubmit = async () => {
+  const drawerHandleOpen = async () => {
+    setIsOpen(true)
+  }
+
+  const onSubmit = async () => {
     setIsProcessing(true)
 
     if (!stripe || !elements) {
@@ -160,10 +146,6 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
     console.log('🚀 ~ Paypal success:', details)
     router.push('/payment-success?amount=' + amount)
   }
-
-  // const handlePaymentRequest = (result: any) => {
-  //   return false
-  // }
 
   const expressCheckoutOptions = {
     buttonHeight: 40,
@@ -322,35 +304,37 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
               </div>
               <div className='border-t border-[#000000] opacity-10 my-4'></div>
               {/* Show Google Pay / Apple Pay Button if available */}
-              {paymentRequestAvailable &&
-                paymentRequest &&
-                deviceType == 'desktop' && (
-                  <div className='mb-4 justify-center gap-4 hidden md:flex'>
-                    <div className='w-full'>
-                      {/* <PaymentRequestButtonElement
+              {paymentRequestAvailable && deviceType == 'desktop' && (
+                <div className='mb-4 justify-center gap-4 hidden md:flex'>
+                  <div className='w-full'>
+                    {/* <PaymentRequestButtonElement
                         options={{ paymentRequest }}
                         onClick={handlePaymentRequest}
                       /> */}
-                      <ExpressCheckoutElement
-                        onClick={onClick}
-                        onConfirm={handleSubmit}
-                        options={expressCheckoutOptions}
-                      />
-                    </div>
-                    <div className='w-full'>
-                      <PaypalButton
-                        amount={amount.toString()}
-                        onSuccess={handlePaypalSuccess}
-                      />
-                    </div>
+                    <ExpressCheckoutElement
+                      onClick={(resolve) =>
+                        handleSubmit(() => onClick(resolve))()
+                      }
+                      onConfirm={() => {
+                        console.log('ExpressCheckoutElement clicked')
+                      }}
+                      options={expressCheckoutOptions}
+                    />
                   </div>
-                )}
+                  <div className='w-full'>
+                    <PaypalButton
+                      amount={amount.toString()}
+                      onSuccess={handlePaypalSuccess}
+                    />
+                  </div>
+                </div>
+              )}
               <div className='hidden md:flex items-center justify-between'>
                 {/* Total Price */}
                 <div>
                   <p className='text-gray-500 text-sm mb-2'>Total</p>
                   <p className='text-[40px] leading-[22px] font-semibold'>
-                    £{amount}
+                    £{amount ? amount : 0}
                   </p>
                 </div>
 
@@ -358,7 +342,8 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
                 <button
                   className='bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-[4px] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:animate-pulse w-[246px] h-[40px]'
                   disabled={isProcessing || !stripe}
-                  onClick={() => handleSubmit()}
+                  type='button'
+                  onClick={handleSubmit(onSubmit)}
                 >
                   <span>Pay by card</span>
                   <span>→</span>
@@ -493,12 +478,17 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
           </div>
         </div>
       )}
-      {paymentRequestAvailable && paymentRequest && deviceType === 'mobile' && (
+      {paymentRequestAvailable && deviceType === 'mobile' && (
         <div className='fixed block md:hidden bottom-0 left-0 w-full border shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] rounded-t-xl p-4 bg-white'>
           {/* Payment Methods */}
           <div className='flex justify-between space-x-3 mb-3'>
             <div className='w-full'>
-              <PaymentRequestButtonElement options={{ paymentRequest }} />
+              {/* <PaymentRequestButtonElement options={{ paymentRequest }} /> */}
+              <ExpressCheckoutElement
+                onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
+                onConfirm={() => onSubmit()}
+                options={expressCheckoutOptions}
+              />
             </div>
             <div className='w-full'>
               <PaypalButton
@@ -512,16 +502,20 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
           <div className='flex items-center justify-between'>
             <div>
               <p className='text-gray-500 text-sm'>Total</p>
-              <p className='text-2xl font-bold'>£29.95</p>
+              <p className='text-2xl font-bold'>£{amount ? amount : 0}</p>
             </div>
 
-            <Drawer>
-              <DrawerTrigger>
-                <button className='bg-green-500 hover:bg-green-600 text-white justify-center font-medium py-3 px-6 rounded-[4px] flex items-center space-x-2 w-[189px] h-[40px]'>
-                  <span>Pay By Card</span>
-                  <span>→</span>
-                </button>
-              </DrawerTrigger>
+            <Drawer open={isOpen} onOpenChange={setIsOpen}>
+              {/* <DrawerTrigger> */}
+              <button
+                className='bg-green-500 hover:bg-green-600 text-white justify-center font-medium py-3 px-6 rounded-[4px] flex items-center space-x-2 w-[189px] h-[40px]'
+                onClick={handleSubmit(drawerHandleOpen)}
+                type='button'
+              >
+                <span>Pay By Card</span>
+                <span>→</span>
+              </button>
+              {/* </DrawerTrigger> */}
               <DrawerContent>
                 <DrawerHeader>
                   <DrawerTitle>Card</DrawerTitle>
@@ -536,8 +530,9 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
                 </DrawerHeader>
                 <DrawerFooter>
                   <Button
-                    onClick={() => handleSubmit()}
+                    onClick={handleSubmit(onSubmit)}
                     disabled={isProcessing || !stripe}
+                    type='button'
                   >
                     Pay
                   </Button>

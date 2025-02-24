@@ -4,6 +4,7 @@ import {
   PayPalButtons,
   PayPalScriptProvider,
 } from '@paypal/react-paypal-js'
+import { useFormContext } from 'react-hook-form'
 
 interface PaypalButtonProps {
   amount: string
@@ -11,6 +12,7 @@ interface PaypalButtonProps {
 }
 
 const PaypalButton = ({ amount,onSuccess }: PaypalButtonProps) => {
+  const { formState: { isValid } } = useFormContext()
   return (
     <PayPalScriptProvider
       options={{
@@ -57,6 +59,7 @@ const PaypalButton = ({ amount,onSuccess }: PaypalButtonProps) => {
               console.error('🚀 ~ Error capturing order:', error)
             })
         }}
+        disabled={!isValid || !amount}
       />
     </PayPalScriptProvider>
   )
