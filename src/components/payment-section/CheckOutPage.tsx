@@ -1,11 +1,11 @@
- 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import useDeviceType from '@/hooks/use-device-type'
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
 import {
   PaymentElement,
-  // PaymentRequestButtonElement,
+  PaymentRequestButtonElement,
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
@@ -35,38 +35,38 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [clientSecret, setClientSecret] = useState('')
-  // const [paymentRequest, setPaymentRequest] = useState<any>(null)
-  // const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
+  const [paymentRequest, setPaymentRequest] = useState<any>(null)
+  const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
 
   const deviceType = useDeviceType()
 
-  // useEffect(() => {
-  //   if (!stripe) return
+  useEffect(() => {
+    if (!stripe) return
 
-  //   const pr = stripe.paymentRequest({
-  //     country: 'US',
-  //     currency: 'usd',
-  //     total: {
-  //       label: 'Total',
-  //       amount: convertToSubCurrency(amount),
-  //     },
-  //     requestPayerName: true,
-  //     requestPayerEmail: true,
-  //   })
+    const pr = stripe.paymentRequest({
+      country: 'US',
+      currency: 'usd',
+      total: {
+        label: 'Total',
+        amount: convertToSubCurrency(amount),
+      },
+      requestPayerName: true,
+      requestPayerEmail: true,
+    })
 
-  //   pr.canMakePayment()
-  //     .then((result) => {
-  //       if (result) {
-  //         setPaymentRequest(pr)
-  //         setPaymentRequestAvailable(true)
-  //       } else {
-  //         console.warn('Google Pay / Apple Pay not available')
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.warn('Error checking for Google Pay / Apple Pay', error)
-  //     })
-  // }, [stripe, amount])
+    pr.canMakePayment()
+      .then((result) => {
+        if (result) {
+          setPaymentRequest(pr)
+          setPaymentRequestAvailable(true)
+        } else {
+          console.warn('Google Pay / Apple Pay not available')
+        }
+      })
+      .catch((error) => {
+        console.warn('Error checking for Google Pay / Apple Pay', error)
+      })
+  }, [stripe, amount])
 
   useEffect(() => {
     fetch('/api/create-payment-intent', {
@@ -289,7 +289,7 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
               </div>
               <div className='border-t border-[#000000] opacity-10 my-4'></div>
               {/* Show Google Pay / Apple Pay Button if available */}
-              {/* {paymentRequestAvailable &&
+              {paymentRequestAvailable &&
                 paymentRequest &&
                 deviceType == 'desktop' && (
                   <div className='mb-4 justify-center gap-4 hidden md:flex'>
@@ -298,14 +298,14 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
                         options={{ paymentRequest }}
                       />
                     </div>
-                    <div className='w-full'>
+                    {/* <div className='w-full'>
                       <PaypalButton
                         amount={amount.toString()}
                         onSuccess={handlePaypalSuccess}
                       />
-                    </div>
+                    </div> */}
                   </div>
-                )} */}
+                )}
               <div className='hidden md:flex items-center justify-between'>
                 {/* Total Price */}
                 <div>
@@ -454,20 +454,20 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
           </div>
         </div>
       )}
-      { deviceType === 'mobile' && (
+      {paymentRequestAvailable && paymentRequest && deviceType === 'mobile' && (
         <div className='fixed block md:hidden bottom-0 left-0 w-full border shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] rounded-t-xl p-4 bg-white'>
           {/* Payment Methods */}
-          {/* <div className='flex justify-between space-x-3 mb-3'>
+          <div className='flex justify-between space-x-3 mb-3'>
             <div className='w-full'>
               <PaymentRequestButtonElement options={{ paymentRequest }} />
             </div>
-            <div className='w-full'>
+            {/* <div className='w-full'>
               <PaypalButton
                 amount={amount.toString()}
                 onSuccess={handlePaypalSuccess}
               />
-            </div>
-          </div> */}
+            </div> */}
+          </div>
 
           {/* Total & Pay Button */}
           <div className='flex items-center justify-between'>
