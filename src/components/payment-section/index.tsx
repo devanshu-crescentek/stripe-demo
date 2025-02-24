@@ -61,12 +61,13 @@ const PaymentSection = () => {
   const totalAmount =
     documents
       .filter((doc) => selectedDocs.includes(doc.id))
-      .reduce((sum, doc) => sum + doc.price, 0) + (selected=== 'express' ? 10 : 0)
+      .reduce((sum, doc) => sum + doc.price, 0) +
+    (selected === 'express' ? 10 : 0)
 
   return (
     <>
       <div className='min-h-screen mt-10'>
-        <div className='max-w-screen-2xl w-full mx-auto grid lg:grid-cols-2 lg:gap-12 gap-0 px-6'>
+        <div className='container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12'>
           <div className=''>
             <Card className='mb-6'>
               <CardContent className='p-6'>

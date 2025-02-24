@@ -9,9 +9,9 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import PaypalButton from './paypal-button'
+// import PaypalButton from './paypal-button'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -30,7 +30,7 @@ import { Card, CardContent } from '../ui/card'
 const CheckOutPage = ({ amount }: { amount: number }) => {
   const stripe = useStripe()
   const elements = useElements()
-  const router = useRouter()
+  // const router = useRouter()
 
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
@@ -131,10 +131,10 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
     )
   }
 
-  const handlePaypalSuccess = (details: any) => {
-    console.log('🚀 ~ Paypal success:', details)
-    router.push('/payment-success?amount=' + amount)
-  }
+  // const handlePaypalSuccess = (details: any) => {
+  //   console.log('🚀 ~ Paypal success:', details)
+  //   router.push('/payment-success?amount=' + amount)
+  // }
 
   return (
     <>
@@ -298,12 +298,12 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
                         options={{ paymentRequest }}
                       />
                     </div>
-                    <div className='w-full'>
+                    {/* <div className='w-full'>
                       <PaypalButton
                         amount={amount.toString()}
                         onSuccess={handlePaypalSuccess}
                       />
-                    </div>
+                    </div> */}
                   </div>
                 )}
               <div className='hidden md:flex items-center justify-between'>
@@ -461,12 +461,12 @@ const CheckOutPage = ({ amount }: { amount: number }) => {
             <div className='w-full'>
               <PaymentRequestButtonElement options={{ paymentRequest }} />
             </div>
-            <div className='w-full'>
+            {/* <div className='w-full'>
               <PaypalButton
                 amount={amount.toString()}
                 onSuccess={handlePaypalSuccess}
               />
-            </div>
+            </div> */}
           </div>
 
           {/* Total & Pay Button */}
