@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Header() {
     return (
@@ -11,12 +12,12 @@ export default function Header() {
             className="h-10 w-10"
           /> */}
           {/* Text Content */}
-          <div>
+          <Link href="/">
            <Image src="/logo.png" alt="LandRegistry Logo" width={200} height={200}/>
             <p className="text-sm text-gray-300">
               Access Official Land Registry Records Online
             </p>
-          </div>
+          </Link>
         </div>
       </header>
     );

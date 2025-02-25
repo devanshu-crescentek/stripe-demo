@@ -14,8 +14,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 const AddressInfo = () => {
-  const { control, formState } = useFormContext()
-  const [isEdit, setIsEdit] = useState(false)
+  const { control, formState, watch } = useFormContext()
+  const [isEdit, setIsEdit] = useState(true)
 
   return (
     <Card>
@@ -36,7 +36,13 @@ const AddressInfo = () => {
           ) : (
             <>
               <p className='text-[##0B0C0C] md:text-[20px] text-[14px] md:leading-[30px] leading-[21px] font-normal w-full'>
-                24 boughton Rd, Wick Hill’ CA, <br />RG40 9BL
+                24 boughton Rd, Wick Hill’ CA, <br />
+                RG40 9BL 
+                <br />
+                {watch('address') && `${watch('address')}, `}
+                {watch('city') && `${watch('city')}, `}
+                {watch('country') && `${watch('country')}, `}<br/>
+                {watch('postalCode') && watch('postalCode')}
               </p>
             </>
           )}
@@ -58,7 +64,7 @@ const AddressInfo = () => {
                   name='address'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Address</FormLabel>
+                      <FormLabel>Address*</FormLabel>
                       <FormControl>
                         <Input
                           placeholder='Enter Address'
@@ -100,7 +106,7 @@ const AddressInfo = () => {
                   name='country'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>County</FormLabel>
+                      <FormLabel>County*</FormLabel>
                       <FormControl>
                         <Input
                           placeholder='Enter County'
@@ -121,7 +127,7 @@ const AddressInfo = () => {
                   name='postalCode'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Postcode</FormLabel>
+                      <FormLabel>Postcode*</FormLabel>
                       <FormControl>
                         <Input
                           placeholder='Postcode'

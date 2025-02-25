@@ -3,7 +3,7 @@ import ProductDetails from '@/features/product-details/components'
 
 const page = () => {
   return (
-    <div className='min-h-screen mt-10'>
+    <div className='h-full'>
       <ProductDetails />
     </div>
   )

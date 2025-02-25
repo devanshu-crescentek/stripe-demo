@@ -1,4 +1,8 @@
-import { useFormContext } from 'react-hook-form'
+'use client'
+
+import { useRouter } from 'next/navigation'
+
+import { SubmitHandler, useFormContext } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -15,18 +19,42 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 import useDeviceType from '@/hooks/use-device-type'
 
+interface FormData {
+  address: string
+  city: string
+  country: string
+  postalCode: string
+  tenure: string
+  title_number?: number
+  agreeTerms: boolean
+}
+
 const TenureInfo = () => {
+  const router = useRouter()
+
   const {
     formState: { errors },
     setValue,
     control,
     watch,
     handleSubmit,
-  } = useFormContext()
+    getValues,
+  } = useFormContext<FormData>()
 
   const selectedTenure = watch('tenure')
 
   const deviceType = useDeviceType()
+
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    const queryObject = {
+      address: data.address,
+      city: data.city,
+      country: data.country,
+      postalCode: data.postalCode,
+    }
+    const queryString = new URLSearchParams(queryObject).toString()
+    router.push(`/search-result?${queryString}`)
+  }
 
   return (
     <>
@@ -37,6 +65,7 @@ const TenureInfo = () => {
         <CardContent>
           <RadioGroup
             className='flex space-x-6'
+            defaultValue={getValues('tenure')}
             onValueChange={(value) => setValue('tenure', value)}
           >
             <div className='flex items-center space-x-2'>
@@ -142,6 +171,7 @@ const TenureInfo = () => {
                     <FormControl>
                       <Checkbox
                         checked={field.value}
+                        className='data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
@@ -161,7 +191,7 @@ const TenureInfo = () => {
             </div>
             <Button
               type='button'
-              onClick={handleSubmit((data) => console.log(data))}
+              onClick={handleSubmit(onSubmit)}
               className='w-full bg-green-600 hover:bg-green-700'
             >
               Find Title Documents Now →
@@ -200,7 +230,7 @@ const TenureInfo = () => {
           <div className='border-t w-full border-[#000000] opacity-10 my-4'></div>
           <Button
             type='button'
-            onClick={handleSubmit((data) => console.log(data))}
+            onClick={handleSubmit(onSubmit)}
             className='w-full bg-green-600 hover:bg-green-700'
           >
             Find Title Documents Now →
