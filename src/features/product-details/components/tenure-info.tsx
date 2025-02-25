@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 
 import { SubmitHandler, useFormContext } from 'react-hook-form'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -19,15 +20,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 import useDeviceType from '@/hooks/use-device-type'
 
-interface FormData {
-  address: string
-  city: string
-  country: string
-  postalCode: string
-  tenure: string
-  title_number?: number
-  agreeTerms: boolean
-}
+import { productDetailsSchema } from '@/features/product-details/schema'
 
 const TenureInfo = () => {
   const router = useRouter()
@@ -39,13 +32,13 @@ const TenureInfo = () => {
     watch,
     handleSubmit,
     getValues,
-  } = useFormContext<FormData>()
+  } = useFormContext<z.infer<typeof productDetailsSchema>>()
 
   const selectedTenure = watch('tenure')
 
   const deviceType = useDeviceType()
 
-  const onSubmit: SubmitHandler<FormData> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof productDetailsSchema>> = (data) => {
     const queryObject = {
       address: data.address,
       city: data.city,
@@ -66,7 +59,7 @@ const TenureInfo = () => {
           <RadioGroup
             className='flex sm:flex-row sm:items-center items-start gap-4 flex-col flex-wrap'
             defaultValue={getValues('tenure')}
-            onValueChange={(value) => setValue('tenure', value)}
+            onValueChange={(value) => setValue('tenure', value as 'freehold' | 'leasehold' | 'not-sure')}
           >
             <div className='flex items-center space-x-2'>
               <RadioGroupItem

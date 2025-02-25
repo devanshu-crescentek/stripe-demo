@@ -8,32 +8,11 @@ import * as z from 'zod'
 import { Form } from '@/components/ui/form'
 
 import TenureInfo from '@/features/product-details/components/tenure-info'
-
-const schema = z.object({
-  address: z.string().nonempty('Address is required'),
-  city: z.string().nonempty('City is required'),
-  country: z.string().nonempty('State is required'),
-  postalCode: z.string().nonempty('Postal Code is required'),
-  tenure: z.enum(['freehold', 'leasehold', 'not-sure'], {
-    required_error: 'Please select an option.',
-  }),
-  title_number: z
-    .union([
-      z.number(),
-      z
-        .string()
-        .length(0)
-        .transform(() => undefined),
-    ])
-    .optional(),
-  agreeTerms: z.boolean().refine((val) => val === true, {
-    message: 'You must agree to the Terms and Privacy Policy.',
-  }),
-})
+import { productDetailsSchema } from '@/features/product-details/schema'
 
 const ProductDetails = () => {
-  const methods = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const methods = useForm<z.infer<typeof productDetailsSchema>>({
+    resolver: zodResolver(productDetailsSchema),
     defaultValues: {
       address: '',
       city: '',
