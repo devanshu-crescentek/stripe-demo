@@ -48,12 +48,15 @@ const ProductDetails = () => {
     <Form {...methods}>
       <FormProvider {...methods}>
         <form>
-          <div className='container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12'>
-            <div>
-              <AddressInfo />
-            </div>
-            <div>
-              <TenureInfo />
+          <div className='h-full mb-10'>
+            <div className='container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12'>
+              <div>
+                <AddressInfo />
+              </div>
+
+              <div>
+                <TenureInfo />
+              </div>
             </div>
           </div>
         </form>

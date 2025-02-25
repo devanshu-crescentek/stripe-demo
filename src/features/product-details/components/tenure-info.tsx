@@ -58,13 +58,13 @@ const TenureInfo = () => {
 
   return (
     <>
-      <Card className='mb-4'>
+      <Card className={`mb-4 ${deviceType === 'mobile' ? 'mb-32' : ''}`}>
         <CardHeader className='md:text-[30px] text-[15px] leading-[15px] font-medium'>
           Tenure *
         </CardHeader>
         <CardContent>
           <RadioGroup
-            className='flex space-x-6'
+            className='flex sm:flex-row sm:items-center items-start gap-4 flex-col flex-wrap'
             defaultValue={getValues('tenure')}
             onValueChange={(value) => setValue('tenure', value)}
           >
