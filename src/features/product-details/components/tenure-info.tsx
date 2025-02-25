@@ -147,10 +147,7 @@ const TenureInfo = () => {
                     </FormControl>
                     <div className='space-y-1 leading-none'>
                       <FormLabel>
-                        I agree to the{' '}
-                        <span className='text-black'>
-                          Terms and Privacy Policy
-                        </span>
+                        I agree to the Terms and Privacy Policy
                       </FormLabel>
                     </div>
                   </FormItem>
@@ -188,10 +185,7 @@ const TenureInfo = () => {
                   </FormControl>
                   <div className='space-y-1 leading-none'>
                     <FormLabel>
-                      I agree to the{' '}
-                      <span className='text-black'>
-                        Terms and Privacy Policy
-                      </span>
+                      I agree to the Terms and Privacy Policy
                     </FormLabel>
                   </div>
                 </FormItem>
