@@ -43,7 +43,7 @@ const ProductLoaderDetails = () => {
         <CardContent className='md:p-[71px] p-[25px] flex flex-col items-center justify-center h-full'>
           <div className='relative flex items-center justify-center md:w-[90px] w-[55px] md:h-[90px] h-[55px]'>
             <Image
-              src='/ownership-docs.png' // Replace with actual icon/image
+              src='/ownership-docs.png'
               alt='Documents Icon'
               width={64}
               height={64}

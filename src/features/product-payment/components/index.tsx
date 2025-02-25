@@ -7,8 +7,9 @@ import * as z from 'zod'
 
 import { loadStripe } from '@stripe/stripe-js'
 import { Edit } from 'lucide-react'
-import { Button } from '../../../components/ui/button'
+import { Elements } from '@stripe/react-stripe-js'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -22,10 +23,12 @@ import {
 } from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Input } from '../../../components/ui/input'
-import { Elements } from '@stripe/react-stripe-js'
+import { Input } from '@/components/ui/input'
+
+import CheckoutPage from '@/features/product-payment/components/checkout-page'
+
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
-import CheckOutPage from './CheckOutPage'
+
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -392,7 +395,7 @@ const PaymentSection = () => {
                       mode: 'payment',
                     }}
                   >
-                    <CheckOutPage amount={totalAmount} />
+                    <CheckoutPage amount={totalAmount} />
                   </Elements>
                 </div>
               </div>
