@@ -210,6 +210,7 @@ const TenureInfo = () => {
                   <FormControl>
                     <Checkbox
                       checked={field.value}
+                       className='data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
