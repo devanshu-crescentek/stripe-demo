@@ -212,7 +212,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         </>
       )}
       {deviceType === 'mobile' && (
-        <div className='flex items-center justify-between gap-6 mb-52'>
+        <div className='flex items-center justify-between gap-6'>
           {/* Secure Payment Text */}
           <h2 className='md:text-[20px] text-[15px] font-semibold whitespace-nowrap'>
             Secure Payment

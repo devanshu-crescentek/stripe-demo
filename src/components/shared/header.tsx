@@ -14,7 +14,7 @@ export default function Header() {
           {/* Text Content */}
           <Link href="/">
            <Image src="/logo.png" alt="LandRegistry Logo" width={200} height={200}/>
-            <p className="text-sm text-gray-300">
+            <p className="md:text-[18px] text-[14px] md:leading-[30px] leading-[20px] text-white font-medium mt-2">
               Access Official Land Registry Records Online
             </p>
           </Link>

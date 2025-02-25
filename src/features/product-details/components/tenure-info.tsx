@@ -51,7 +51,7 @@ const TenureInfo = () => {
 
   return (
     <>
-      <Card className={`mb-4 ${deviceType === 'mobile' ? 'mb-32' : ''}`}>
+      <Card className={`mb-4`}>
         <CardHeader className='md:text-[30px] text-[15px] leading-[15px] font-medium'>
           Tenure *
         </CardHeader>

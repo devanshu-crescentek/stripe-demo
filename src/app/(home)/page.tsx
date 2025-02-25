@@ -1,15 +1,8 @@
-'use client'
+import Home from '@/features/home/components'
+import React from 'react'
 
-import PaymentSection from '@/features/product-payment/components'
-
-if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-  throw new Error('Missing NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY')
+const page = () => {
+  return <Home />
 }
 
-export default function Home() {
-  return (
-    <>
-      <PaymentSection />
-    </>
-  )
-}
+export default page
