@@ -1,11 +1,10 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { redirect, useSearchParams } from 'next/navigation'
 
 import { Card, CardContent } from '@/components/ui/card'
 import Image from 'next/image'
-
 
 const ProductLoaderDetails = () => {
   const searchParams = useSearchParams()
@@ -14,6 +13,15 @@ const ProductLoaderDetails = () => {
   const city = searchParams.get('city') || ''
   const country = searchParams.get('country') || ''
   const postalCode = searchParams.get('postalCode') || ''
+
+  useEffect(() => {
+    const delay = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000
+    const timer = setTimeout(() => {
+      redirect('/product-payment')
+    }, delay)
+
+    return () => clearTimeout(timer) // Cleanup function to prevent memory leaks
+  }, [])
 
   return (
     <div className='h-fit container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12 lg:pt-10 md:pt-5 pt-0 pb-10'>

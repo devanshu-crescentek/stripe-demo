@@ -1,7 +1,17 @@
+'use client'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
 import DocCard from './doc-card'
 import FaqCard from './faq-card'
 
 const Home = () => {
+  const router = useRouter()
+
+  const handleNavigate = () => {
+    router.push('/details')
+  }
+
   return (
     <div className='h-full'>
       <div className='md:py-16 sm:py-10 py-9 bg-white'>
@@ -26,13 +36,16 @@ const Home = () => {
 
             {/* Help Link */}
             <p className='mt-2 text-[#0d6efd] text-[12px] font-bold mb-6'>
-              <a href='#' className='underline'>
+              <Link href='/details' className='underline'>
                 Don’t know the Postcode? Enter the address manually &gt;&gt;
-              </a>
+              </Link>
             </p>
 
             {/* Search Button */}
-            <button className='mt-4 w-full bg-green-600 text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700'>
+            <button
+              className='mt-4 w-full bg-green-600 text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700'
+              onClick={handleNavigate}
+            >
               Search Title Documents
               <span>&#8594;</span>
             </button>
@@ -62,6 +75,7 @@ const Home = () => {
           },
         ]}
         btnTitle='Get Title Register Now'
+        handleNavigate={handleNavigate}
       />
       <DocCard
         cardBgColor='bg-white'
@@ -74,12 +88,14 @@ const Home = () => {
           },
         ]}
         btnTitle='Get Title Plan Now'
+        handleNavigate={handleNavigate}
       />
       <DocCard
         cardBgColor='bg-[#F3F2F1]'
         cardTitle='Conveyancing Pack'
         cardDes='The pack contains all available; Lease Deeds, Transfer Deeds, Conveyancing Deeds and Charge (Mortgage) documents available for the selected property or land.'
         btnTitle='Get Conveyance Plan Now'
+        handleNavigate={handleNavigate}
       />
       <DocCard
         cardBgColor='bg-white'
@@ -87,6 +103,7 @@ const Home = () => {
         cardDes='Our online Land Registry services are available 24/7 to everyone, including commercial and public organizations as well as individuals. Easily request property and land title deeds through our website and we’ll email electronic copies of the title deed documents to you the same day.'
         cardSubDes='You can also access the Land Registry Title Register and Title Plan on our site, which provide comprehensive details including property boundaries, owner information, a physical description of the property, and specifics like restrictive covenants and easements.'
         btnTitle='Access Registry Documents Now'
+        handleNavigate={handleNavigate}
       />
       <DocCard
         cardBgColor='bg-[#F3F2F1]'
@@ -94,6 +111,7 @@ const Home = () => {
         cardDes='The Title Plan may show features (such as parts of the land coloured differently, or edged in various colours) with no explanation on the plan itself, it is therefore often difficult to determine the full extent of the Title deeds. These features will always be explained in the Title Register document.'
         cardSubDes='Such features would usually relate to areas over which the property has a right of way, or areas of land that may have been removed from the Title Plan. We would, therefore, recommend that you purchase the Title Plan & Register at the same time.'
         btnTitle='Get title Documents Now'
+        handleNavigate={handleNavigate}
       />
       <DocCard
         cardBgColor='bg-white'
@@ -115,8 +133,9 @@ const Home = () => {
           },
         ]}
         btnTitle='Get Land Registry Documents'
+        handleNavigate={handleNavigate}
       />
-      <FaqCard/>
+      <FaqCard />
     </div>
   )
 }

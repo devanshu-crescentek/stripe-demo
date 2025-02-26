@@ -8,6 +8,7 @@ const DocCard = ({
   pointInfo,
   btnTitle,
   titleLeading = false,
+  handleNavigate,
 }: {
   cardBgColor: string
   cardTitle?: string
@@ -19,13 +20,16 @@ const DocCard = ({
   }[]
   btnTitle?: string
   titleLeading?: boolean
+  handleNavigate?: () => void
 }) => {
   return (
     <div className={`${cardBgColor} md:py-16 sm:py-10 py-9`}>
       <div className='container w-full mx-auto px-4 sm:px-6 lg:gap-12'>
         {' '}
         <h2
-          className={`md:text-[40px] text-[30px] font-semibold ${titleLeading ? 'md:leading-[50px] leading-[35px]' : 'leading-[30px]'} max-w-3xl`}
+          className={`md:text-[40px] text-[30px] font-semibold ${
+            titleLeading ? 'md:leading-[50px] leading-[35px]' : 'leading-[30px]'
+          } max-w-3xl`}
         >
           {cardTitle}
         </h2>
@@ -57,7 +61,10 @@ const DocCard = ({
           </div>
         )}
         {btnTitle && (
-          <button className='mt-6 w-fit p-[20px] h-[58px] md:text-[20px] text-[16px] bg-green-600  text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700'>
+          <button
+            className='mt-6 w-fit p-[20px] h-[58px] md:text-[20px] text-[16px] bg-green-600  text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700'
+            onClick={handleNavigate}
+          >
             {btnTitle}
             <span>&#8594;</span>
           </button>

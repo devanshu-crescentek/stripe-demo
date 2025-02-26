@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import {
   FUNDING,
   PayPalButtons,
   PayPalScriptProvider,
 } from '@paypal/react-paypal-js'
+import { useFormContext } from 'react-hook-form'
 
 interface PaypalButtonProps {
   amount: string
@@ -11,6 +11,35 @@ interface PaypalButtonProps {
 }
 
 const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
+  const { handleSubmit } = useFormContext()
+
+  // Function to validate form before creating order
+  const validateAndCreateOrder = async () => {
+    return new Promise<string>((resolve, reject) => {
+      handleSubmit(
+        async () => {
+          // If form validation succeeds, create the order
+          resolve(
+            JSON.stringify({
+              intent: 'CAPTURE',
+              purchase_units: [
+                {
+                  amount: {
+                    value: amount,
+                    currency_code: 'USD',
+                  },
+                },
+              ],
+            })
+          )
+        },
+        () => {
+          reject(console.log('Form validation failed'))
+        }
+      )()
+    })
+  }
+
   return (
     <PayPalScriptProvider
       options={{
@@ -19,7 +48,7 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
       }}
     >
       <PayPalButtons
-      className='w-full h-[40px]'
+        className='w-full h-[40px]'
         style={{
           shape: 'rect',
           layout: 'vertical',
@@ -28,33 +57,31 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
           height: 40,
         }}
         fundingSource={FUNDING.PAYPAL}
-        createOrder={(data, action) => {
-          return action.order.create({
-            intent: 'CAPTURE',
-            purchase_units: [
-              {
-                amount: {
-                  value: amount,
-                  currency_code: 'USD',
-                },
-              },
-            ],
-          })
+        createOrder={async (_, actions) => {
+          try {
+            const orderData = await validateAndCreateOrder()
+            return actions.order.create(JSON.parse(orderData))
+          } catch (error) {
+            console.log('🚀 ~ Error creating order:', error)
+            return Promise.reject(error)
+          }
         }}
-        onApprove={(data, actions) => {
+        onApprove={async (data, actions) => {
           if (!actions.order) {
             console.error('Order actions are undefined')
-            return Promise.resolve() // Ensure a Promise<void> is always returned
+            return Promise.resolve()
           }
 
           return actions.order
             .capture()
             .then((details) => {
               console.log('🚀 ~ Order captured successfully:', details)
-              onSuccess && onSuccess(details)
+              if (onSuccess) {
+                onSuccess(details)
+              }
             })
             .catch((error) => {
-              console.error('🚀 ~ Error capturing order:', error)
+              console.log('🚀 ~ Error capturing order:', error)
             })
         }}
       />
