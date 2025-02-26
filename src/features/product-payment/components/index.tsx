@@ -29,7 +29,6 @@ import CheckoutPage from '@/features/product-payment/components/checkout-page'
 
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
 
-
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
@@ -101,7 +100,6 @@ const PaymentSection = () => {
       .filter((doc) => selectedDocs.includes(doc.id))
       .reduce((sum, doc) => sum + doc.price, 0) +
     (selectedDelivery === 'express' ? 10 : 0)
-
 
   return (
     <>
@@ -272,9 +270,13 @@ const PaymentSection = () => {
                             <div className='flex items-center justify-between w-full cursor-pointer'>
                               Standard
                               <span
-                                className={`font-medium md:text-[20px] text-[16px] leading-[30px] `}
+                                className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center'
                                 onClick={() => setValue('delivery', 'standard')}
                               >
+                                <span className='relative text-black text-sm'>
+                                  £4.99
+                                  <span className='absolute left-0 top-1/2 w-full h-[1px] bg-red-500'></span>
+                                </span>
                                 Free
                               </span>
                             </div>
@@ -283,9 +285,12 @@ const PaymentSection = () => {
                         {selectedDelivery === 'standard' && (
                           <div className='mt-2 text-[#6B6B6B]'>
                             <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px]'>
-                              Standard delivery are sent to you email within 1
-                              UK business day.
+                              Your documents will be delivered via email within
+                              1 business day (Monday-Friday, 8 AM-5 PM). If you
+                              don’t receive your order, please check your junk
+                              or spam folder.
                             </p>
+                            {/* <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px]'></p> */}
 
                             <FormField
                               control={form.control}
@@ -332,10 +337,14 @@ const PaymentSection = () => {
                             <div className='flex items-center justify-between w-full cursor-pointer'>
                               Express
                               <span
-                                className={`font-medium md:text-[20px] text-[16px] leading-[30px] `}
+                                className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col`}
                                 onClick={() => setValue('delivery', 'express')}
                               >
-                                £10.00
+                                <span className='relative text-black text-sm'>
+                                  £14.99
+                                  <span className='absolute left-0 top-1/2 w-full h-[1px] bg-red-500'></span>
+                                </span>
+                                £9.99
                               </span>
                             </div>
                           </Label>

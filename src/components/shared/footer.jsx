@@ -1,4 +1,4 @@
-import { FaArrowUp } from 'react-icons/fa'
+import Link from 'next/link'
 
 const Footer = () => {
   return (
@@ -6,18 +6,19 @@ const Footer = () => {
       <div className='container w-full mx-auto px-4 sm:px-6 flex flex-shrink sm:items-start items-center sm:justify-start justify-center flex-grow gap-8 text-gray-800'>
         {/* Left Section */}
         <div className='sm:flex flex-col flex-wrap w-[25%] hidden'>
-          <a href='#' className='pb-2 text-[16px] font-normal'>
+          <Link href='/' className='pb-2 text-[16px] font-normal'>
             Home
-          </a>
-          <a href='#' className='pb-2 text-[16px] font-normal'>
+          </Link>
+
+          <Link href='/' className='pb-2 text-[16px] font-normal'>
             Title Document
-          </a>
-          <a href='#' className='pb-2 text-[16px] font-normal'>
+          </Link>
+          <Link href='#' className='pb-2 text-[16px] font-normal'>
             Title Deed
-          </a>
-          <a href='#' className='pb-2 text-[16px] font-normal'>
+          </Link>
+          <Link href='#' className='pb-2 text-[16px] font-normal'>
             Conveyancing Pack
-          </a>
+          </Link>
         </div>
 
         {/* Center Section */}
@@ -59,57 +60,57 @@ const Footer = () => {
 
         {/* Right Section */}
         <div className='sm:flex flex-col flex-wrap items-end text-center w-[25%] hidden'>
-          <a
-            href='#'
+          <Link
+            href='/privacy-policy'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
           >
             Privacy Policy
-          </a>
-          <a
-            href='#'
+          </Link>
+          <Link
+            href='/cookies-policy'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
           >
             Cookies Policy
-          </a>
-          <a
-            href='#'
+          </Link>
+          <Link
+            href='/terms-conditions'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
           >
             Terms & Conditions
-          </a>
+          </Link>
         </div>
       </div>
       <div className='container w-full mx-auto px-4 sm:px-6 flex sm:hidden items-center justify-between gap-8 text-gray-800 mb-4'>
         <div className='flex flex-col flex-wrap w-[50%]'>
-          <a href='#' className='pb-2 text-[16px] font-normal'>
+          <Link href='/' className='pb-2 text-[16px] font-normal'>
             Home
-          </a>
-          <a href='#' className='pb-2 text-[16px] font-normal'>
+          </Link>
+          <Link href='/' className='pb-2 text-[16px] font-normal'>
             Title Document
-          </a>
-          <a href='#' className='pb-2 text-[16px] font-normal'>
+          </Link>
+          <Link href='/faq' className='pb-2 text-[16px] font-normal'>
             FAQ
-          </a>
+          </Link>
         </div>
         <div className='flex flex-col flex-wrap items-end text-center w-[50%]'>
-          <a
-            href='#'
+          <Link
+             href='/privacy-policy'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
           >
             Privacy Policy
-          </a>
-          <a
-            href='#'
+          </Link>
+          <Link
+           href='/cookies-policy'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
           >
             Cookies Policy
-          </a>
-          <a
-            href='#'
+          </Link>
+          <Link
+            href='/terms-conditions'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
           >
             Terms & Conditions
-          </a>
+          </Link>
         </div>
       </div>
       <div className='container w-full mx-auto px-4 sm:px-6 flex sm:hidden items-center justify-center gap-8 text-gray-800'>
