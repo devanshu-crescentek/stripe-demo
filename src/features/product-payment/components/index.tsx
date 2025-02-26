@@ -97,8 +97,21 @@ const PaymentSection = () => {
   } = form
 
   useEffect(() => {
-    if (form.formState.errors.selectedDocs && window.innerWidth < 1024) {
-      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (form.formState.errors.selectedDocs) {
+      // Only apply effect on screens smaller than 1024px
+      if (window.innerWidth < 1024 && cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+  
+        // Check if the card is already visible in the viewport
+        const isFullyVisible = rect.top >= 0 && rect.bottom <= windowHeight;
+  
+        if (!isFullyVisible) {
+          setTimeout(() => {
+            cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 1000);
+        }
+      }
     }
   }, [form.formState.errors.selectedDocs]);
 
