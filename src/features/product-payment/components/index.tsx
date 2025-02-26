@@ -1,13 +1,15 @@
 'use client'
+import { useEffect, useRef } from 'react'
+
 import Image from 'next/image'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, FormProvider } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
+import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { Edit } from 'lucide-react'
-import { Elements } from '@stripe/react-stripe-js'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -21,9 +23,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Input } from '@/components/ui/input'
 
 import CheckoutPage from '@/features/product-payment/components/checkout-page'
 
@@ -78,6 +80,8 @@ const schema = z.object({
 })
 
 const PaymentSection = () => {
+  const cardRef = useRef<HTMLDivElement | null>(null)
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -91,6 +95,12 @@ const PaymentSection = () => {
     setValue,
     formState: { errors },
   } = form
+
+  useEffect(() => {
+    if (form.formState.errors.selectedDocs && window.innerWidth < 1024) {
+      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [form.formState.errors.selectedDocs]);
 
   const selectedDocs = form.watch('selectedDocs')
   const selectedDelivery = form.watch('delivery')
@@ -146,7 +156,7 @@ const PaymentSection = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className='mb-6'>
+                  <Card className={`mb-6 transition-all duration-500 ${form.formState.errors.selectedDocs ? 'border border-red-500 shadow-md' : 'border'}`} ref={cardRef}>
                     <CardHeader className='font-semibold md:text-[30px] text-[18px] leading-[23px] text-[#222222]'>
                       Select Your Documents
                     </CardHeader>
@@ -197,9 +207,9 @@ const PaymentSection = () => {
                             control={form.control}
                             name='selectedDocs'
                             render={({ field }) => (
-                              <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4'>
+                              <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4 '>
                                 <div className='space-y-1 leading-none'>
-                                  <FormLabel className='font-semibold text-[18px] mb-2'>
+                                  <FormLabel className='font-semibold text-[18px] mb-2 text-black'>
                                     <p className='font-semibold text-[18px] mb-2'>
                                       {doc.name}
                                     </p>
@@ -208,7 +218,7 @@ const PaymentSection = () => {
                                     {doc.description}
                                   </FormDescription>
                                 </div>
-                                <FormLabel className='font-semibold text-[20px]'>
+                                <FormLabel className='font-semibold text-[20px] text-black'>
                                   £{doc.price.toFixed(2)}
                                 </FormLabel>
                                 <FormControl>
@@ -286,9 +296,12 @@ const PaymentSection = () => {
                           <div className='text-[#6B6B6B]'>
                             <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
                               Your documents will be delivered via email within
-                              <b className='text-[#28A745]'> 1 business day</b> (Monday-Friday, 8 AM-5 PM). If you
-                              don’t receive your order, please check your junk
-                              or spam folder.
+                              <b className='text-[#28A745]'>
+                                {' '}
+                                1 business day
+                              </b>{' '}
+                              (Monday-Friday, 8 AM-5 PM). If you don’t receive
+                              your order, please check your junk or spam folder.
                             </p>
 
                             <FormField
@@ -351,10 +364,13 @@ const PaymentSection = () => {
                         {selectedDelivery === 'express' && (
                           <div className='text-[#6B6B6B]'>
                             <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
-                              Your documents will be delivered via email within 
-                              <b className='text-[#28A745]'> 1 business hour</b> (Monday–Friday, 8 AM–5 PM). If you
-                              don’t receive your order, please check your junk
-                              or spam folder.
+                              Your documents will be delivered via email within
+                              <b className='text-[#28A745]'>
+                                {' '}
+                                1 business hour
+                              </b>{' '}
+                              (Monday–Friday, 8 AM–5 PM). If you don’t receive
+                              your order, please check your junk or spam folder.
                             </p>
 
                             <FormField

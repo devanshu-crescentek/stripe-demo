@@ -170,16 +170,15 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
               {/* Show Google Pay / Apple Pay Button if available */}
               {paymentRequestAvailable && deviceType == 'desktop' && (
                 <div className='mb-4 justify-center gap-4 hidden md:flex'>
-                  <div className='w-full h-[40px] mb-0'>
+                  <div className='w-full flex items-center gap-4 h-[40px] mb-0'>
                     <ExpressCheckoutElement
                       onClick={(resolve) =>
                         handleSubmit(() => onClick(resolve))()
                       }
                       onConfirm={() => onSubmit()}
                       options={expressCheckoutOptions}
+                      className='w-full h-[40px]'
                     />
-                  </div>
-                  <div className='w-full h-[40px] mb-0'>
                     <PaypalButton
                       amount={amount.toString()}
                       onSuccess={handlePaypalSuccess}
@@ -243,15 +242,13 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         <div className='fixed block md:hidden bottom-0 left-0 w-full border shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] rounded-t-xl p-4 bg-white'>
           {/* Payment Methods */}
           <div className='flex justify-between space-x-3 mb-3'>
-            <div className='w-full h-[40px] mb-0'>
-              {/* <PaymentRequestButtonElement options={{ paymentRequest }} /> */}
+            <div className='w-full flex items-center gap-4 h-[40px] mb-0'>
               <ExpressCheckoutElement
                 onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
                 onConfirm={() => onSubmit()}
                 options={expressCheckoutOptions}
+                className='w-full h-[40px]'
               />
-            </div>
-            <div className='w-full h-[40px] mb-0'>
               <PaypalButton
                 amount={amount.toString()}
                 onSuccess={handlePaypalSuccess}

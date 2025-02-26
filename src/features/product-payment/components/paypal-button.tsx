@@ -10,7 +10,7 @@ interface PaypalButtonProps {
   onSuccess?: (details: unknown) => void
 }
 
-const PaypalButton = ({ amount,onSuccess }: PaypalButtonProps) => {
+const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
   return (
     <PayPalScriptProvider
       options={{
@@ -19,17 +19,18 @@ const PaypalButton = ({ amount,onSuccess }: PaypalButtonProps) => {
       }}
     >
       <PayPalButtons
-      style={{
-        shape: "rect",
-        layout: "vertical",
-        color: "gold",
-        label: "paypal",
-        height: 40,
-      }}
+      className='w-full h-[40px]'
+        style={{
+          shape: 'rect',
+          layout: 'vertical',
+          color: 'gold',
+          label: 'paypal',
+          height: 40,
+        }}
         fundingSource={FUNDING.PAYPAL}
         createOrder={(data, action) => {
           return action.order.create({
-            intent:'CAPTURE',
+            intent: 'CAPTURE',
             purchase_units: [
               {
                 amount: {
@@ -51,7 +52,6 @@ const PaypalButton = ({ amount,onSuccess }: PaypalButtonProps) => {
             .then((details) => {
               console.log('🚀 ~ Order captured successfully:', details)
               onSuccess && onSuccess(details)
-              
             })
             .catch((error) => {
               console.error('🚀 ~ Error capturing order:', error)
