@@ -175,7 +175,7 @@ const PaymentSection = () => {
                                   />
                                 </FormControl>
                                 <div className='space-y-1 leading-none'>
-                                  <FormLabel className='text-[20px] font-semibold leading-[30px] peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
+                                  <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
                                     {doc.name} - £{doc.price}
                                   </FormLabel>
                                   <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
@@ -283,14 +283,13 @@ const PaymentSection = () => {
                           </Label>
                         </div>
                         {selectedDelivery === 'standard' && (
-                          <div className='mt-2 text-[#6B6B6B]'>
-                            <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px]'>
+                          <div className='text-[#6B6B6B]'>
+                            <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
                               Your documents will be delivered via email within
-                              1 business day (Monday-Friday, 8 AM-5 PM). If you
+                              <b className='text-[#28A745]'> 1 business day</b> (Monday-Friday, 8 AM-5 PM). If you
                               don’t receive your order, please check your junk
                               or spam folder.
                             </p>
-                            {/* <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px]'></p> */}
 
                             <FormField
                               control={form.control}
@@ -302,7 +301,7 @@ const PaymentSection = () => {
                                       type='email'
                                       placeholder='Enter Your Email Address'
                                       {...field}
-                                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
                                         form.formState.errors.userEmail
                                           ? 'border-red-500'
                                           : ''
@@ -350,10 +349,12 @@ const PaymentSection = () => {
                           </Label>
                         </div>
                         {selectedDelivery === 'express' && (
-                          <div className='mt-2 text-[#6B6B6B]'>
-                            <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px]'>
-                              Standard delivery are sent to you email within 1
-                              UK business day.
+                          <div className='text-[#6B6B6B]'>
+                            <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
+                              Your documents will be delivered via email within 
+                              <b className='text-[#28A745]'> 1 business hour</b> (Monday–Friday, 8 AM–5 PM). If you
+                              don’t receive your order, please check your junk
+                              or spam folder.
                             </p>
 
                             <FormField
@@ -366,7 +367,7 @@ const PaymentSection = () => {
                                       type='email'
                                       placeholder='Enter Your Email Address'
                                       {...field}
-                                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
                                         form.formState.errors.userEmail
                                           ? 'border-red-500'
                                           : ''
