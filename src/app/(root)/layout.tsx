@@ -11,8 +11,8 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'Stripe Payment Demo',
-  description: 'Next.js Stripe Payment Demo',
+  title: 'Land Registry & Title Register Deeds in England, Wales & Scotland',
+  description: 'Land Registry & Title Register Deeds in England, Wales & Scotland',
 }
 
 export default function RootLayout({
