@@ -64,7 +64,7 @@ const TenureInfo = () => {
 
   return (
     <>
-      <Card className={`mb-4`}>
+      <Card className={`md:mb-4 mb-[160px]`}>
         <CardHeader className='md:text-[30px] text-[15px] leading-[15px] font-medium'>
           Tenure *
         </CardHeader>

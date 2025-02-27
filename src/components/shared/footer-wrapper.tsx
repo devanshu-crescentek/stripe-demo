@@ -7,7 +7,7 @@ export default function FooterWrapper() {
   const pathname = usePathname()
 
   // Check if current path is /product-payment
-  const hideFooter = pathname === '/product-payment'
+  const hideFooter = pathname === '/product-payment' || pathname === '/details'
 
   return (
     <div className={hideFooter ? 'hidden md:block' : ''}>

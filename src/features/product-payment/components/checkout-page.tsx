@@ -11,7 +11,7 @@ import convertToSubCurrency from '@/lib/convertToSubCurrency'
 import {
   ExpressCheckoutElement,
   useElements,
-  useStripe
+  useStripe,
 } from '@stripe/react-stripe-js'
 import { useFormContext } from 'react-hook-form'
 
@@ -251,7 +251,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       {paymentRequestAvailable && deviceType === 'mobile' && (
         <div className='fixed block md:hidden bottom-0 left-0 w-full border shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] rounded-t-xl p-4 bg-white'>
           {/* Payment Methods */}
-          <div className='flex justify-between space-x-3 mb-3'>
+          <div className='flex justify-between items-center flex-wrap gap-4 mb-3'>
             <div className='w-full flex items-center gap-4 h-[40px] mb-0'>
               <ExpressCheckoutElement
                 onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
@@ -259,6 +259,8 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                 options={expressCheckoutOptions}
                 className='w-full h-[40px]'
               />
+            </div>
+            <div className='w-full flex items-center gap-4 h-[40px] mb-0'>
               <PaypalButton
                 amount={amount.toString()}
                 onSuccess={handlePaypalSuccess}

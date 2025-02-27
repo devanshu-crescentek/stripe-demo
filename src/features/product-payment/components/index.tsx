@@ -49,7 +49,7 @@ const documents = [
   {
     id: 'title-plan',
     name: 'Title Plan',
-    price: 19.99,
+    price: 24.99,
     required: false,
     description:
       'A visual representation of the property or land in a registered title. Consider purchasing the Title Register for details.',
