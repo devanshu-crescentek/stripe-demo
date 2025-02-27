@@ -8,9 +8,13 @@ interface AddressState {
   selectedAddress: {
     address?: string
     city?: string
-    county?: string
-    postcode?: string
+    country?: string
+    postalCode?: string
   } | null
+  tenure_info: {
+    tenure?: string | null
+    titleNumber?: number | null
+  }
 }
 
 const initialState: AddressState = {
@@ -18,6 +22,10 @@ const initialState: AddressState = {
   loading: false,
   error: null,
   selectedAddress: null,
+  tenure_info: {
+    tenure: null,
+    titleNumber: null,
+  },
 }
 
 const addressSlice = createSlice({
@@ -29,17 +37,30 @@ const addressSlice = createSlice({
       action: PayloadAction<{
         address?: string
         city?: string
-        county?: string
-        postcode?: string
-      } | null> 
+        country?: string
+        postalCode?: string
+      } | null>
     ) => {
-      state.selectedAddress = action.payload ?? null;
+      state.selectedAddress = action.payload ?? null
+    },
+    setTenureInfo: (
+      state,
+      action: PayloadAction<{
+        tenure?: string | null
+        titleNumber?: number | null
+      }>
+    ) => {
+      state.tenure_info = action.payload
     },
     resetAddress: (state) => {
       state.data = []
       state.loading = false
       state.error = null
       state.selectedAddress = null
+      state.tenure_info = {
+        tenure: null,
+        titleNumber: null,
+      }
     },
   },
   extraReducers: (builder) => {
@@ -68,6 +89,7 @@ const addressSlice = createSlice({
   },
 })
 
-export const { resetAddress ,setSelectedAddress} = addressSlice.actions
+export const { resetAddress, setSelectedAddress, setTenureInfo } =
+  addressSlice.actions
 
 export default addressSlice.reducer

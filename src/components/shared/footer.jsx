@@ -63,18 +63,21 @@ const Footer = () => {
           <Link
             href='/privacy-policy'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
+            target='_blank'
           >
             Privacy Policy
           </Link>
           <Link
             href='/cookies-policy'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
+            target='_blank'
           >
             Cookies Policy
           </Link>
           <Link
             href='/terms-conditions'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
+            target='_blank'
           >
             Terms & Conditions
           </Link>
@@ -94,20 +97,23 @@ const Footer = () => {
         </div>
         <div className='flex flex-col flex-wrap items-end text-center w-[50%]'>
           <Link
-             href='/privacy-policy'
+            href='/privacy-policy'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
+            target='_blank'
           >
             Privacy Policy
           </Link>
           <Link
-           href='/cookies-policy'
+            href='/cookies-policy'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
+            target='_blank'
           >
             Cookies Policy
           </Link>
           <Link
             href='/terms-conditions'
             className='pb-2 text-[16px] font-normal text-center flex items-center'
+            target='_blank'
           >
             Terms & Conditions
           </Link>

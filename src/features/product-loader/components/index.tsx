@@ -15,7 +15,7 @@ const ProductLoaderDetails = () => {
   const postalCode = searchParams.get('postalCode') || ''
 
   useEffect(() => {
-    const delay = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000
+    const delay = Math.floor(Math.random() * 5) + 1;
     const timer = setTimeout(() => {
       redirect('/product-payment')
     }, delay)

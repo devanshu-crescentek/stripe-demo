@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+
+
 import { useFormContext } from 'react-hook-form'
 import { Edit } from 'lucide-react'
 
@@ -15,15 +18,25 @@ import { Button } from '@/components/ui/button'
 import { useAppSelector } from '@/store/hook'
 
 const AddressInfo = () => {
-  const data = useAppSelector((state) => state.address.selectedAddress) || false
-  const { control, formState, watch } = useFormContext()
   const [isEdit, setIsEdit] = useState(true)
+  const searchParams = useSearchParams()
+
+  const isEditParams = searchParams.get('isEdit')
+
+  const { control, formState, watch } = useFormContext()
+  const data = useAppSelector((state) => state.address.selectedAddress) || false
 
   useEffect(() => {
     if (data) {
       setIsEdit(false)
     }
   }, [data])
+
+  useEffect(() => {
+    if (isEditParams === 'true') {
+      setIsEdit(true)
+    }
+  }, [isEditParams])
 
   return (
     <Card>

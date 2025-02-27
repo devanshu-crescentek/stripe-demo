@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 import { SubmitHandler, useFormContext } from 'react-hook-form'
 import { z } from 'zod'
@@ -21,9 +22,12 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import useDeviceType from '@/hooks/use-device-type'
 
 import { productDetailsSchema } from '@/features/product-details/schema'
+import { useAppDispatch } from '@/store/hook'
+import { setSelectedAddress, setTenureInfo } from '@/store/slices/address-slice'
 
 const TenureInfo = () => {
   const router = useRouter()
+  const dispatch = useAppDispatch()
 
   const {
     formState: { errors },
@@ -34,19 +38,28 @@ const TenureInfo = () => {
     getValues,
   } = useFormContext<z.infer<typeof productDetailsSchema>>()
 
-  const selectedTenure = watch('tenure')
+  const selectedTenure = getValues('tenure')
 
   const deviceType = useDeviceType()
 
-  const onSubmit: SubmitHandler<z.infer<typeof productDetailsSchema>> = (data) => {
-    const queryObject = {
-      address: data.address,
-      city: data.city,
-      country: data.country,
-      postalCode: data.postalCode,
-    }
-    const queryString = new URLSearchParams(queryObject).toString()
-    router.push(`/search-result?${queryString}`)
+  const onSubmit: SubmitHandler<z.infer<typeof productDetailsSchema>> = (
+    data
+  ) => {
+    dispatch(
+      setTenureInfo({
+        tenure: data.tenure,
+        titleNumber: data.title_number ? data.title_number : undefined,
+      })
+    )
+    dispatch(
+      setSelectedAddress({
+        address: data.address,
+        city: data.city,
+        country: data.country,
+        postalCode: data.postalCode,
+      })
+    )
+    router.push(`/search-result`)
   }
 
   return (
@@ -58,8 +71,10 @@ const TenureInfo = () => {
         <CardContent>
           <RadioGroup
             className='flex sm:items-center items-start sm:gap-4 gap-2 flex-wrap'
-            defaultValue={getValues('tenure')}
-            onValueChange={(value) => setValue('tenure', value as 'freehold' | 'leasehold' | 'not-sure')}
+            defaultValue={watch('tenure')}
+            onValueChange={(value) =>
+              setValue('tenure', value as 'freehold' | 'leasehold' | 'not-sure')
+            }
           >
             <div className='flex items-center gap-2'>
               <RadioGroupItem
@@ -73,7 +88,7 @@ const TenureInfo = () => {
               />
               <Label
                 htmlFor='freehold'
-                className={`md:text-[20px] text-[15px] leading-[30px] font-normal ${
+                className={`md:text-[20px] text-[15px] leading-[30px] font-normal cursor-pointer ${
                   selectedTenure === 'freehold'
                     ? 'text-[#28A745]'
                     : 'text-[#000000]'
@@ -94,7 +109,7 @@ const TenureInfo = () => {
               />
               <Label
                 htmlFor='leasehold'
-                className={`md:text-[20px] text-[15px] leading-[30px] font-normal ${
+                className={`md:text-[20px] text-[15px] leading-[30px] font-normal cursor-pointer ${
                   selectedTenure === 'leasehold'
                     ? 'text-[#28A745]'
                     : 'text-[#000000]'
@@ -115,7 +130,7 @@ const TenureInfo = () => {
               />
               <Label
                 htmlFor='not-sure'
-                className={`md:text-[20px] text-[15px] leading-[30px] font-normal ${
+                className={`md:text-[20px] text-[15px] leading-[30px] font-normal cursor-pointer ${
                   selectedTenure === 'not-sure'
                     ? 'text-[#28A745]'
                     : 'text-[#000000]'
@@ -170,7 +185,22 @@ const TenureInfo = () => {
                     </FormControl>
                     <div className='space-y-1 leading-none'>
                       <FormLabel>
-                        I agree to the Terms and Privacy Policy
+                        I agree to the{' '}
+                        <Link
+                          className='text-[#89c120] font-bold'
+                          href='/terms-conditions'
+                          target='_blank'
+                        >
+                          Terms
+                        </Link>{' '}
+                        and{' '}
+                        <Link
+                          className='text-[#89c120] font-bold'
+                          href='/privacy-policy'
+                          target='_blank'
+                        >
+                          Privacy Policy
+                        </Link>
                       </FormLabel>
                     </div>
                   </FormItem>
@@ -203,13 +233,28 @@ const TenureInfo = () => {
                   <FormControl>
                     <Checkbox
                       checked={field.value}
-                       className='data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                      className='data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
                   <div className='space-y-1 leading-none'>
                     <FormLabel>
-                      I agree to the Terms and Privacy Policy
+                      I agree to the{' '}
+                      <Link
+                        className='text-[#89c120] font-bold'
+                        href='/terms-conditions'
+                        target='_blank'
+                      >
+                        Terms
+                      </Link>{' '}
+                      and{' '}
+                      <Link
+                        className='text-[#89c120] font-bold'
+                        href='/privacy-policy'
+                        target='_blank'
+                      >
+                        Privacy Policy
+                      </Link>
                     </FormLabel>
                   </div>
                 </FormItem>

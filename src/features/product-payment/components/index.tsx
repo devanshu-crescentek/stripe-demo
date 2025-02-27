@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react'
 
 import Image from 'next/image'
+import { redirect, useRouter } from 'next/navigation'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -30,6 +31,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import CheckoutPage from '@/features/product-payment/components/checkout-page'
 
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
+import { useAppSelector } from '@/store/hook'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -39,7 +41,7 @@ const documents = [
   {
     id: 'title-register',
     name: 'Title Register',
-    price: 19.95,
+    price: 24.99,
     required: true,
     description:
       'Shows property ownership, description, and any restrictive covenants. For a visual of the land, consider purchasing the Title Plan.',
@@ -47,7 +49,7 @@ const documents = [
   {
     id: 'title-plan',
     name: 'Title Plan',
-    price: 19.95,
+    price: 19.99,
     required: false,
     description:
       'A visual representation of the property or land in a registered title. Consider purchasing the Title Register for details.',
@@ -55,7 +57,7 @@ const documents = [
   {
     id: 'conveyancing-pack',
     name: 'Conveyancing Pack',
-    price: 49.95,
+    price: 49.99,
     required: false,
     description:
       'The pack includes all available Lease Deeds, Transfer Deeds, Conveyancing Deeds, and Charges for the selected property.',
@@ -81,6 +83,7 @@ const schema = z.object({
 
 const PaymentSection = () => {
   const cardRef = useRef<HTMLDivElement | null>(null)
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -96,24 +99,34 @@ const PaymentSection = () => {
     formState: { errors },
   } = form
 
+  const { selectedAddress, tenure_info } =
+    useAppSelector((state) => state.address) || false
+
   useEffect(() => {
     if (form.formState.errors.selectedDocs) {
       // Only apply effect on screens smaller than 1024px
       if (window.innerWidth < 1024 && cardRef.current) {
-        const rect = cardRef.current.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-  
+        const rect = cardRef.current.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+
         // Check if the card is already visible in the viewport
-        const isFullyVisible = rect.top >= 0 && rect.bottom <= windowHeight;
-  
+        const isFullyVisible = rect.top >= 0 && rect.bottom <= windowHeight
+
         if (!isFullyVisible) {
           setTimeout(() => {
-            cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 1000);
+            cardRef.current?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            })
+          }, 1000)
         }
       }
     }
-  }, [form.formState.errors.selectedDocs]);
+  }, [form.formState.errors.selectedDocs])
+
+  if (!selectedAddress) {
+    return redirect('/')
+  }
 
   const selectedDocs = form.watch('selectedDocs')
   const selectedDelivery = form.watch('delivery')
@@ -122,321 +135,325 @@ const PaymentSection = () => {
     documents
       .filter((doc) => selectedDocs.includes(doc.id))
       .reduce((sum, doc) => sum + doc.price, 0) +
-    (selectedDelivery === 'express' ? 10 : 0)
+    (selectedDelivery === 'express' ? 9.99 : 0)
+
+  const goToDetailsPage = () => {
+    router.push('/details?isEdit=true')
+  }
 
   return (
     <>
       <Form {...form}>
         <FormProvider {...form}>
-          <form>
-            <div className='h-full mb-10'>
-              <div className='container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12'>
-                <div className=''>
-                  <Card className='mb-6'>
-                    <CardContent className='p-6'>
-                      <div className='flex items-center space-x-2 mb-4'>
-                        <Image
-                          src='/thumb.svg'
-                          alt='Check'
-                          width={41}
-                          className='md:w-[41px] md:h-[62px] w-[27px] h-[40px]'
-                          height={62}
-                        />
-                        <h2 className='md:text-[40px] md:leading-[50px] text-[18px] leading-[23px] font-medium text-[#1E1E1E]'>
-                          We&apos;ve found the following documents for the
-                          address
-                        </h2>
-                      </div>
+          <form className='flex-1 mb-10'>
+            <div className='container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12'>
+              <div className=''>
+                <Card className='mb-6'>
+                  <CardContent className='p-6'>
+                    <div className='flex items-center space-x-2 mb-4'>
+                      <Image
+                        src='/thumb.svg'
+                        alt='Check'
+                        width={41}
+                        className='md:w-[30px] md:h-[60px] w-[27px] h-[40px]'
+                        height={62}
+                      />
+                      <h2 className='font-semibold md:text-[30px] text-[18px] leading-[35px] text-[#222222]'>
+                        We&apos;ve found the following documents for the address
+                      </h2>
+                    </div>
 
-                      {/* Address */}
-                      <div className='flex items-start justify-between'>
-                        <p className='text-[#0B0C0C] md:text-[20px] text-[18px] leading-[30px] font-normal'>
-                          24 Boughton Rd,
-                          <br className='md:hidden block' />
-                          Wick Hill’ CA,
-                          <br className='md:hidden block' />
-                          RG40 9BL
-                          <br />
-                          Title Number: 13456
-                        </p>
-                        <Button
-                          className='bg-[#28A745] rounded-[4px] md:w-[115px] w-[94px] md:h-[49px] h-[31px] font-normal  md:text-[20px] text-[18px] leading-[30px] md:[&_svg]:size-6 [&_svg]:size-4'
-                          disabled
-                        >
-                          <Edit /> Edit
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className={`mb-6 transition-all duration-500 ${form.formState.errors.selectedDocs ? 'border border-red-500 shadow-md' : 'border'}`} ref={cardRef}>
-                    <CardHeader className='font-semibold md:text-[30px] text-[18px] leading-[23px] text-[#222222]'>
-                      Select Your Documents
-                    </CardHeader>
-                    <CardContent>
-                      <div className='hidden md:block'>
-                        {documents.map((doc) => (
-                          <FormField
-                            key={doc.id}
-                            control={form.control}
-                            name='selectedDocs'
-                            render={({ field }) => (
-                              <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value.includes(doc.id)}
-                                    className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
-                                    onCheckedChange={() => {
-                                      field.onChange(
-                                        field.value.includes(doc.id)
-                                          ? field.value.filter(
-                                              (id) => id !== doc.id
-                                            )
-                                          : [...field.value, doc.id]
-                                      )
-                                    }}
-                                  />
-                                </FormControl>
-                                <div className='space-y-1 leading-none'>
-                                  <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
-                                    {doc.name} - £{doc.price}
-                                  </FormLabel>
-                                  <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
-                                    {doc.description}
-                                  </FormDescription>
-                                </div>
-                              </FormItem>
-                            )}
-                          />
-                        ))}
-                        <FormMessage>
-                          {form.formState.errors.selectedDocs?.message}
-                        </FormMessage>
-                      </div>
-                      <div className='block md:hidden'>
-                        {documents.map((doc) => (
-                          <FormField
-                            key={doc.id}
-                            control={form.control}
-                            name='selectedDocs'
-                            render={({ field }) => (
-                              <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4 '>
-                                <div className='space-y-1 leading-none'>
-                                  <FormLabel className='font-semibold text-[18px] mb-2 text-black'>
-                                    <p className='font-semibold text-[18px] mb-2'>
-                                      {doc.name}
-                                    </p>
-                                  </FormLabel>
-                                  <FormDescription className='text-sm text-gray-600'>
-                                    {doc.description}
-                                  </FormDescription>
-                                </div>
-                                <FormLabel className='font-semibold text-[20px] text-black'>
-                                  £{doc.price.toFixed(2)}
-                                </FormLabel>
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value.includes(doc.id)}
-                                    className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
-                                    onCheckedChange={() => {
-                                      field.onChange(
-                                        field.value.includes(doc.id)
-                                          ? field.value.filter(
-                                              (id) => id !== doc.id
-                                            )
-                                          : [...field.value, doc.id]
-                                      )
-                                    }}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                        ))}
-                        <FormMessage>
-                          {form.formState.errors.selectedDocs?.message}
-                        </FormMessage>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className=''>
-                  <Card className='mb-6'>
-                    <CardContent className='p-6'>
-                      <RadioGroup
-                        defaultValue={form.getValues('delivery')}
-                        onValueChange={(value) =>
-                          setValue(
-                            'delivery',
-                            value === 'standard' ? 'standard' : 'express'
-                          )
-                        }
+                    {/* Address */}
+                    <div className='flex items-start justify-between'>
+                      <p className='text-[#0B0C0C] md:text-[20px] text-[18px] leading-[30px] font-normal'>
+                        {selectedAddress.address &&
+                          `${selectedAddress.address}, `}
+                        {selectedAddress.city && `${selectedAddress.city}, `}
+                        {selectedAddress.country &&
+                          `${selectedAddress.country}, `}
+                        <br />
+                        {selectedAddress.postalCode &&
+                          selectedAddress.postalCode}
+                        <br />
+                        {tenure_info?.titleNumber && (
+                          <>Title Number: {tenure_info.titleNumber}</>
+                        )}
+                      </p>
+                      <Button
+                        type='button'
+                        className='bg-[#28A745] hover:bg-green-700 rounded-[4px] md:w-[115px] w-[94px] md:h-[49px] h-[31px] font-normal  md:text-[20px] text-[18px] leading-[30px] md:[&_svg]:size-6 [&_svg]:size-4'
+                        onClick={goToDetailsPage}
                       >
-                        <div className='flex items-center space-x-2'>
-                          <RadioGroupItem
-                            value='standard'
-                            id='r2'
-                            className={`peer ${
-                              selectedDelivery === 'standard'
-                                ? 'text-[#28A745] border-[#28A745] [&_svg]:fill-[#28A745]'
-                                : 'text-[#000] border-[#000]'
-                            } md:h-5 h-[18px] md:w-5 w-[18px] md:[&_svg]:h-[12px] [&_svg]:h-[10px] md:[&_svg]:w-[12px] [&_svg]:w-[10px]`}
-                          />
-                          <Label
-                            htmlFor='r2'
-                            className={`font-semibold flex items-center justify-between w-full cursor-pointer md:text-[20px] text-[16px] md:leading-[23px] leading-[30px] ${
-                              selectedDelivery === 'standard'
-                                ? 'text-[#28A745]'
-                                : 'text-[#000000]'
-                            }`}
-                          >
-                            <div className='flex items-center justify-between w-full cursor-pointer'>
-                              Standard
-                              <span
-                                className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center'
-                                onClick={() => setValue('delivery', 'standard')}
-                              >
-                                <span className='relative text-black text-sm'>
-                                  £4.99
-                                  <span className='absolute left-0 top-1/2 w-full h-[1px] bg-red-500'></span>
-                                </span>
-                                Free
-                              </span>
-                            </div>
-                          </Label>
-                        </div>
-                        {selectedDelivery === 'standard' && (
-                          <div className='text-[#6B6B6B]'>
-                            <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
-                              Your documents will be delivered via email within
-                              <b className='text-[#28A745]'>
-                                {' '}
-                                1 business day
-                              </b>{' '}
-                              (Monday-Friday, 8 AM-5 PM). If you don’t receive
-                              your order, please check your junk or spam folder.
-                            </p>
+                        <Edit /> Edit
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
 
-                            <FormField
-                              control={form.control}
-                              name='userEmail'
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      type='email'
-                                      placeholder='Enter Your Email Address'
-                                      {...field}
-                                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
-                                        form.formState.errors.userEmail
-                                          ? 'border-red-500'
-                                          : ''
-                                      }`}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                <Card
+                  className={`mb-6 transition-all duration-500 ${
+                    form.formState.errors.selectedDocs
+                      ? 'border border-red-500 shadow-md'
+                      : 'border'
+                  }`}
+                  ref={cardRef}
+                >
+                  <CardHeader className='font-semibold md:text-[30px] text-[18px] leading-[23px] text-[#222222]'>
+                    Select Your Documents
+                  </CardHeader>
+                  <CardContent>
+                    <div className='hidden md:block'>
+                      {documents.map((doc) => (
+                        <FormField
+                          key={doc.id}
+                          control={form.control}
+                          name='selectedDocs'
+                          render={({ field }) => (
+                            <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value.includes(doc.id)}
+                                  className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                                  onCheckedChange={() => {
+                                    field.onChange(
+                                      field.value.includes(doc.id)
+                                        ? field.value.filter(
+                                            (id) => id !== doc.id
+                                          )
+                                        : [...field.value, doc.id]
+                                    )
+                                  }}
+                                />
+                              </FormControl>
+                              <div className='space-y-1 leading-none'>
+                                <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'>
+                                  {doc.name} - £{doc.price}
+                                </FormLabel>
+                                <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
+                                  {doc.description}
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                      <FormMessage>
+                        {form.formState.errors.selectedDocs?.message}
+                      </FormMessage>
+                    </div>
+                    <div className='block md:hidden'>
+                      {documents.map((doc) => (
+                        <FormField
+                          key={doc.id}
+                          control={form.control}
+                          name='selectedDocs'
+                          render={({ field }) => (
+                            <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4 '>
+                              <div className='space-y-1 leading-none cursor-pointer'>
+                                <FormLabel className='font-semibold text-[18px] mb-2 text-black'>
+                                  <p className='font-semibold text-[18px] mb-2'>
+                                    {doc.name}
+                                  </p>
+                                </FormLabel>
+                                <FormDescription className='text-sm text-gray-600'>
+                                  {doc.description}
+                                </FormDescription>
+                              </div>
+                              <FormLabel className='font-semibold text-[20px] text-black'>
+                                £{doc.price.toFixed(2)}
+                              </FormLabel>
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value.includes(doc.id)}
+                                  className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                                  onCheckedChange={() => {
+                                    field.onChange(
+                                      field.value.includes(doc.id)
+                                        ? field.value.filter(
+                                            (id) => id !== doc.id
+                                          )
+                                        : [...field.value, doc.id]
+                                    )
+                                  }}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                      <FormMessage>
+                        {form.formState.errors.selectedDocs?.message}
+                      </FormMessage>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              <div className=''>
+                <Card className='mb-6'>
+                  <CardContent className='p-6'>
+                    <RadioGroup
+                      defaultValue={form.getValues('delivery')}
+                      onValueChange={(value) =>
+                        setValue(
+                          'delivery',
+                          value === 'standard' ? 'standard' : 'express'
+                        )
+                      }
+                    >
+                      <div className='flex items-center space-x-2'>
+                        <RadioGroupItem
+                          value='standard'
+                          id='r2'
+                          className={`peer ${
+                            selectedDelivery === 'standard'
+                              ? 'text-[#28A745] border-[#28A745] [&_svg]:fill-[#28A745]'
+                              : 'text-[#000] border-[#000]'
+                          } md:h-5 h-[18px] md:w-5 w-[18px] md:[&_svg]:h-[12px] [&_svg]:h-[10px] md:[&_svg]:w-[12px] [&_svg]:w-[10px]`}
+                        />
+                        <Label
+                          htmlFor='r2'
+                          className={`font-semibold flex items-center justify-between w-full cursor-pointer md:text-[20px] text-[16px] md:leading-[23px] leading-[30px] ${
+                            selectedDelivery === 'standard'
+                              ? 'text-[#28A745]'
+                              : 'text-[#000000]'
+                          }`}
+                        >
+                          <div className='flex items-center justify-between w-full cursor-pointer'>
+                            Standard
+                            <span
+                              className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center'
+                              onClick={() => setValue('delivery', 'standard')}
+                            >
+                              Free
+                            </span>
                           </div>
-                        )}
-                        <div className='border-t border-[#000000] opacity-10 my-4'></div>
-                        <div className='flex items-center space-x-2'>
-                          <RadioGroupItem
-                            value='express'
-                            id='r3'
-                            className={`peer ${
-                              selectedDelivery === 'express'
-                                ? 'text-[#28A745] border-[#28A745] [&_svg]:fill-[#28A745]'
-                                : 'text-[#000] border-[#000]'
-                            } md:h-5 h-[18px] md:w-5 w-[18px] md:[&_svg]:h-[12px] [&_svg]:h-[10px] md:[&_svg]:w-[12px] [&_svg]:w-[10px]`}
+                        </Label>
+                      </div>
+                      {selectedDelivery === 'standard' && (
+                        <div className='text-[#6B6B6B]'>
+                          <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
+                            Your documents will be delivered via email within
+                            <b className='text-[#28A745]'>
+                              {' '}
+                              1 business day
+                            </b>{' '}
+                            (Monday-Friday, 8 AM-5 PM). If you don’t receive
+                            your order, please check your junk or spam folder.
+                          </p>
+
+                          <FormField
+                            control={form.control}
+                            name='userEmail'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input
+                                    type='email'
+                                    placeholder='Enter Your Email Address'
+                                    {...field}
+                                    className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                                      form.formState.errors.userEmail
+                                        ? 'border-red-500'
+                                        : ''
+                                    }`}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
                           />
-                          <Label
-                            htmlFor='r3'
-                            className={`font-semibold flex items-center justify-between w-full cursor-pointer md:text-[20px] text-[16px] md:leading-[23px] leading-[30px] ${
-                              selectedDelivery === 'express'
-                                ? 'text-[#28A745]'
-                                : 'text-[#000000]'
-                            }`}
-                          >
-                            <div className='flex items-center justify-between w-full cursor-pointer'>
-                              Express
-                              <span
-                                className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col`}
-                                onClick={() => setValue('delivery', 'express')}
-                              >
-                                <span className='relative text-black text-sm'>
-                                  £14.99
-                                  <span className='absolute left-0 top-1/2 w-full h-[1px] bg-red-500'></span>
-                                </span>
-                                £9.99
-                              </span>
-                            </div>
-                          </Label>
                         </div>
-                        {selectedDelivery === 'express' && (
-                          <div className='text-[#6B6B6B]'>
-                            <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
-                              Your documents will be delivered via email within
-                              <b className='text-[#28A745]'>
-                                {' '}
-                                1 business hour
-                              </b>{' '}
-                              (Monday–Friday, 8 AM–5 PM). If you don’t receive
-                              your order, please check your junk or spam folder.
-                            </p>
-
-                            <FormField
-                              control={form.control}
-                              name='userEmail'
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      type='email'
-                                      placeholder='Enter Your Email Address'
-                                      {...field}
-                                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
-                                        form.formState.errors.userEmail
-                                          ? 'border-red-500'
-                                          : ''
-                                      }`}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                        )}
-                      </RadioGroup>
-
-                      {errors.delivery && (
-                        <p className='text-red-500 text-sm'>
-                          {errors.delivery.message}
-                        </p>
                       )}
-                    </CardContent>
-                  </Card>
-                  <Elements
-                    stripe={stripePromise}
-                    options={{
-                      appearance: {
-                        theme: 'stripe',
-                        variables: {
-                          borderRadius: '4px',
-                        },
+                      <div className='border-t border-[#000000] opacity-10 my-4'></div>
+                      <div className='flex items-center space-x-2'>
+                        <RadioGroupItem
+                          value='express'
+                          id='r3'
+                          className={`peer ${
+                            selectedDelivery === 'express'
+                              ? 'text-[#28A745] border-[#28A745] [&_svg]:fill-[#28A745]'
+                              : 'text-[#000] border-[#000]'
+                          } md:h-5 h-[18px] md:w-5 w-[18px] md:[&_svg]:h-[12px] [&_svg]:h-[10px] md:[&_svg]:w-[12px] [&_svg]:w-[10px]`}
+                        />
+                        <Label
+                          htmlFor='r3'
+                          className={`font-semibold flex items-center justify-between w-full cursor-pointer md:text-[20px] text-[16px] md:leading-[23px] leading-[30px] ${
+                            selectedDelivery === 'express'
+                              ? 'text-[#28A745]'
+                              : 'text-[#000000]'
+                          }`}
+                        >
+                          <div className='flex items-center justify-between w-full cursor-pointer'>
+                            Express
+                            <span
+                              className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col`}
+                              onClick={() => setValue('delivery', 'express')}
+                            >
+                              £9.99
+                            </span>
+                          </div>
+                        </Label>
+                      </div>
+                      {selectedDelivery === 'express' && (
+                        <div className='text-[#6B6B6B]'>
+                          <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
+                            Your documents will be delivered via email within
+                            <b className='text-[#28A745]'>
+                              {' '}
+                              1 business hour
+                            </b>{' '}
+                            (Monday–Friday, 8 AM–5 PM). If you don’t receive
+                            your order, please check your junk or spam folder.
+                          </p>
+
+                          <FormField
+                            control={form.control}
+                            name='userEmail'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input
+                                    type='email'
+                                    placeholder='Enter Your Email Address'
+                                    {...field}
+                                    className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                                      form.formState.errors.userEmail
+                                        ? 'border-red-500'
+                                        : ''
+                                    }`}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      )}
+                    </RadioGroup>
+
+                    {errors.delivery && (
+                      <p className='text-red-500 text-sm'>
+                        {errors.delivery.message}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+                <Elements
+                  stripe={stripePromise}
+                  options={{
+                    appearance: {
+                      theme: 'stripe',
+                      variables: {
+                        borderRadius: '4px',
                       },
-                      amount: convertToSubCurrency(
-                        totalAmount ? totalAmount : 1
-                      ), //cents
-                      currency: 'usd',
-                      mode: 'payment',
-                    }}
-                  >
-                    <CheckoutPage amount={totalAmount} />
-                  </Elements>
-                </div>
+                    },
+                    amount: convertToSubCurrency(totalAmount ? totalAmount : 1), //cents
+                    currency: 'usd',
+                    mode: 'payment',
+                  }}
+                >
+                  <CheckoutPage amount={totalAmount} />
+                </Elements>
               </div>
             </div>
           </form>

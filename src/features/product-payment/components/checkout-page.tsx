@@ -6,19 +6,18 @@ import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { useFormContext } from 'react-hook-form'
 import useDeviceType from '@/hooks/use-device-type'
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
 import {
   ExpressCheckoutElement,
-  PaymentElement,
   useElements,
-  useStripe,
+  useStripe
 } from '@stripe/react-stripe-js'
+import { useFormContext } from 'react-hook-form'
 
 import { Card, CardContent } from '@/components/ui/card'
-import PaypalButton from '@/features/product-payment/components/paypal-button'
 import PaymentDrawer from '@/features/product-payment/components/payment-drawer'
+import PaypalButton from '@/features/product-payment/components/paypal-button'
 
 import { paymentMethods } from '@/lib/constants'
 
@@ -126,7 +125,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
     <>
       {deviceType === 'desktop' && (
         <>
-          <Card className='mb-6'>
+          {/* <Card className='mb-6'>
             <CardContent className='p-6'>
               {clientSecret && deviceType == 'desktop' && (
                 <PaymentElement options={{ layout: 'accordion' }} />
@@ -137,7 +136,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                 </div>
               )}
             </CardContent>
-          </Card>
+          </Card> */}
           <Card className='mb-6'>
             <CardContent className='p-6'>
               <div className='flex items-center justify-between gap-6'>
@@ -196,7 +195,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                 </div>
 
                 {/* Pay Button */}
-                <button
+                {/* <button
                   className='bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-[4px] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:animate-pulse w-[246px] h-[40px]'
                   disabled={isProcessing || !stripe}
                   type='button'
@@ -204,14 +203,25 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                 >
                   <span>Pay by card</span>
                   <span>→</span>
-                </button>
+                </button> */}
+                <PaymentDrawer
+                  errorMessage={errorMessage}
+                  handleSubmit={handleSubmit}
+                  isOpen={isOpen}
+                  setIsOpen={setIsOpen}
+                  isProcessing={isProcessing}
+                  stripe={stripe}
+                  onSubmit={onSubmit}
+                  setErrorMessage={setErrorMessage}
+                  setIsProcessing={setIsProcessing}
+                />
               </div>
             </CardContent>
           </Card>
         </>
       )}
       {deviceType === 'mobile' && (
-        <div className='flex items-center justify-between gap-6'>
+        <div className='flex items-center justify-between gap-6 mb-[160px]'>
           {/* Secure Payment Text */}
           <h2 className='md:text-[20px] text-[15px] font-semibold whitespace-nowrap'>
             Secure Payment

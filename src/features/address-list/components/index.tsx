@@ -26,8 +26,8 @@ const AddressList = () => {
       const payload = {
         address: item.address ? item.address[0] : '',
         city: item.city,
-        county: item.county,
-        postcode: item.postcode,
+        country: item.county,
+        postalCode: item.postcode,
       }
       dispatch(setSelectedAddress(payload))
     }else{
@@ -37,7 +37,7 @@ const AddressList = () => {
   }
 
   return (
-    <div className='h-full mb-[160px]'>
+    <div className='flex-1'>
       <div className='container mx-auto  w-full px-4 sm:px-6 lg:gap-12'>
         <h3 className='text-[1.5em] font-bold mb-[20px] mt-[40px]'>
           Search Result For : {postalCode}

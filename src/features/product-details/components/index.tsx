@@ -13,7 +13,8 @@ import { useAppSelector } from '@/store/hook'
 import { useEffect } from 'react'
 
 const ProductDetails = () => {
-  const data = useAppSelector((state) => state.address.selectedAddress) || false
+  const { selectedAddress, tenure_info } =
+    useAppSelector((state) => state.address) || false
 
   const methods = useForm<z.infer<typeof productDetailsSchema>>({
     resolver: zodResolver(productDetailsSchema),
@@ -22,33 +23,53 @@ const ProductDetails = () => {
       city: '',
       country: '',
       postalCode: '',
-      tenure: 'not-sure',
+      tenure: tenure_info.tenure as 'freehold' | 'leasehold' | 'not-sure' || 'not-sure',
       agreeTerms: false,
     },
   })
 
   useEffect(() => {
-    if (data) {
-      methods.setValue('address', data?.address ? data?.address : '')
-      methods.setValue('city', data?.city ? data?.city : '')
-      methods.setValue('country', data?.county ? data?.county : '')
-      methods.setValue('postalCode', data?.postcode ? data?.postcode : '')
+    if (selectedAddress) {
+      methods.setValue(
+        'address',
+        selectedAddress?.address ? selectedAddress?.address : ''
+      )
+      methods.setValue(
+        'city',
+        selectedAddress?.city ? selectedAddress?.city : ''
+      )
+      methods.setValue(
+        'country',
+        selectedAddress?.country ? selectedAddress?.country : ''
+      )
+      methods.setValue(
+        'postalCode',
+        selectedAddress?.postalCode ? selectedAddress?.postalCode : ''
+      )
     }
-  },[data, methods])
+    if (tenure_info) {
+      methods.setValue(
+        'title_number',
+        tenure_info?.titleNumber as number | undefined
+      )
+      methods.setValue(
+        'tenure',
+        tenure_info?.tenure as 'freehold' | 'leasehold' | 'not-sure' || 'not-sure'
+      )
+    }
+  }, [selectedAddress, methods, tenure_info])
 
   return (
     <Form {...methods}>
       <FormProvider {...methods}>
-        <form>
-          <div className='h-full mb-10'>
-            <div className='container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12'>
-              <div>
-                <AddressInfo />
-              </div>
+        <form className='flex-1 mb-10'>
+          <div className='container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12'>
+            <div>
+              <AddressInfo />
+            </div>
 
-              <div>
-                <TenureInfo />
-              </div>
+            <div>
+              <TenureInfo />
             </div>
           </div>
         </form>

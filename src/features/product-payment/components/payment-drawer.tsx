@@ -5,13 +5,13 @@ import { PaymentElement } from '@stripe/react-stripe-js'
 import { FieldValues, UseFormHandleSubmit } from 'react-hook-form'
 
 import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
 } from '@/components/ui/drawer'
 
 type PaymentDrawerProps = {
@@ -47,7 +47,7 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
         <span>Pay By Card</span>
         <span>→</span>
       </button>
-      <DrawerContent>
+      <DrawerContent className='z-[100]'>
         <DrawerHeader>
           <DrawerTitle>Card</DrawerTitle>
           <DrawerDescription>
@@ -59,17 +59,20 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
             )}
           </DrawerDescription>
         </DrawerHeader>
-        <DrawerFooter>
-          <Button
-            onClick={handleSubmit(onSubmit)}
+        <DrawerFooter className='flex items-center justify-between'>
+          <button
+            className='bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-[4px] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:animate-pulse sm:w-[246px] w-full h-[40px]'
             disabled={isProcessing || !stripe}
             type='button'
+            onClick={handleSubmit(onSubmit)}
           >
-            Pay
-          </Button>
+            <span>Pay</span>
+            <span>→</span>
+          </button>
           <DrawerClose>
             <Button
               variant='outline'
+              className='sm:w-[246px] w-full h-[40px]'
               onClick={() => {
                 setErrorMessage('')
                 setIsProcessing(false)

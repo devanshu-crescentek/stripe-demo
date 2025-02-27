@@ -1,4 +1,6 @@
 'use client'
+import { useEffect } from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -18,10 +20,8 @@ import FaqCard from '@/features/home/components/faq-card'
 import { postalCodeSchema } from '../schema'
 
 import { useGetAddressDetailsMutation } from '@/store/api/get-address'
-import { useEffect } from 'react'
 import { useAppDispatch } from '@/store/hook'
 import { resetAddress } from '@/store/slices/address-slice'
-import { toast } from 'sonner'
 
 const Home = () => {
   const router = useRouter()
@@ -48,9 +48,8 @@ const Home = () => {
     try {
       const res = await temGetAddressDetails(data.postalCode).unwrap()
       if (res.length > 0) {
-        router.push(`/search-postcode?postalCode=${data.postalCode}`)
+        router.push(`/search-postalCode?postalCode=${data.postalCode}`)
       } else {
-        toast.error('No records found')
         methods.setError('postalCode', {
           type: 'manual',
           message: 'No records found',
@@ -58,7 +57,10 @@ const Home = () => {
       }
     } catch (error) {
       console.log('🚀 ~ handleOnSubmit ~ error:', error)
-      toast.error('Something went wrong')
+      methods.setError('postalCode', {
+        type: 'manual',
+        message: 'Something went wrong',
+      })
     }
   }
 
@@ -88,7 +90,7 @@ const Home = () => {
                         <input
                           type='text'
                           {...field}
-                          placeholder='Enter your postcode here ....'
+                          placeholder='Enter your postalCode here ....'
                           className={`mt-4 w-full p-3 border border-gray-300 rounded-md focus:outline-none ${
                             methods.formState.errors.postalCode
                               ? 'border-red-500'
