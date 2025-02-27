@@ -69,7 +69,7 @@ const AddressInfo = () => {
                         <Input
                           placeholder='Enter Address'
                           {...field}
-                          className={`w-full border bg-white mt-2 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                          className={`w-full border bg-white mt-2 h-[44px] rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
                             formState.errors.address ? 'border-red-500' : ''
                           }`}
                         />
@@ -90,7 +90,7 @@ const AddressInfo = () => {
                         <Input
                           placeholder='City'
                           {...field}
-                          className={`w-full border bg-white mt-2 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                          className={`w-full border bg-white mt-2 h-[44px] rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
                             formState.errors.city ? 'border-red-500' : ''
                           }`}
                         />
@@ -111,7 +111,7 @@ const AddressInfo = () => {
                         <Input
                           placeholder='Enter County'
                           {...field}
-                          className={`w-full border bg-white mt-2 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                          className={`w-full border bg-white mt-2 h-[44px] rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
                             formState.errors.country ? 'border-red-500' : ''
                           }`}
                         />
@@ -132,7 +132,7 @@ const AddressInfo = () => {
                         <Input
                           placeholder='Postcode'
                           {...field}
-                          className={`w-full border bg-white mt-2 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                          className={`w-full border bg-white mt-2 h-[44px] rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
                             formState.errors.postalCode ? 'border-red-500' : ''
                           }`}
                         />

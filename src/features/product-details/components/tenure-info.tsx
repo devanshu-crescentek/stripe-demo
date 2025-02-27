@@ -142,7 +142,7 @@ const TenureInfo = () => {
                       placeholder='Enter Title Number (If known)'
                       {...field}
                       type='number'
-                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0`}
+                      className={`w-full border bg-white mt-2 h-[44px] rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0`}
                     />
                   </FormControl>
                 </FormItem>
