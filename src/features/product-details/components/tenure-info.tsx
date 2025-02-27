@@ -57,11 +57,11 @@ const TenureInfo = () => {
         </CardHeader>
         <CardContent>
           <RadioGroup
-            className='flex sm:flex-row sm:items-center items-start gap-4 flex-col flex-wrap'
+            className='flex sm:items-center items-start sm:gap-4 gap-2 flex-wrap'
             defaultValue={getValues('tenure')}
             onValueChange={(value) => setValue('tenure', value as 'freehold' | 'leasehold' | 'not-sure')}
           >
-            <div className='flex items-center space-x-2'>
+            <div className='flex items-center gap-2'>
               <RadioGroupItem
                 value='freehold'
                 id='freehold'
@@ -82,7 +82,7 @@ const TenureInfo = () => {
                 Freehold
               </Label>
             </div>
-            <div className='flex items-center space-x-2'>
+            <div className='flex items-center gap-2'>
               <RadioGroupItem
                 value='leasehold'
                 id='leasehold'
@@ -103,7 +103,7 @@ const TenureInfo = () => {
                 Leasehold
               </Label>
             </div>
-            <div className='flex items-center space-x-2'>
+            <div className='flex items-center gap-2'>
               <RadioGroupItem
                 value='not-sure'
                 id='not-sure'

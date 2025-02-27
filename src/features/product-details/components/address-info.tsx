@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Edit } from 'lucide-react'
 
@@ -12,10 +12,18 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useAppSelector } from '@/store/hook'
 
 const AddressInfo = () => {
+  const data = useAppSelector((state) => state.address.selectedAddress) || false
   const { control, formState, watch } = useFormContext()
   const [isEdit, setIsEdit] = useState(true)
+
+  useEffect(() => {
+    if (data) {
+      setIsEdit(false)
+    }
+  }, [data])
 
   return (
     <Card>
@@ -36,24 +44,24 @@ const AddressInfo = () => {
           ) : (
             <>
               <p className='text-[##0B0C0C] md:text-[20px] text-[14px] md:leading-[30px] leading-[21px] font-normal w-full'>
-                24 boughton Rd, Wick Hill’ CA, <br />
-                RG40 9BL 
-                <br />
                 {watch('address') && `${watch('address')}, `}
                 {watch('city') && `${watch('city')}, `}
-                {watch('country') && `${watch('country')}, `}<br/>
+                {watch('country') && `${watch('country')}, `}
+                <br />
                 {watch('postalCode') && watch('postalCode')}
               </p>
             </>
           )}
 
-          <Button
-            onClick={() => setIsEdit((prev) => !prev)}
-            type='button'
-            className='bg-[#28A745] hover:bg-green-700 rounded-[4px] md:w-[115px] w-[94px] md:h-[49px] h-[31px] font-normal  md:text-[20px] text-[18px] leading-[30px] md:[&_svg]:size-6 [&_svg]:size-4'
-          >
-            <Edit /> Edit
-          </Button>
+          {data && (
+            <Button
+              onClick={() => setIsEdit((prev) => !prev)}
+              type='button'
+              className='bg-[#28A745] hover:bg-green-700 rounded-[4px] md:w-[115px] w-[94px] md:h-[49px] h-[31px] font-normal  md:text-[20px] text-[18px] leading-[30px] md:[&_svg]:size-6 [&_svg]:size-4'
+            >
+              <Edit /> Edit
+            </Button>
+          )}
         </div>
         {isEdit && (
           <>

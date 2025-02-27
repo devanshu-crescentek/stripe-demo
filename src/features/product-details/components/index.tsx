@@ -9,8 +9,12 @@ import { Form } from '@/components/ui/form'
 
 import TenureInfo from '@/features/product-details/components/tenure-info'
 import { productDetailsSchema } from '@/features/product-details/schema'
+import { useAppSelector } from '@/store/hook'
+import { useEffect } from 'react'
 
 const ProductDetails = () => {
+  const data = useAppSelector((state) => state.address.selectedAddress) || false
+
   const methods = useForm<z.infer<typeof productDetailsSchema>>({
     resolver: zodResolver(productDetailsSchema),
     defaultValues: {
@@ -18,10 +22,19 @@ const ProductDetails = () => {
       city: '',
       country: '',
       postalCode: '',
-      tenure: 'freehold',
+      tenure: 'not-sure',
       agreeTerms: false,
     },
   })
+
+  useEffect(() => {
+    if (data) {
+      methods.setValue('address', data?.address ? data?.address : '')
+      methods.setValue('city', data?.city ? data?.city : '')
+      methods.setValue('country', data?.county ? data?.county : '')
+      methods.setValue('postalCode', data?.postcode ? data?.postcode : '')
+    }
+  },[data, methods])
 
   return (
     <Form {...methods}>

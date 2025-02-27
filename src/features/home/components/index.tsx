@@ -2,67 +2,148 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import DocCard from './doc-card'
-import FaqCard from './faq-card'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form'
+import DocCard from '@/features/home/components/doc-card'
+import FaqCard from '@/features/home/components/faq-card'
+import { postalCodeSchema } from '../schema'
+
+import { useGetAddressDetailsMutation } from '@/store/api/get-address'
+import { useEffect } from 'react'
+import { useAppDispatch } from '@/store/hook'
+import { resetAddress } from '@/store/slices/address-slice'
+import { toast } from 'sonner'
 
 const Home = () => {
   const router = useRouter()
+  const dispatch = useAppDispatch()
+
+  const methods = useForm<z.infer<typeof postalCodeSchema>>({
+    resolver: zodResolver(postalCodeSchema),
+    defaultValues: {
+      postalCode: '',
+    },
+  })
+
+  useEffect(() => {
+    dispatch(resetAddress())
+  }, [dispatch])
+
+  const [temGetAddressDetails, { isLoading }] = useGetAddressDetailsMutation()
 
   const handleNavigate = () => {
     router.push('/details')
   }
 
+  const handleOnSubmit = async (data: z.infer<typeof postalCodeSchema>) => {
+    try {
+      const res = await temGetAddressDetails(data.postalCode).unwrap()
+      if (res.length > 0) {
+        router.push(`/search-postcode?postalCode=${data.postalCode}`)
+      } else {
+        toast.error('No records found')
+        methods.setError('postalCode', {
+          type: 'manual',
+          message: 'No records found',
+        })
+      }
+    } catch (error) {
+      console.log('🚀 ~ handleOnSubmit ~ error:', error)
+      toast.error('Something went wrong')
+    }
+  }
+
   return (
     <div className='h-full'>
       <div className='md:py-16 sm:py-10 py-9 bg-white'>
-        <div className='container w-full mx-auto px-4 sm:px-6 lg:gap-12'>
-          <div className='bg-[#F3F2F1] rounded-lg text-start max-w-3xl min-h-[129px] flex justify-center items-center p-[20px]'>
-            <p className='md:text-[20px] text-[16px] md:leading-[30px] leading-[25px] font-semibold'>
-              Find information and access official electronic copies of title
-              deeds and documents for over 28 million properties in England,
-              Wales & Scotland.
-            </p>
-          </div>
-          <h2 className='md:text-[40px] text-[30px] font-semibold leading-[30px] md:mb-10 mb-2 mt-10'>
-            Search by Postcode
-          </h2>
-          <div className='md:mt-10 mt-4 w-full max-w-sm'>
-            {/* Input Box */}
-            <input
-              type='text'
-              placeholder='Enter your postcode here ....'
-              className='mt-4 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 mb-4'
-            />
+        <Form {...methods}>
+          <form onSubmit={methods.handleSubmit(handleOnSubmit)}>
+            <div className='container w-full mx-auto px-4 sm:px-6 lg:gap-12'>
+              <div className='bg-[#F3F2F1] rounded-lg text-start max-w-3xl min-h-[129px] flex justify-center items-center p-[20px]'>
+                <p className='md:text-[20px] text-[16px] md:leading-[30px] leading-[25px] font-semibold'>
+                  Find information and access official electronic copies of
+                  title deeds and documents for over 28 million properties in
+                  England, Wales & Scotland.
+                </p>
+              </div>
+              <h2 className='md:text-[40px] text-[30px] font-semibold leading-[30px] md:mb-10 mb-2 mt-10'>
+                Search by Postcode
+              </h2>
+              <div className='md:mt-10 mt-4 w-full max-w-sm'>
+                <FormField
+                  control={methods.control}
+                  name='postalCode'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <input
+                          type='text'
+                          {...field}
+                          placeholder='Enter your postcode here ....'
+                          className={`mt-4 w-full p-3 border border-gray-300 rounded-md focus:outline-none ${
+                            methods.formState.errors.postalCode
+                              ? 'border-red-500'
+                              : ''
+                          }`}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {/* Help Link */}
-            <p className='mt-2 text-[#0d6efd] text-[12px] font-bold mb-6'>
-              <Link href='/details' className='underline'>
-                Don’t know the Postcode? Enter the address manually &gt;&gt;
-              </Link>
-            </p>
+                {/* Help Link */}
+                <p className='mt-2 text-[#0d6efd] text-[12px] font-bold mb-6'>
+                  <Link href='/details' className='underline'>
+                    Don’t know the Postcode? Enter the address manually &gt;&gt;
+                  </Link>
+                </p>
 
-            {/* Search Button */}
-            <button
-              className='mt-4 w-full bg-green-600 text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700'
-              onClick={handleNavigate}
-            >
-              Search Title Documents
-              <span>&#8594;</span>
-            </button>
+                {/* Search Button */}
+                <button
+                  type='submit'
+                  className={`mt-4 w-full bg-green-600 text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
+                    isLoading
+                      ? 'bg-slate-300 opacity-50   cursor-not-allowed'
+                      : ''
+                  }`}
+                >
+                  {isLoading ? (
+                    <>
+                      <span>Please wait...</span>
+                    </>
+                  ) : (
+                    <>
+                      Search Title Document
+                      <span>&#8594;</span>
+                    </>
+                  )}
+                </button>
 
-            <p className='mt-[15px] mb-[1.6em] text-[16px] text-gray-600'>
-              By using this service, you agree to the
-              <a href='#' className='text-green-600 mx-1'>
-                terms of service
-              </a>
-              and
-              <a href='#' className='text-green-600 mx-1'>
-                privacy policy
-              </a>
-              .
-            </p>
-          </div>
-        </div>
+                <p className='mt-[15px] mb-[1.6em] text-[16px] text-gray-600'>
+                  By using this service, you agree to the
+                  <a href='#' className='text-green-600 mx-1'>
+                    terms of service
+                  </a>
+                  and
+                  <a href='#' className='text-green-600 mx-1'>
+                    privacy policy
+                  </a>
+                  .
+                </p>
+              </div>
+            </div>
+          </form>
+        </Form>
       </div>
       <DocCard
         cardBgColor='bg-[#F3F2F1]'
