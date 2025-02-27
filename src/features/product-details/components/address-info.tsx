@@ -42,15 +42,13 @@ const AddressInfo = () => {
               </p>
             </>
           ) : (
-            <>
-              <p className='text-[##0B0C0C] md:text-[20px] text-[14px] md:leading-[30px] leading-[21px] font-normal w-full'>
-                {watch('address') && `${watch('address')}, `}
-                {watch('city') && `${watch('city')}, `}
-                {watch('country') && `${watch('country')}, `}
-                <br />
-                {watch('postalCode') && watch('postalCode')}
-              </p>
-            </>
+            <p className='text-[##0B0C0C] md:text-[20px] text-[14px] md:leading-[30px] leading-[21px] font-normal w-full'>
+              {watch('address') && `${watch('address')}, `}
+              {watch('city') && `${watch('city')}, `}
+              {watch('country') && `${watch('country')}, `}
+              <br />
+              {watch('postalCode') && watch('postalCode')}
+            </p>
           )}
 
           {data && (
