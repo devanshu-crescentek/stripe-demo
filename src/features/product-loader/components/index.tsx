@@ -1,21 +1,24 @@
 'use client'
-import React, { useEffect } from 'react'
-import { Suspense } from 'react'
-import { redirect, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect } from 'react'
+
+import Image from 'next/image'
+import { redirect } from 'next/navigation'
 
 import { Card, CardContent } from '@/components/ui/card'
-import Image from 'next/image'
+import { useAppSelector } from '@/store/hook'
 
 const ProductLoaderDetails = () => {
-  const searchParams = useSearchParams()
+  const { selectedAddress } = useAppSelector(
+    (state) => state.address
+  )
 
-  const address = searchParams.get('address') || ''
-  const city = searchParams.get('city') || ''
-  const country = searchParams.get('country') || ''
-  const postalCode = searchParams.get('postalCode') || ''
+  const address = selectedAddress?.address || ''
+  const city = selectedAddress?.city || ''
+  const country = selectedAddress?.country || ''
+  const postalCode = selectedAddress?.postalCode || ''
 
   useEffect(() => {
-    const delay = Math.floor(Math.random() * 5) + 1;
+    const delay = Math.floor(Math.random() * 5) + 1
     const timer = setTimeout(() => {
       redirect('/product-payment')
     }, delay)
