@@ -6,33 +6,77 @@ import { redirect } from 'next/navigation'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { useAppSelector } from '@/store/hook'
+import { useGetCountryDetailsQuery } from '@/store/api/get-country'
+import posthog from 'posthog-js'
 
 const ProductLoaderDetails = () => {
-  const { selectedAddress } = useAppSelector(
-    (state) => state.address
-  )
+  // const router = useRouter()
+
+  const { selectedAddress } = useAppSelector((state) => state.address)
 
   const address = selectedAddress?.address || ''
   const city = selectedAddress?.city || ''
   const country = selectedAddress?.country || ''
   const postalCode = selectedAddress?.postalCode || ''
 
+  const { data } = useGetCountryDetailsQuery(
+    {
+      postcode: postalCode,
+    },
+    {
+      skip: !postalCode || postalCode === '',
+      refetchOnMountOrArgChange: true,
+    }
+  )
+
+  const countryFromApi = data?.result?.country || ''
+
+  // Second API Call: Trigger when `countryFromApi` is available
+  // const {
+  //   data: additionalData,
+  //   isLoading: isSecondLoading,
+  //   isError: isSecondError,
+  // } = useSecondQuery(
+  //   { country: countryFromApi },
+  //   {
+  //     skip: !countryFromApi,
+  //     refetchOnMountOrArgChange: true,
+  //   }
+  // );
+
+  // useEffect(() => {
+  //   if (isError || isSecondError) {
+  //     // Redirect back if any API fails
+  //     router.back();
+  //   } else if (data && additionalData) {
+  //     // Redirect to the next page when both API calls succeed
+  //     router.push("/product-payment");
+  //   }
+  // }, [data, additionalData, isError, isSecondError]);
+
   useEffect(() => {
-    const delay = Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000;
+    const delay = Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000
     const timer = setTimeout(() => {
-      redirect('/product-payment')
+      if (countryFromApi) {
+        posthog.capture('Order_Country_Details', {
+          country: countryFromApi,
+        })
+        redirect('/product-payment')
+      } else {
+        redirect('/details')
+      }
     }, delay)
 
     return () => clearTimeout(timer) // Cleanup function to prevent memory leaks
-  }, [])
+  }, [countryFromApi])
 
   return (
-    <div className='h-fit container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12 lg:pt-10 md:pt-5 pt-0 pb-10'>
+    <div className='h-fit container w-full mx-auto grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6 px-4 sm:px-6 lg:gap-12 lg:pt-10 md:pt-5 pt-10 pb-10'>
       <Card>
         <CardContent className='py-8 px-6 flex flex-col items-center justify-center gap-10 h-full'>
           <div className='w-full h-3/4'>
             <Image
-              src='/searching-web.gif' // Replace with the actual GIF path
+              src='/searching-web.gif'
               alt='Searching Animation'
               width={100}
               height={100}

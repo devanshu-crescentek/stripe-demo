@@ -37,7 +37,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const [clientSecret, setClientSecret] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
-  const [isExpressCheckout, setIsExpressCheckout] = useState(true)
+  // const [isExpressCheckout, setIsExpressCheckout] = useState(true)
 
   const deviceType = useDeviceType()
   const userEmail = watch('userEmail')
@@ -159,16 +159,14 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                   {paymentMethods.map((method, index) => (
                     <div
                       key={index}
-                      className='px-2 py-1 bg-[#e9e9e9] text-[#9c9c9c] rounded h-[22px] flex items-center justify-center'
+                      className='h-[22px] flex items-center justify-center'
                     >
                       <Image
                         width={30}
                         height={12}
                         src={method.src}
                         alt={method.alt}
-                        className={`w-[30px] ${
-                          method.alt === 'paypal' ? 'h-[12px]' : 'h-auto '
-                        }`}
+                        className={`w-[42px] h-auto`}
                       />
                     </div>
                   ))}
@@ -184,14 +182,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                     }
                     onConfirm={() => onSubmit(false)}
                     options={expressCheckoutOptions}
-                    className={`w-full gap-4 h-[40px] mb-0 ${
-                      isExpressCheckout ? 'block' : 'hidden'
-                    }`}
-                    onReady={(element) => {
-                      if (element.availablePaymentMethods?.link) {
-                        setIsExpressCheckout(false)
-                      }
-                    }}
+                    className={`w-full gap-4 h-[40px] mb-0`}
                   />
                   <PaypalButton
                     amount={amount.toString()}
@@ -226,7 +217,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         </>
       )}
       {deviceType === 'mobile' && (
-        <div className='flex items-center justify-between gap-6 mb-[160px]'>
+        <div className='flex items-center justify-between gap-6 mb-[220px]'>
           {/* Secure Payment Text */}
           <h2 className='md:text-[20px] text-[15px] font-semibold whitespace-nowrap'>
             Secure Payment
@@ -237,16 +228,14 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
             {paymentMethods.map((method, index) => (
               <div
                 key={index}
-                className='px-2 py-1 bg-[#e9e9e9] text-[#9c9c9c] rounded h-[22px] flex items-center justify-center'
+                className='h-[22px] flex items-center justify-center'
               >
                 <Image
                   width={30}
                   height={12}
                   src={method.src}
                   alt={method.alt}
-                  className={`w-[30px] ${
-                    method.alt === 'paypal' ? 'h-[12px]' : 'h-auto '
-                  }`}
+                  className={`w-[42px] h-auto`}
                 />
               </div>
             ))}
@@ -261,14 +250,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
               onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
               onConfirm={() => onSubmit(false)}
               options={expressCheckoutOptions}
-              className={`w-full gap-4 h-[40px] mb-0 ${
-                isExpressCheckout ? 'block' : 'hidden'
-              }`}
-              onReady={(element) => {
-                if (element.availablePaymentMethods?.link) {
-                  setIsExpressCheckout(false)
-                }
-              }}
+              className={`w-full gap-4 h-[40px] mb-0`}
             />
             <PaypalButton
               amount={amount.toString()}

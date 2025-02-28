@@ -350,7 +350,7 @@ const PaymentSection = () => {
                           }`}
                         >
                           <div className='flex items-center justify-between w-full cursor-pointer'>
-                            Standard
+                            Standard Delivery
                             <span
                               className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center'
                               onClick={() => setValue('delivery', 'standard')}
@@ -425,7 +425,7 @@ const PaymentSection = () => {
                           }`}
                         >
                           <div className='flex items-center justify-between w-full cursor-pointer'>
-                            Express
+                            Express Delivery
                             <span
                               className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col`}
                               onClick={() => setValue('delivery', 'express')}

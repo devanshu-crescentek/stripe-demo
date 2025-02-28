@@ -1,10 +1,10 @@
 export const paymentMethods = [
-  { src: '/payment-icons/paypal.svg', alt: 'paypal' },
-  { src: '/payment-icons/stripe.svg', alt: 'stripe' },
-  { src: '/payment-icons/visa.svg', alt: 'visa' },
-  { src: '/payment-icons/master-card.svg', alt: 'master-card' },
-  { src: '/payment-icons/a-express.png', alt: 'american-express' },
-  { src: '/payment-icons/apple-pay.png', alt: 'Apple Pay' },
-  { src: '/payment-icons/g-pay.png', alt: 'gpay' },
-  { src: '/payment-icons/card.png', alt: 'Card' },
+  { src: '/icons/paypal.svg', alt: 'paypal' },
+  { src: '/icons/Stripe.svg', alt: 'stripe' },
+  { src: '/icons/visa.svg', alt: 'visa' },
+  { src: '/icons/master-card.svg', alt: 'master-card' },
+  { src: '/icons/a-express.svg', alt: 'american-express' },
+  { src: '/icons/apple-pay.svg', alt: 'Apple Pay' },
+  { src: '/icons/g-pay.svg', alt: 'gpay' },
+  { src: '/icons/Card.svg', alt: 'Card' },
 ]
