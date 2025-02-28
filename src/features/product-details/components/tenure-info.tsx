@@ -219,7 +219,7 @@ const TenureInfo = () => {
               onClick={handleSubmit(onSubmit)}
               className='w-full bg-green-600 hover:bg-green-700'
             >
-              Find Title Documents Now →
+              Search Now →
             </Button>
           </CardContent>
         </Card>
@@ -274,7 +274,7 @@ const TenureInfo = () => {
             onClick={handleSubmit(onSubmit)}
             className='w-full bg-green-600 hover:bg-green-700'
           >
-            Find Title Documents Now →
+            Search Now →
           </Button>
         </div>
       )}

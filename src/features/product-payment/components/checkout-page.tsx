@@ -31,14 +31,14 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const elements = useElements()
   const router = useRouter()
 
-  const { handleSubmit, getValues, watch } = useFormContext()
+  const { handleSubmit, watch } = useFormContext()
 
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [clientSecret, setClientSecret] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
-  const [isExpressCheckout, setIsExpressCheckout] = useState(false)
+  const [isExpressCheckout, setIsExpressCheckout] = useState(true)
 
   const deviceType = useDeviceType()
   const email = watch('email')
@@ -85,7 +85,9 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
     resolve(options)
   }
 
-  const onSubmit = async (isPayByCard: boolean): Promise<JSX.Element | undefined> => {
+  const onSubmit = async (
+    isPayByCard: boolean
+  ): Promise<JSX.Element | undefined> => {
     setIsProcessing(true)
 
     if (!stripe || !elements) {
@@ -101,7 +103,8 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
     }
 
     posthog.identify(Math.random().toString(36).substring(2, 6).toUpperCase(), {
-      email: getValues('email'),
+      email: email,
+      name: email,
     })
     if (isPayByCard) {
       posthog.capture('Pay by card')
@@ -188,27 +191,22 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
               <div className='border-t border-[#000000] opacity-10 my-4'></div>
               {/* Show Google Pay / Apple Pay Button if available */}
               {paymentRequestAvailable && deviceType == 'desktop' && (
-                <div className='mb-4 justify-center gap-4 hidden md:flex'>
-                  {isExpressCheckout && (
-                    <ExpressCheckoutElement
-                      onClick={(resolve) =>
-                        handleSubmit(() => onClick(resolve))()
+                <div className='mb-4 justify-center gap-2 hidden md:flex w-full'>
+                  <ExpressCheckoutElement
+                    onClick={(resolve) =>
+                      handleSubmit(() => onClick(resolve))()
+                    }
+                    onConfirm={() => onSubmit(false)}
+                    options={expressCheckoutOptions}
+                    className={`w-full gap-4 h-[40px] mb-0 ${
+                      isExpressCheckout ? 'block' : 'hidden'
+                    }`}
+                    onReady={(element) => {
+                      if (element.availablePaymentMethods?.link) {
+                        setIsExpressCheckout(false)
                       }
-                      onConfirm={() => onSubmit(false)}
-                      options={expressCheckoutOptions}
-                      className='w-full flex items-center gap-4 h-[40px] mb-0'
-                      onReady={(element) => {
-                        if (
-                          element.availablePaymentMethods?.amazonPay ||
-                          element.availablePaymentMethods?.applePay ||
-                          element.availablePaymentMethods?.googlePay ||
-                          element.availablePaymentMethods?.paypal
-                        ) {
-                          setIsExpressCheckout(true)
-                        }
-                      }}
-                    />
-                  )}
+                    }}
+                  />
                   <PaypalButton
                     amount={amount.toString()}
                     onSuccess={handlePaypalSuccess}
@@ -272,25 +270,20 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       {paymentRequestAvailable && deviceType === 'mobile' && (
         <div className='fixed block md:hidden bottom-0 left-0 w-full border shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] rounded-t-xl p-4 bg-white'>
           {/* Payment Methods */}
-          <div className='flex justify-between items-center flex-wrap gap-4 mb-3'>
-            {isExpressCheckout && (
-              <ExpressCheckoutElement
-                onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
-                onConfirm={() => onSubmit(false)}
-                options={expressCheckoutOptions}
-                className='w-full flex items-center gap-4 h-[40px] mb-0'
-                onReady={(element) => {
-                  if (
-                    element.availablePaymentMethods?.amazonPay ||
-                    element.availablePaymentMethods?.applePay ||
-                    element.availablePaymentMethods?.googlePay ||
-                    element.availablePaymentMethods?.paypal
-                  ) {
-                    setIsExpressCheckout(true)
-                  }
-                }}
-              />
-            )}
+          <div className='flex justify-between items-center flex-wrap gap-4 mb-3 w-full'>
+            <ExpressCheckoutElement
+              onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
+              onConfirm={() => onSubmit(false)}
+              options={expressCheckoutOptions}
+              className={`w-full gap-4 h-[40px] mb-0 ${
+                isExpressCheckout ? 'block' : 'hidden'
+              }`}
+              onReady={(element) => {
+                if (element.availablePaymentMethods?.link) {
+                  setIsExpressCheckout(false)
+                }
+              }}
+            />
             <PaypalButton
               amount={amount.toString()}
               onSuccess={handlePaypalSuccess}
