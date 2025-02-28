@@ -32,6 +32,7 @@ import CheckoutPage from '@/features/product-payment/components/checkout-page'
 
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
 import { useAppSelector } from '@/store/hook'
+import { validEmailRegex } from '@/lib/utils'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -116,7 +117,7 @@ const PaymentSection = () => {
         selectedDelivery,
       })
     }
-  }, [selectedDelivery])
+  }, [])
 
   useEffect(() => {
     posthog.capture('Selected Title Register')
@@ -245,9 +246,11 @@ const PaymentSection = () => {
                                       )
 
                                       if (isChecked) {
-                                        posthog.capture(`De-Selected ${doc.name}`);
+                                        posthog.capture(
+                                          `De-Selected ${doc.name}`
+                                        )
                                       } else {
-                                        posthog.capture(`Selected ${doc.name}`);
+                                        posthog.capture(`Selected ${doc.name}`)
                                       }
                                     }}
                                   />
@@ -378,7 +381,17 @@ const PaymentSection = () => {
                                   <Input
                                     type='email'
                                     placeholder='Enter Your Email Address'
-                                    {...field}
+                                    onChange={(e) => {
+                                      field.onChange(e)
+                                      if (
+                                        e.target.value.length > 0 &&
+                                        e.target.value.match(validEmailRegex)
+                                      ) {
+                                        posthog.capture('Enter Email id', {
+                                          email: e.target.value,
+                                        })
+                                      }
+                                    }}
                                     className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
                                       form.formState.errors.userEmail
                                         ? 'border-red-500'
@@ -444,6 +457,17 @@ const PaymentSection = () => {
                                     type='email'
                                     placeholder='Enter Your Email Address'
                                     {...field}
+                                    onChange={(e) => {
+                                      field.onChange(e)
+                                      if (
+                                        e.target.value.length > 0 &&
+                                        e.target.value.match(validEmailRegex)
+                                      ) {
+                                        posthog.capture('Enter Email id', {
+                                          email: e.target.value,
+                                        })
+                                      }
+                                    }}
                                     className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
                                       form.formState.errors.userEmail
                                         ? 'border-red-500'

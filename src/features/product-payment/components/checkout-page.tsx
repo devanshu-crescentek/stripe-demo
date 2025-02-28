@@ -4,23 +4,22 @@
 import Image from 'next/image'
 import { JSX, useEffect, useState } from 'react'
 
-import { useRouter } from 'next/navigation'
-import posthog from 'posthog-js'
-import { useFormContext } from 'react-hook-form'
 import {
   ExpressCheckoutElement,
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
+import { useRouter } from 'next/navigation'
+import posthog from 'posthog-js'
+import { useFormContext } from 'react-hook-form'
 
 import { Card, CardContent } from '@/components/ui/card'
 import PaymentDrawer from '@/features/product-payment/components/payment-drawer'
 import PaypalButton from '@/features/product-payment/components/paypal-button'
 
-import { paymentMethods } from '@/lib/constants'
 import useDeviceType from '@/hooks/use-device-type'
+import { paymentMethods } from '@/lib/constants'
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
-import { validEmailRegex } from '@/lib/utils'
 
 const expressCheckoutOptions = {
   buttonHeight: 40,
@@ -41,7 +40,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const [isExpressCheckout, setIsExpressCheckout] = useState(true)
 
   const deviceType = useDeviceType()
-  const email = watch('email')
+  const userEmail = watch('userEmail')
 
   useEffect(() => {
     if (!stripe || !amount) return
@@ -68,16 +67,6 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       })
   }, [amount])
 
-  useEffect(() => {
-    if (email?.length > 0 && email?.match(validEmailRegex)) {
-      const timeout = setTimeout(() => {
-        posthog.capture('Enter Email id', { email })
-      }, 2000)
-
-      return () => clearTimeout(timeout) // Cleanup function to reset timeout on changes
-    }
-  }, [email])
-
   const onClick = ({ resolve: resolve }: any) => {
     const options = {
       emailRequired: true,
@@ -102,10 +91,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       return
     }
 
-    posthog.identify(Math.random().toString(36).substring(2, 6).toUpperCase(), {
-      email: email,
-      name: email,
-    })
+    posthog.identify(userEmail)
     if (isPayByCard) {
       posthog.capture('Pay by card')
     }

@@ -38,6 +38,7 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(resetAddress())
+    posthog.reset(true)
   }, [dispatch])
 
   useEffect(() => {
