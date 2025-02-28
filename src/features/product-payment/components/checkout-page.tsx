@@ -2,24 +2,25 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { JSX, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
-
-import useDeviceType from '@/hooks/use-device-type'
-import convertToSubCurrency from '@/lib/convertToSubCurrency'
+import posthog from 'posthog-js'
+import { useFormContext } from 'react-hook-form'
 import {
   ExpressCheckoutElement,
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
-import { useFormContext } from 'react-hook-form'
 
 import { Card, CardContent } from '@/components/ui/card'
 import PaymentDrawer from '@/features/product-payment/components/payment-drawer'
 import PaypalButton from '@/features/product-payment/components/paypal-button'
 
 import { paymentMethods } from '@/lib/constants'
+import useDeviceType from '@/hooks/use-device-type'
+import convertToSubCurrency from '@/lib/convertToSubCurrency'
+import { validEmailRegex } from '@/lib/utils'
 
 const expressCheckoutOptions = {
   buttonHeight: 40,
@@ -30,7 +31,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const elements = useElements()
   const router = useRouter()
 
-  const { handleSubmit } = useFormContext()
+  const { handleSubmit, getValues, watch } = useFormContext()
 
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
@@ -40,6 +41,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const [isExpressCheckout, setIsExpressCheckout] = useState(false)
 
   const deviceType = useDeviceType()
+  const email = watch('email')
 
   useEffect(() => {
     if (!stripe || !amount) return
@@ -66,6 +68,16 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       })
   }, [amount])
 
+  useEffect(() => {
+    if (email?.length > 0 && email?.match(validEmailRegex)) {
+      const timeout = setTimeout(() => {
+        posthog.capture('Enter Email id', { email })
+      }, 2000)
+
+      return () => clearTimeout(timeout) // Cleanup function to reset timeout on changes
+    }
+  }, [email])
+
   const onClick = ({ resolve: resolve }: any) => {
     const options = {
       emailRequired: true,
@@ -73,7 +85,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
     resolve(options)
   }
 
-  const onSubmit = async () => {
+  const onSubmit = async (isPayByCard: boolean): Promise<JSX.Element | undefined> => {
     setIsProcessing(true)
 
     if (!stripe || !elements) {
@@ -86,6 +98,13 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       setErrorMessage(submitError.message!)
       setIsProcessing(false)
       return
+    }
+
+    posthog.identify(Math.random().toString(36).substring(2, 6).toUpperCase(), {
+      email: getValues('email'),
+    })
+    if (isPayByCard) {
+      posthog.capture('Pay by card')
     }
 
     const { error } = await stripe.confirmPayment({
@@ -175,7 +194,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                       onClick={(resolve) =>
                         handleSubmit(() => onClick(resolve))()
                       }
-                      onConfirm={() => onSubmit()}
+                      onConfirm={() => onSubmit(false)}
                       options={expressCheckoutOptions}
                       className='w-full flex items-center gap-4 h-[40px] mb-0'
                       onReady={(element) => {
@@ -257,7 +276,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
             {isExpressCheckout && (
               <ExpressCheckoutElement
                 onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
-                onConfirm={() => onSubmit()}
+                onConfirm={() => onSubmit(false)}
                 options={expressCheckoutOptions}
                 className='w-full flex items-center gap-4 h-[40px] mb-0'
                 onReady={(element) => {

@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { setSelectedAddress } from '@/store/slices/address-slice'
 import { ChevronsRight } from 'lucide-react'
 import { redirect, useRouter, useSearchParams } from 'next/navigation'
+import posthog from 'posthog-js'
 
 interface AddressItem {
   address?: string[]
@@ -29,8 +30,15 @@ const AddressList = () => {
         country: item.county,
         postalCode: item.postcode,
       }
+      posthog.capture('Selected address', {
+        address: item.address ? item.address[0] : '',
+        city: item.city,
+        country: item.county,
+        postalCode: item.postcode,
+      })
       dispatch(setSelectedAddress(payload))
-    }else{
+    } else {
+      posthog.capture('Skipped address')
       dispatch(setSelectedAddress(null))
     }
     router.push('/details')

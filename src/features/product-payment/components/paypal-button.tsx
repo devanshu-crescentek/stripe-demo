@@ -3,6 +3,7 @@ import {
   PayPalButtons,
   PayPalScriptProvider,
 } from '@paypal/react-paypal-js'
+import posthog from 'posthog-js'
 import { useFormContext } from 'react-hook-form'
 
 interface PaypalButtonProps {
@@ -60,6 +61,9 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
         createOrder={async (_, actions) => {
           try {
             const orderData = await validateAndCreateOrder()
+            posthog.capture('Pay by paypal', {
+              amount,
+            })
             return actions.order.create(JSON.parse(orderData))
           } catch (error) {
             console.log('🚀 ~ Error creating order:', error)

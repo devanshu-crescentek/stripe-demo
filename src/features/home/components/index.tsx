@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import posthog from 'posthog-js'
 
 import {
   Form,
@@ -17,7 +18,7 @@ import {
 } from '@/components/ui/form'
 import DocCard from '@/features/home/components/doc-card'
 import FaqCard from '@/features/home/components/faq-card'
-import { postalCodeSchema } from '../schema'
+import { postalCodeSchema } from '@/features/home/schema'
 
 import { useGetAddressDetailsMutation } from '@/store/api/get-address'
 import { useAppDispatch } from '@/store/hook'
@@ -33,10 +34,21 @@ const Home = () => {
       postalCode: '',
     },
   })
+  const postalCode = methods.watch('postalCode')
 
   useEffect(() => {
     dispatch(resetAddress())
   }, [dispatch])
+
+  useEffect(() => {
+    if (postalCode?.length > 0) {
+      const timeout = setTimeout(() => {
+        posthog.capture('Enter Postcode', { postalCode })
+      }, 2000)
+
+      return () => clearTimeout(timeout) // Cleanup function to reset timeout on changes
+    }
+  }, [postalCode])
 
   const [temGetAddressDetails, { isLoading }] = useGetAddressDetailsMutation()
 
@@ -47,6 +59,7 @@ const Home = () => {
   const handleOnSubmit = async (data: z.infer<typeof postalCodeSchema>) => {
     try {
       const res = await temGetAddressDetails(data.postalCode).unwrap()
+      posthog.capture('Search Postcode', { postalCode: data.postalCode })
       if (res.length > 0) {
         router.push(`/search-postalCode?postalCode=${data.postalCode}`)
       } else {
@@ -105,7 +118,13 @@ const Home = () => {
 
                 {/* Help Link */}
                 <p className='mt-2 text-[#0d6efd] text-[12px] font-bold mb-6'>
-                  <Link href='/details' className='underline'>
+                  <Link
+                    href='/details'
+                    className='underline'
+                    onClick={() => {
+                      posthog.capture('Skip Postcode')
+                    }}
+                  >
                     Don’t know the Postcode? Enter the address manually &gt;&gt;
                   </Link>
                 </p>

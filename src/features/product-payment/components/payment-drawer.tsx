@@ -1,23 +1,25 @@
-import React from 'react'
-import { Button } from '@/components/ui/button'
+import React, { JSX } from 'react'
+
 import { Stripe } from '@stripe/stripe-js'
-import { PaymentElement } from '@stripe/react-stripe-js'
+import posthog from 'posthog-js'
 import { FieldValues, UseFormHandleSubmit } from 'react-hook-form'
+
+import { Button } from '@/components/ui/button'
+import { PaymentElement } from '@stripe/react-stripe-js'
 
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
-  DrawerTitle,
+  DrawerTitle
 } from '@/components/ui/drawer'
 
 type PaymentDrawerProps = {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
-  onSubmit: (data: FieldValues) => void
+  onSubmit: (isPayByCard: boolean) => Promise<JSX.Element | undefined>
   handleSubmit: UseFormHandleSubmit<FieldValues>
   errorMessage: string
   isProcessing: boolean
@@ -38,10 +40,15 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
   setIsProcessing,
 }) => {
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer open={isOpen} onOpenChange={setIsOpen} onClose={() => {
+      posthog.capture('Dismissed pay by card')
+    }}>
       <button
         className='bg-green-500 hover:bg-green-600 text-white justify-center font-medium py-3 px-6 rounded-[4px] flex items-center space-x-2 w-[189px] h-[40px]'
-        onClick={handleSubmit(() => setIsOpen(true))}
+        onClick={handleSubmit(() => {
+          posthog.capture('Initiated pay by card')
+          setIsOpen(true)
+        })}
         type='button'
       >
         <span>Pay By Card</span>
@@ -64,23 +71,23 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
             className='bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-[4px] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:animate-pulse sm:w-[246px] w-full h-[40px]'
             disabled={isProcessing || !stripe}
             type='button'
-            onClick={handleSubmit(onSubmit)}
+            onClick={handleSubmit(() => onSubmit(true))}
           >
             <span>Pay</span>
             <span>→</span>
           </button>
-          <DrawerClose>
             <Button
               variant='outline'
               className='sm:w-[246px] w-full h-[40px]'
               onClick={() => {
                 setErrorMessage('')
+                setIsOpen(false)
+                posthog.capture('Cancelled pay by card')
                 setIsProcessing(false)
               }}
             >
               Cancel
             </Button>
-          </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

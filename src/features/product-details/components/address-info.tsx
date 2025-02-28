@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-
 import { useFormContext } from 'react-hook-form'
 import { Edit } from 'lucide-react'
+import posthog from 'posthog-js'
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
@@ -66,7 +66,10 @@ const AddressInfo = () => {
 
           {data && (
             <Button
-              onClick={() => setIsEdit((prev) => !prev)}
+              onClick={() => {
+                posthog.capture('Edit address on Address page')
+                setIsEdit((prev) => !prev)
+              }}
               type='button'
               className='bg-[#28A745] hover:bg-green-700 rounded-[4px] md:w-[115px] w-[94px] md:h-[49px] h-[31px] font-normal  md:text-[20px] text-[18px] leading-[30px] md:[&_svg]:size-6 [&_svg]:size-4'
             >

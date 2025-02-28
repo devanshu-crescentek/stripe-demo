@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
+import posthog from 'posthog-js'
 import { SubmitHandler, useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -59,6 +60,7 @@ const TenureInfo = () => {
         postalCode: data.postalCode,
       })
     )
+    posthog.capture('Search document')
     router.push(`/search-result`)
   }
 

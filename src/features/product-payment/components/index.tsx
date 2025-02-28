@@ -10,6 +10,7 @@ import * as z from 'zod'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { Edit } from 'lucide-react'
+import posthog from 'posthog-js'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -87,7 +88,7 @@ const PaymentSection = () => {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      selectedDocs: ['title-register'],
+      selectedDocs: ['title-register', 'title-plan'],
       delivery: 'standard',
       userEmail: '',
     },
@@ -98,8 +99,29 @@ const PaymentSection = () => {
     formState: { errors },
   } = form
 
+  const selectedDocs = form.watch('selectedDocs')
+  const selectedDelivery = form.watch('delivery')
+
   const { selectedAddress, tenure_info } =
     useAppSelector((state) => state.address) || false
+
+  useEffect(() => {
+    if (selectedDelivery === 'express') {
+      posthog.capture('Selected express delivery', {
+        selectedDelivery,
+      })
+    }
+    if (selectedDelivery === 'standard') {
+      posthog.capture('Selected standard delivery', {
+        selectedDelivery,
+      })
+    }
+  }, [selectedDelivery])
+
+  useEffect(() => {
+    posthog.capture('Selected Title Register')
+    posthog.capture('Selected Title plan')
+  }, [form])
 
   useEffect(() => {
     if (form.formState.errors.selectedDocs) {
@@ -127,9 +149,6 @@ const PaymentSection = () => {
     return redirect('/')
   }
 
-  const selectedDocs = form.watch('selectedDocs')
-  const selectedDelivery = form.watch('delivery')
-
   const totalAmount =
     documents
       .filter((doc) => selectedDocs.includes(doc.id))
@@ -137,6 +156,7 @@ const PaymentSection = () => {
     (selectedDelivery === 'express' ? 9.99 : 0)
 
   const goToDetailsPage = () => {
+    posthog.capture('Edit address on payment page')
     router.push('/details?isEdit=true')
   }
 
@@ -207,33 +227,42 @@ const PaymentSection = () => {
                           key={doc.id}
                           control={form.control}
                           name='selectedDocs'
-                          render={({ field }) => (
-                            <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value.includes(doc.id)}
-                                  className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
-                                  onCheckedChange={() => {
-                                    field.onChange(
-                                      field.value.includes(doc.id)
-                                        ? field.value.filter(
-                                            (id) => id !== doc.id
-                                          )
-                                        : [...field.value, doc.id]
-                                    )
-                                  }}
-                                />
-                              </FormControl>
-                              <div className='space-y-1 leading-none'>
-                                <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'>
-                                  {doc.name} - £{doc.price}
-                                </FormLabel>
-                                <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
-                                  {doc.description}
-                                </FormDescription>
-                              </div>
-                            </FormItem>
-                          )}
+                          render={({ field }) => {
+                            const isChecked = field.value.includes(doc.id)
+                            return (
+                              <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value.includes(doc.id)}
+                                    className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                                    onCheckedChange={() => {
+                                      field.onChange(
+                                        field.value.includes(doc.id)
+                                          ? field.value.filter(
+                                              (id) => id !== doc.id
+                                            )
+                                          : [...field.value, doc.id]
+                                      )
+
+                                      if (isChecked) {
+                                        posthog.capture(`De-Selected ${doc.name}`);
+                                      } else {
+                                        posthog.capture(`Selected ${doc.name}`);
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <div className='space-y-1 leading-none'>
+                                  <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'>
+                                    {doc.name} - £{doc.price}
+                                  </FormLabel>
+                                  <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
+                                    {doc.description}
+                                  </FormDescription>
+                                </div>
+                              </FormItem>
+                            )
+                          }}
                         />
                       ))}
                       <FormMessage>
