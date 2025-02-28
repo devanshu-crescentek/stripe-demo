@@ -24,7 +24,7 @@ const ProductDetails = () => {
       country: '',
       postalCode: '',
       tenure: tenure_info.tenure as 'freehold' | 'leasehold' | 'not-sure' || 'not-sure',
-      agreeTerms: false,
+      agreeTerms: true,
     },
   })
 

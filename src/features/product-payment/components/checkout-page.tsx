@@ -37,6 +37,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const [clientSecret, setClientSecret] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
+  const [isExpressCheckout, setIsExpressCheckout] = useState(false)
 
   const deviceType = useDeviceType()
 
@@ -169,20 +170,30 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
               {/* Show Google Pay / Apple Pay Button if available */}
               {paymentRequestAvailable && deviceType == 'desktop' && (
                 <div className='mb-4 justify-center gap-4 hidden md:flex'>
-                  <div className='w-full flex items-center gap-4 h-[40px] mb-0'>
+                  {isExpressCheckout && (
                     <ExpressCheckoutElement
                       onClick={(resolve) =>
                         handleSubmit(() => onClick(resolve))()
                       }
                       onConfirm={() => onSubmit()}
                       options={expressCheckoutOptions}
-                      className='w-full h-[40px]'
+                      className='w-full flex items-center gap-4 h-[40px] mb-0'
+                      onReady={(element) => {
+                        if (
+                          element.availablePaymentMethods?.amazonPay ||
+                          element.availablePaymentMethods?.applePay ||
+                          element.availablePaymentMethods?.googlePay ||
+                          element.availablePaymentMethods?.paypal
+                        ) {
+                          setIsExpressCheckout(true)
+                        }
+                      }}
                     />
-                    <PaypalButton
-                      amount={amount.toString()}
-                      onSuccess={handlePaypalSuccess}
-                    />
-                  </div>
+                  )}
+                  <PaypalButton
+                    amount={amount.toString()}
+                    onSuccess={handlePaypalSuccess}
+                  />
                 </div>
               )}
               <div className='hidden md:flex items-center justify-between'>
@@ -195,15 +206,6 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                 </div>
 
                 {/* Pay Button */}
-                {/* <button
-                  className='bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-[4px] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:animate-pulse w-[246px] h-[40px]'
-                  disabled={isProcessing || !stripe}
-                  type='button'
-                  onClick={handleSubmit(onSubmit)}
-                >
-                  <span>Pay by card</span>
-                  <span>→</span>
-                </button> */}
                 <PaymentDrawer
                   errorMessage={errorMessage}
                   handleSubmit={handleSubmit}
@@ -252,22 +254,29 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         <div className='fixed block md:hidden bottom-0 left-0 w-full border shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] rounded-t-xl p-4 bg-white'>
           {/* Payment Methods */}
           <div className='flex justify-between items-center flex-wrap gap-4 mb-3'>
-            <div className='w-full flex items-center gap-4 h-[40px] mb-0'>
+            {isExpressCheckout && (
               <ExpressCheckoutElement
                 onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
                 onConfirm={() => onSubmit()}
                 options={expressCheckoutOptions}
-                className='w-full h-[40px]'
+                className='w-full flex items-center gap-4 h-[40px] mb-0'
+                onReady={(element) => {
+                  if (
+                    element.availablePaymentMethods?.amazonPay ||
+                    element.availablePaymentMethods?.applePay ||
+                    element.availablePaymentMethods?.googlePay ||
+                    element.availablePaymentMethods?.paypal
+                  ) {
+                    setIsExpressCheckout(true)
+                  }
+                }}
               />
-            </div>
-            <div className='w-full flex items-center gap-4 h-[40px] mb-0'>
-              <PaypalButton
-                amount={amount.toString()}
-                onSuccess={handlePaypalSuccess}
-              />
-            </div>
+            )}
+            <PaypalButton
+              amount={amount.toString()}
+              onSuccess={handlePaypalSuccess}
+            />
           </div>
-
           {/* Total & Pay Button */}
           <div className='flex items-center justify-between'>
             <div>

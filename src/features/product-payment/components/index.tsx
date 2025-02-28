@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useRef } from 'react'
 
-import Image from 'next/image'
 import { redirect, useRouter } from 'next/navigation'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -150,7 +149,7 @@ const PaymentSection = () => {
               <div className=''>
                 <Card className='mb-6'>
                   <CardContent className='p-6'>
-                    <div className='flex items-center space-x-2 mb-4'>
+                    {/* <div className='flex items-center space-x-2 mb-4'>
                       <Image
                         src='/thumb.svg'
                         alt='Check'
@@ -161,7 +160,7 @@ const PaymentSection = () => {
                       <h2 className='font-semibold md:text-[30px] text-[18px] leading-[35px] text-[#222222]'>
                         We&apos;ve found the following documents for the address
                       </h2>
-                    </div>
+                    </div> */}
 
                     {/* Address */}
                     <div className='flex items-start justify-between'>
