@@ -1,18 +1,20 @@
 'use client'
 import { Suspense, useEffect } from 'react'
 
+import posthog from 'posthog-js'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { useAppSelector } from '@/store/hook'
 import { useGetCountryDetailsQuery } from '@/store/api/get-country'
-import posthog from 'posthog-js'
+// import { setDocuments } from '@/store/slices/address-slice'
+// import { useGetDocumentListQuery } from '@/store/api/get-documents'
 
 const ProductLoaderDetails = () => {
-  // const router = useRouter()
 
   const { selectedAddress } = useAppSelector((state) => state.address)
+  // const dispatch = useAppDispatch()
 
   const address = selectedAddress?.address || ''
   const city = selectedAddress?.city || ''
@@ -33,10 +35,10 @@ const ProductLoaderDetails = () => {
 
   // Second API Call: Trigger when `countryFromApi` is available
   // const {
-  //   data: additionalData,
-  //   isLoading: isSecondLoading,
-  //   isError: isSecondError,
-  // } = useSecondQuery(
+  //   data: documentList,
+  //   isLoading: isDocumentListLoading,
+  //   isError: isDocumentListError,
+  // } = useGetDocumentListQuery(
   //   { country: countryFromApi },
   //   {
   //     skip: !countryFromApi,
@@ -45,14 +47,15 @@ const ProductLoaderDetails = () => {
   // );
 
   // useEffect(() => {
-  //   if (isError || isSecondError) {
+  //   if (isError || isDocumentListError,) {
   //     // Redirect back if any API fails
-  //     router.back();
-  //   } else if (data && additionalData) {
+  //    redirect('/details')
+  //   } else if (data && documentList) {
+  //     dispatch(setDocuments([]))
   //     // Redirect to the next page when both API calls succeed
-  //     router.push("/product-payment");
+  //      redirect('/product-payment')
   //   }
-  // }, [data, additionalData, isError, isSecondError]);
+  // }, [data, documentList, isError, isDocumentListError]);
 
   useEffect(() => {
     const delay = Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000

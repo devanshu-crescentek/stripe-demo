@@ -86,11 +86,13 @@ const PaymentSection = () => {
   const cardRef = useRef<HTMLDivElement | null>(null)
   const router = useRouter()
 
+  const queryParams = useAppSelector((state) => state.queryParams.params)
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       selectedDocs: ['title-register', 'title-plan'],
-      delivery: 'standard',
+      delivery: queryParams?.ft === 'true' ? 'express' : 'standard',
       userEmail: '',
     },
   })
@@ -330,157 +332,166 @@ const PaymentSection = () => {
                           value === 'standard' ? 'standard' : 'express'
                         )
                       }
+                      className={`flex space-y-1 ${
+                        queryParams?.ft === 'true'
+                          ? 'flex-col-reverse'
+                          : 'flex-col'
+                      }`}
                     >
-                      <div className='flex items-center space-x-2'>
-                        <RadioGroupItem
-                          value='standard'
-                          id='r2'
-                          className={`peer ${
-                            selectedDelivery === 'standard'
-                              ? 'text-[#28A745] border-[#28A745] [&_svg]:fill-[#28A745]'
-                              : 'text-[#000] border-[#000]'
-                          } md:h-5 h-[18px] md:w-5 w-[18px] md:[&_svg]:h-[12px] [&_svg]:h-[10px] md:[&_svg]:w-[12px] [&_svg]:w-[10px]`}
-                        />
-                        <Label
-                          htmlFor='r2'
-                          className={`font-semibold flex items-center justify-between w-full cursor-pointer md:text-[20px] text-[16px] md:leading-[23px] leading-[30px] ${
-                            selectedDelivery === 'standard'
-                              ? 'text-[#28A745]'
-                              : 'text-[#000000]'
-                          }`}
-                        >
-                          <div className='flex items-center justify-between w-full cursor-pointer'>
-                            Standard Delivery
-                            <span
-                              className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center'
-                              onClick={() => setValue('delivery', 'standard')}
-                            >
-                              Free
-                            </span>
-                          </div>
-                        </Label>
-                      </div>
-                      {selectedDelivery === 'standard' && (
-                        <div className='text-[#6B6B6B]'>
-                          <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
-                            Your documents will be delivered via email within
-                            <b className='text-[#28A745]'>
-                              {' '}
-                              1 business day
-                            </b>{' '}
-                            (Monday-Friday, 8 AM-5 PM). If you don’t receive
-                            your order, please check your junk or spam folder.
-                          </p>
-
-                          <FormField
-                            control={form.control}
-                            name='userEmail'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <Input
-                                    type='email'
-                                    placeholder='Enter Your Email Address'
-                                    onChange={(e) => {
-                                      field.onChange(e)
-                                      if (
-                                        e.target.value.length > 0 &&
-                                        e.target.value.match(validEmailRegex)
-                                      ) {
-                                        posthog.capture('Enter Email id', {
-                                          email: e.target.value,
-                                        })
-                                      }
-                                    }}
-                                    className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
-                                      form.formState.errors.userEmail
-                                        ? 'border-red-500'
-                                        : ''
-                                    }`}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
+                      <div>
+                        <div className='flex items-center space-x-2'>
+                          <RadioGroupItem
+                            value='standard'
+                            id='r2'
+                            className={`peer ${
+                              selectedDelivery === 'standard'
+                                ? 'text-[#28A745] border-[#28A745] [&_svg]:fill-[#28A745]'
+                                : 'text-[#000] border-[#000]'
+                            } md:h-5 h-[18px] md:w-5 w-[18px] md:[&_svg]:h-[12px] [&_svg]:h-[10px] md:[&_svg]:w-[12px] [&_svg]:w-[10px]`}
                           />
+                          <Label
+                            htmlFor='r2'
+                            className={`font-semibold flex items-center justify-between w-full cursor-pointer md:text-[20px] text-[16px] md:leading-[23px] leading-[30px] ${
+                              selectedDelivery === 'standard'
+                                ? 'text-[#28A745]'
+                                : 'text-[#000000]'
+                            }`}
+                          >
+                            <div className='flex items-center justify-between w-full cursor-pointer'>
+                              Standard Delivery
+                              <span
+                                className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center'
+                                onClick={() => setValue('delivery', 'standard')}
+                              >
+                                Free
+                              </span>
+                            </div>
+                          </Label>
                         </div>
-                      )}
+                        {selectedDelivery === 'standard' && (
+                          <div className='text-[#6B6B6B]'>
+                            <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
+                              Your documents will be delivered via email within
+                              <b className='text-[#28A745]'>
+                                {' '}
+                                1 business day
+                              </b>{' '}
+                              (Monday-Friday, 8 AM-5 PM). If you don’t receive
+                              your order, please check your junk or spam folder.
+                            </p>
+
+                            <FormField
+                              control={form.control}
+                              name='userEmail'
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      type='email'
+                                      placeholder='Enter Your Email Address'
+                                      onChange={(e) => {
+                                        field.onChange(e)
+                                        if (
+                                          e.target.value.length > 0 &&
+                                          e.target.value.match(validEmailRegex)
+                                        ) {
+                                          posthog.capture('Enter Email id', {
+                                            email: e.target.value,
+                                          })
+                                        }
+                                      }}
+                                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                                        form.formState.errors.userEmail
+                                          ? 'border-red-500'
+                                          : ''
+                                      }`}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        )}
+                      </div>
                       <div className='border-t border-[#000000] opacity-10 my-4'></div>
-                      <div className='flex items-center space-x-2'>
-                        <RadioGroupItem
-                          value='express'
-                          id='r3'
-                          className={`peer ${
-                            selectedDelivery === 'express'
-                              ? 'text-[#28A745] border-[#28A745] [&_svg]:fill-[#28A745]'
-                              : 'text-[#000] border-[#000]'
-                          } md:h-5 h-[18px] md:w-5 w-[18px] md:[&_svg]:h-[12px] [&_svg]:h-[10px] md:[&_svg]:w-[12px] [&_svg]:w-[10px]`}
-                        />
-                        <Label
-                          htmlFor='r3'
-                          className={`font-semibold flex items-center justify-between w-full cursor-pointer md:text-[20px] text-[16px] md:leading-[23px] leading-[30px] ${
-                            selectedDelivery === 'express'
-                              ? 'text-[#28A745]'
-                              : 'text-[#000000]'
-                          }`}
-                        >
-                          <div className='flex items-center justify-between w-full cursor-pointer'>
-                            Express Delivery
-                            <span
-                              className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col`}
-                              onClick={() => setValue('delivery', 'express')}
-                            >
-                              £9.99
-                            </span>
-                          </div>
-                        </Label>
-                      </div>
-                      {selectedDelivery === 'express' && (
-                        <div className='text-[#6B6B6B]'>
-                          <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
-                            Your documents will be delivered via email within
-                            <b className='text-[#28A745]'>
-                              {' '}
-                              1 business hour
-                            </b>{' '}
-                            (Monday–Friday, 8 AM–5 PM). If you don’t receive
-                            your order, please check your junk or spam folder.
-                          </p>
-
-                          <FormField
-                            control={form.control}
-                            name='userEmail'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <Input
-                                    type='email'
-                                    placeholder='Enter Your Email Address'
-                                    {...field}
-                                    onChange={(e) => {
-                                      field.onChange(e)
-                                      if (
-                                        e.target.value.length > 0 &&
-                                        e.target.value.match(validEmailRegex)
-                                      ) {
-                                        posthog.capture('Enter Email id', {
-                                          email: e.target.value,
-                                        })
-                                      }
-                                    }}
-                                    className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
-                                      form.formState.errors.userEmail
-                                        ? 'border-red-500'
-                                        : ''
-                                    }`}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
+                      <div>
+                        <div className='flex items-center space-x-2'>
+                          <RadioGroupItem
+                            value='express'
+                            id='r3'
+                            className={`peer ${
+                              selectedDelivery === 'express'
+                                ? 'text-[#28A745] border-[#28A745] [&_svg]:fill-[#28A745]'
+                                : 'text-[#000] border-[#000]'
+                            } md:h-5 h-[18px] md:w-5 w-[18px] md:[&_svg]:h-[12px] [&_svg]:h-[10px] md:[&_svg]:w-[12px] [&_svg]:w-[10px]`}
                           />
+                          <Label
+                            htmlFor='r3'
+                            className={`font-semibold flex items-center justify-between w-full cursor-pointer md:text-[20px] text-[16px] md:leading-[23px] leading-[30px] ${
+                              selectedDelivery === 'express'
+                                ? 'text-[#28A745]'
+                                : 'text-[#000000]'
+                            }`}
+                          >
+                            <div className='flex items-center justify-between w-full cursor-pointer'>
+                              Express Delivery
+                              <span
+                                className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col`}
+                                onClick={() => setValue('delivery', 'express')}
+                              >
+                                £9.99
+                              </span>
+                            </div>
+                          </Label>
                         </div>
-                      )}
+                        {selectedDelivery === 'express' && (
+                          <div className='text-[#6B6B6B]'>
+                            <p className='md:text-[18px] text-[12px] md:leading-[25px] leading-[15px] mb-4'>
+                              Your documents will be delivered via email within
+                              <b className='text-[#28A745]'>
+                                {' '}
+                                1 business hour
+                              </b>{' '}
+                              (Monday–Friday, 8 AM–5 PM). If you don’t receive
+                              your order, please check your junk or spam folder.
+                            </p>
+
+                            <FormField
+                              control={form.control}
+                              name='userEmail'
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      type='email'
+                                      placeholder='Enter Your Email Address'
+                                      {...field}
+                                      onChange={(e) => {
+                                        field.onChange(e)
+                                        if (
+                                          e.target.value.length > 0 &&
+                                          e.target.value.match(validEmailRegex)
+                                        ) {
+                                          posthog.capture('Enter Email id', {
+                                            email: e.target.value,
+                                          })
+                                        }
+                                      }}
+                                      className={`w-full border bg-white mt-2 rounded-md px-4 py-2 h-[44px] text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
+                                        form.formState.errors.userEmail
+                                          ? 'border-red-500'
+                                          : ''
+                                      }`}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        )}
+                      </div>
                     </RadioGroup>
 
                     {errors.delivery && (

@@ -15,6 +15,12 @@ interface AddressState {
     tenure?: string | null
     titleNumber?: number | null
   }
+  documents: {
+    id: string
+    title: string
+    description: string
+    price: string
+  }[]
 }
 
 const initialState: AddressState = {
@@ -26,6 +32,7 @@ const initialState: AddressState = {
     tenure: null,
     titleNumber: null,
   },
+  documents: [],
 }
 
 const addressSlice = createSlice({
@@ -52,6 +59,19 @@ const addressSlice = createSlice({
     ) => {
       state.tenure_info = action.payload
     },
+    setDocuments: (
+      state,
+      action: PayloadAction<
+        {
+          id: string
+          title: string
+          description: string
+          price: string
+        }[]
+      >
+    ) => {
+      state.documents = action.payload
+    },
     resetAddress: (state) => {
       state.data = []
       state.loading = false
@@ -61,6 +81,7 @@ const addressSlice = createSlice({
         tenure: null,
         titleNumber: null,
       }
+      state.documents = []
     },
   },
   extraReducers: (builder) => {
@@ -89,7 +110,7 @@ const addressSlice = createSlice({
   },
 })
 
-export const { resetAddress, setSelectedAddress, setTenureInfo } =
+export const { resetAddress, setSelectedAddress, setTenureInfo, setDocuments } =
   addressSlice.actions
 
 export default addressSlice.reducer

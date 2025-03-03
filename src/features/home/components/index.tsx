@@ -2,12 +2,12 @@
 import { useEffect } from 'react'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import posthog from 'posthog-js'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
-import posthog from 'posthog-js'
 
 import {
   Form,
@@ -21,12 +21,23 @@ import FaqCard from '@/features/home/components/faq-card'
 import { postalCodeSchema } from '@/features/home/schema'
 
 import { useGetAddressDetailsMutation } from '@/store/api/get-address'
-import { useAppDispatch } from '@/store/hook'
+import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { resetAddress } from '@/store/slices/address-slice'
+import { setQueryParams } from '@/store/slices/query-slice'
+
 
 const Home = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
+  const searchParams = useSearchParams()
+
+  const queryParams = useAppSelector((state) => state.queryParams.params)
+
+  useEffect(() => {
+    // Convert search params to an object
+    const params = Object.fromEntries(searchParams.entries())
+    dispatch(setQueryParams(params))
+  }, [dispatch, searchParams])
 
   const methods = useForm<z.infer<typeof postalCodeSchema>>({
     resolver: zodResolver(postalCodeSchema),
@@ -85,11 +96,20 @@ const Home = () => {
           <form onSubmit={methods.handleSubmit(handleOnSubmit)}>
             <div className='container w-full mx-auto px-4 sm:px-6 lg:gap-12'>
               <div className='bg-[#F3F2F1] rounded-lg text-start max-w-3xl min-h-[129px] flex justify-center items-center p-[20px]'>
-                <p className='md:text-[20px] text-[16px] md:leading-[30px] leading-[25px] font-semibold'>
-                  Find information and access official electronic copies of
-                  title deeds and documents for over 28 million properties in
-                  England, Wales & Scotland.
-                </p>
+                {queryParams?.ft === 'true' || queryParams?.ct ? (
+                  <p className='md:text-[20px] text-[16px] md:leading-[30px] leading-[25px] font-semibold'>
+                    It will change
+                  </p>
+                ) : (
+                  <p className='md:text-[20px] text-[16px] md:leading-[30px] leading-[25px] font-semibold'>
+                    Find information and access official electronic copies of
+                    title deeds and documents for millions of properties in
+                    <span className='text-green-500'>
+                      {' '}
+                      England, Wales, Northern Ireland & Scotland.
+                    </span>
+                  </p>
+                )}
               </div>
               <h2 className='md:text-[40px] text-[30px] font-semibold leading-[30px] md:mb-10 mb-2 mt-10'>
                 Search by Postcode
@@ -135,7 +155,7 @@ const Home = () => {
                   type='submit'
                   className={`mt-4 w-full bg-green-600 text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
                     isLoading
-                      ? 'bg-slate-300 opacity-50   cursor-not-allowed'
+                      ? 'bg-slate-300 opacity-50 cursor-not-allowed'
                       : ''
                   }`}
                 >
