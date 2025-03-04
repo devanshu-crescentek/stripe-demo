@@ -6,12 +6,12 @@ export const getDocumentAPI = createApi({
   reducerPath: 'document-api',
   baseQuery: createBaseQueryWithReAuth({
     authCheck: false,
-    baseUrl: 'https://api.postcodes.io/',
+    baseUrl: 'https://phpstack-1400660-5285689.cloudwaysapps.com/wp-json/crsc/v1/',
   }),
   endpoints: (builder) => ({
     getDocumentList: builder.query({
       query: ({ country }) => {
-        const url = `postcodes/${country}`
+        const url = `get-land-registry-product-data?${country}`
 
         return url
       },

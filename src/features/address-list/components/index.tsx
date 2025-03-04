@@ -27,15 +27,8 @@ const AddressList = () => {
       const payload = {
         address: item.address ? item.address[0] : '',
         city: item.city,
-        country: item.county,
         postalCode: item.postcode,
       }
-      posthog.capture('Selected address', {
-        address: item.address ? item.address[0] : '',
-        city: item.city,
-        country: item.county,
-        postalCode: item.postcode,
-      })
       dispatch(setSelectedAddress(payload))
     } else {
       posthog.capture('Skipped address')

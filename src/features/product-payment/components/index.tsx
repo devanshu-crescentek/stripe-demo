@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import { useEffect, useRef } from 'react'
 
@@ -38,36 +39,10 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
 
-const documents = [
-  {
-    id: 'title-register',
-    name: 'Title Register',
-    price: 24.99,
-    required: true,
-    description:
-      'Shows property ownership, description, and any restrictive covenants. For a visual of the land, consider purchasing the Title Plan.',
-  },
-  {
-    id: 'title-plan',
-    name: 'Title Plan',
-    price: 24.99,
-    required: false,
-    description:
-      'A visual representation of the property or land in a registered title. Consider purchasing the Title Register for details.',
-  },
-  {
-    id: 'conveyancing-pack',
-    name: 'Conveyancing Pack',
-    price: 49.99,
-    required: false,
-    description:
-      'The pack includes all available Lease Deeds, Transfer Deeds, Conveyancing Deeds, and Charges for the selected property.',
-  },
-]
 
 const schema = z.object({
   selectedDocs: z
-    .array(z.string())
+    .array(z.number())
     .min(1, 'Please select at least one document'),
   userEmail: z
     .string()
@@ -87,11 +62,13 @@ const PaymentSection = () => {
   const router = useRouter()
 
   const queryParams = useAppSelector((state) => state.queryParams.params)
+  const { selectedAddress, tenure_info, documents } =
+    useAppSelector((state) => state.address) || false
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      selectedDocs: ['title-register', 'title-plan'],
+      selectedDocs: [71, 72],
       delivery: queryParams?.ft === 'true' ? 'express' : 'standard',
       userEmail: '',
     },
@@ -104,9 +81,6 @@ const PaymentSection = () => {
 
   const selectedDocs = form.watch('selectedDocs')
   const selectedDelivery = form.watch('delivery')
-
-  const { selectedAddress, tenure_info } =
-    useAppSelector((state) => state.address) || false
 
   useEffect(() => {
     if (selectedDelivery === 'express') {
@@ -122,8 +96,13 @@ const PaymentSection = () => {
   }, [])
 
   useEffect(() => {
-    posthog.capture('Selected Title Register')
-    posthog.capture('Selected Title plan')
+    if (selectedDocs.length > 0) {
+      documents
+        .filter((doc) => selectedDocs.includes(doc.id))
+        .forEach((doc) => {
+          posthog.capture(`Selected ${doc.name}`)
+        })
+    }
   }, [form])
 
   useEffect(() => {
@@ -172,18 +151,6 @@ const PaymentSection = () => {
               <div className=''>
                 <Card className='mb-6'>
                   <CardContent className='p-6'>
-                    {/* <div className='flex items-center space-x-2 mb-4'>
-                      <Image
-                        src='/thumb.svg'
-                        alt='Check'
-                        width={41}
-                        className='md:w-[30px] md:h-[60px] w-[27px] h-[40px]'
-                        height={62}
-                      />
-                      <h2 className='font-semibold md:text-[30px] text-[18px] leading-[35px] text-[#222222]'>
-                        We&apos;ve found the following documents for the address
-                      </h2>
-                    </div> */}
 
                     {/* Address */}
                     <div className='flex items-start justify-between'>
@@ -192,7 +159,7 @@ const PaymentSection = () => {
                           `${selectedAddress.address}, `}
                         {selectedAddress.city && `${selectedAddress.city}, `}
                         {selectedAddress.country &&
-                          `${selectedAddress.country}, `}
+                          `${selectedAddress.country}`}
                         <br />
                         {selectedAddress.postalCode &&
                           selectedAddress.postalCode}
@@ -225,95 +192,116 @@ const PaymentSection = () => {
                   </CardHeader>
                   <CardContent>
                     <div className='hidden md:block'>
-                      {documents.map((doc) => (
-                        <FormField
-                          key={doc.id}
-                          control={form.control}
-                          name='selectedDocs'
-                          render={({ field }) => {
-                            const isChecked = field.value.includes(doc.id)
-                            return (
-                              <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value.includes(doc.id)}
-                                    className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
-                                    onCheckedChange={() => {
-                                      field.onChange(
-                                        field.value.includes(doc.id)
-                                          ? field.value.filter(
-                                              (id) => id !== doc.id
-                                            )
-                                          : [...field.value, doc.id]
-                                      )
-
-                                      if (isChecked) {
-                                        posthog.capture(
-                                          `De-Selected ${doc.name}`
+                      {documents
+                        .slice() // Create a shallow copy to avoid mutating the original array
+                        .sort((a, b) => a.price - b.price) // Sort by price in ascending order
+                        .map((doc) => (
+                          <FormField
+                            key={doc.id}
+                            control={form.control}
+                            name='selectedDocs'
+                            render={({ field }) => {
+                              const isChecked = field.value.includes(doc.id)
+                              return (
+                                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value.includes(doc.id)}
+                                      className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                                      onCheckedChange={() => {
+                                        field.onChange(
+                                          field.value.includes(doc.id)
+                                            ? field.value.filter(
+                                                (id) => id !== doc.id
+                                              )
+                                            : [...field.value, doc.id]
                                         )
-                                      } else {
-                                        posthog.capture(`Selected ${doc.name}`)
-                                      }
-                                    }}
-                                  />
-                                </FormControl>
-                                <div className='space-y-1 leading-none'>
-                                  <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'>
-                                    {doc.name} - £{doc.price}
-                                  </FormLabel>
-                                  <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
-                                    {doc.description}
-                                  </FormDescription>
-                                </div>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
+
+                                        if (isChecked) {
+                                          posthog.capture(
+                                            `De-Selected ${doc.name}`
+                                          )
+                                        } else {
+                                          posthog.capture(
+                                            `Selected ${doc.name}`
+                                          )
+                                        }
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <div className='space-y-1 leading-none'>
+                                    <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'>
+                                      {doc.name} - £{doc.price}
+                                    </FormLabel>
+                                    <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
+                                      {doc.description}
+                                    </FormDescription>
+                                  </div>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        ))}
                       <FormMessage>
                         {form.formState.errors.selectedDocs?.message}
                       </FormMessage>
                     </div>
                     <div className='block md:hidden'>
-                      {documents.map((doc) => (
-                        <FormField
-                          key={doc.id}
-                          control={form.control}
-                          name='selectedDocs'
-                          render={({ field }) => (
-                            <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4 '>
-                              <div className='space-y-1 leading-none cursor-pointer'>
-                                <FormLabel className='font-semibold text-[18px] mb-2 text-black'>
-                                  <p className='font-semibold text-[18px] mb-2'>
-                                    {doc.name}
-                                  </p>
-                                </FormLabel>
-                                <FormDescription className='text-sm text-gray-600'>
-                                  {doc.description}
-                                </FormDescription>
-                              </div>
-                              <FormLabel className='font-semibold text-[20px] text-black'>
-                                £{doc.price.toFixed(2)}
-                              </FormLabel>
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value.includes(doc.id)}
-                                  className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
-                                  onCheckedChange={() => {
-                                    field.onChange(
-                                      field.value.includes(doc.id)
-                                        ? field.value.filter(
-                                            (id) => id !== doc.id
+                      {documents
+                        .slice() // Create a shallow copy to avoid mutating the original array
+                        .sort((a, b) => a.price - b.price) // Sort by price in ascending order
+                        .map((doc) => (
+                          <FormField
+                            key={doc.id}
+                            control={form.control}
+                            name='selectedDocs'
+                            render={({ field }) => {
+                              const isChecked = field.value.includes(doc.id)
+                              return (
+                                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4 '>
+                                  <div className='space-y-1 leading-none cursor-pointer'>
+                                    <FormLabel className='font-semibold text-[18px] mb-2 text-black'>
+                                      <p className='font-semibold text-[18px] mb-2'>
+                                        {doc.name}
+                                      </p>
+                                    </FormLabel>
+                                    <FormDescription className='text-sm text-gray-600'>
+                                      {doc.description}
+                                    </FormDescription>
+                                  </div>
+                                  <FormLabel className='font-semibold text-[20px] text-black'>
+                                    £{doc.price.toFixed(2)}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value.includes(doc.id)}
+                                      className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                                      onCheckedChange={() => {
+                                        field.onChange(
+                                          field.value.includes(doc.id)
+                                            ? field.value.filter(
+                                                (id) => id !== doc.id
+                                              )
+                                            : [...field.value, doc.id]
+                                        )
+
+                                        if (isChecked) {
+                                          posthog.capture(
+                                            `De-Selected ${doc.name}`
                                           )
-                                        : [...field.value, doc.id]
-                                    )
-                                  }}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      ))}
+                                        } else {
+                                          posthog.capture(
+                                            `Selected ${doc.name}`
+                                          )
+                                        }
+                                      }}
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        ))}
                       <FormMessage>
                         {form.formState.errors.selectedDocs?.message}
                       </FormMessage>

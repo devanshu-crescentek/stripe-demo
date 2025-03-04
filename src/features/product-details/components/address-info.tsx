@@ -22,21 +22,48 @@ const AddressInfo = () => {
   const searchParams = useSearchParams()
 
   const isEditParams = searchParams.get('isEdit')
+  const isCountryError = searchParams.get('isCtError')
 
-  const { control, formState, watch } = useFormContext()
-  const data = useAppSelector((state) => state.address.selectedAddress) || false
+  const { control, formState, watch, setError } = useFormContext()
+  const { selectedAddress } = useAppSelector((state) => state.address) || {};
 
   useEffect(() => {
-    if (data) {
-      setIsEdit(false)
+    if (!selectedAddress) {
+      setIsEdit(true);
+      return;
     }
-  }, [data])
+  
+    const requiredFields: (keyof typeof selectedAddress)[] = [
+      "address",
+      "city",
+      "country",
+      "postalCode",
+    ];
+  
+    const isValidAddress = requiredFields.every(
+      (key) => selectedAddress[key] && selectedAddress[key]!.length > 0
+    );
+  
+    if(!isValidAddress) {
+      setIsEdit(false);
+    }
+  }, [selectedAddress]);
 
   useEffect(() => {
     if (isEditParams === 'true') {
       setIsEdit(true)
     }
   }, [isEditParams])
+
+  useEffect(() => {
+    if (isCountryError === 'true') {
+      setError('country', {
+        type: 'manual',
+        message: 'Please enter a valid country.',
+      })
+      setIsEdit(true)
+    }
+  }, [isCountryError, setError])
 
   return (
     <Card>
@@ -58,13 +85,13 @@ const AddressInfo = () => {
             <p className='text-[##0B0C0C] md:text-[20px] text-[14px] md:leading-[30px] leading-[21px] font-normal w-full'>
               {watch('address') && `${watch('address')}, `}
               {watch('city') && `${watch('city')}, `}
-              {watch('country') && `${watch('country')}, `}
+              {watch('country') && `${watch('country')} `}
               <br />
               {watch('postalCode') && watch('postalCode')}
             </p>
           )}
 
-          {data && (
+          {selectedAddress && (
             <Button
               onClick={() => {
                 posthog.capture('Edit address on Address page')

@@ -25,44 +25,46 @@ import useDeviceType from '@/hooks/use-device-type'
 import { productDetailsSchema } from '@/features/product-details/schema'
 import { useAppDispatch } from '@/store/hook'
 import { setSelectedAddress, setTenureInfo } from '@/store/slices/address-slice'
+import { useCheckCountryMutation } from '@/store/api/get-country'
 
 const TenureInfo = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
 
   const {
-    formState: { errors },
+    formState: { errors, dirtyFields },
     setValue,
     control,
     watch,
     handleSubmit,
     getValues,
+    setError,
   } = useFormContext<z.infer<typeof productDetailsSchema>>()
 
   const selectedTenure = getValues('tenure')
 
   const deviceType = useDeviceType()
 
-  const onSubmit: SubmitHandler<z.infer<typeof productDetailsSchema>> = (
-    data
-  ) => {
-    dispatch(
-      setTenureInfo({
-        tenure: data.tenure,
-        titleNumber: data.title_number ? data.title_number : undefined,
-      })
-    )
-    dispatch(
-      setSelectedAddress({
-        address: data.address,
-        city: data.city,
-        country: data.country,
-        postalCode: data.postalCode,
-      })
-    )
-    posthog.capture('Search document')
-    router.push(`/search-result`)
-  }
+  const [checkCountry] = useCheckCountryMutation()
+
+  const onSubmit: SubmitHandler<z.infer<typeof productDetailsSchema>> = async (data) => {
+    try {
+      if (dirtyFields.postalCode) {
+        const res = await checkCountry({ postalCode: data.postalCode }).unwrap();
+        data.country = res.result.country || data.country;
+      }
+  
+      dispatch(setTenureInfo({ tenure: data.tenure, titleNumber: data.title_number || undefined }));
+      dispatch(setSelectedAddress({ ...data }));
+  
+      posthog.capture('Search document');
+      router.push('/search-result');
+    } catch (error) {
+      console.error('🚀 ~ TenureInfo ~ error:', error);
+      setError('postalCode', { type: 'manual', message: 'Please enter a valid postal code.' });
+    }
+  };
+  
 
   return (
     <>

@@ -16,10 +16,11 @@ interface AddressState {
     titleNumber?: number | null
   }
   documents: {
-    id: string
-    title: string
-    description: string
-    price: string
+    id: number
+    name: string
+    description?: string
+    price: number
+    country?: string
   }[]
 }
 
@@ -63,10 +64,11 @@ const addressSlice = createSlice({
       state,
       action: PayloadAction<
         {
-          id: string
-          title: string
-          description: string
-          price: string
+          id: number
+          name: string
+          description?: string
+          price: number
+          country?: string
         }[]
       >
     ) => {

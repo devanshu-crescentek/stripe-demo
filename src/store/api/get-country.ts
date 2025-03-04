@@ -16,7 +16,14 @@ export const getCountryAPI = createApi({
         return url
       },
     }),
+    checkCountry: builder.mutation({
+      query: ({ postalCode }) => ({
+        url: `postcodes/${postalCode}`,
+        method: 'GET',
+      }),
+    }),
   }),
 })
 
-export const { useGetCountryDetailsQuery } = getCountryAPI
+export const { useGetCountryDetailsQuery, useCheckCountryMutation } =
+  getCountryAPI
