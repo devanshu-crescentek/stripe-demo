@@ -18,11 +18,12 @@ import PaymentDrawer from '@/features/product-payment/components/payment-drawer'
 import PaypalButton from '@/features/product-payment/components/paypal-button'
 
 import useDeviceType from '@/hooks/use-device-type'
-import { useAppSelector } from '@/store/hook'
+import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { paymentMethods } from '@/lib/constants'
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
 
 import { useAddToCartMutation } from '@/store/api/add-to-cart'
+import { setSelectedDocuments } from '@/store/slices/address-slice'
 
 const expressCheckoutOptions = {
   buttonHeight: 40,
@@ -32,6 +33,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const stripe = useStripe()
   const elements = useElements()
   const router = useRouter()
+  const dispatch = useAppDispatch()
 
   const { handleSubmit, watch } = useFormContext()
 
@@ -121,6 +123,18 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         }),
         country: documents[0]?.country || '',
       }
+      
+      const sDocuments = documents
+        .filter((doc) => selectedDocs.includes(doc.id))
+        .map((doc) => {
+          return {
+            id: doc.id,
+            name: doc.name,
+            price: doc.price,
+          }
+        })
+
+      dispatch(setSelectedDocuments(sDocuments))
 
       const { order_id } = await addToCart(cartPayload).unwrap()
 
