@@ -23,6 +23,13 @@ interface AddressState {
     price: number
     country?: string
   }[]
+  selectedDocuments: {
+    id: number
+    name: string
+    description?: string
+    price: number
+    country?: string
+  }[]
 }
 
 const initialState: AddressState = {
@@ -35,6 +42,7 @@ const initialState: AddressState = {
     titleNumber: null,
   },
   documents: [],
+  selectedDocuments: [],
 }
 
 const addressSlice = createSlice({
@@ -76,6 +84,20 @@ const addressSlice = createSlice({
     ) => {
       state.documents = action.payload
     },
+    setSelectedDocuments: (
+      state,
+      action: PayloadAction<
+        {
+          id: number
+          name: string
+          description?: string
+          price: number
+          country?: string
+        }[]
+      >
+    ) => {
+      state.selectedDocuments = action.payload
+    },
     resetAddress: (state) => {
       state.data = []
       state.loading = false
@@ -86,6 +108,7 @@ const addressSlice = createSlice({
         titleNumber: null,
       }
       state.documents = []
+      state.selectedDocuments = []
     },
   },
   extraReducers: (builder) => {
@@ -114,7 +137,12 @@ const addressSlice = createSlice({
   },
 })
 
-export const { resetAddress, setSelectedAddress, setTenureInfo, setDocuments } =
-  addressSlice.actions
+export const {
+  resetAddress,
+  setSelectedAddress,
+  setTenureInfo,
+  setDocuments,
+  setSelectedDocuments,
+} = addressSlice.actions
 
 export default addressSlice.reducer
