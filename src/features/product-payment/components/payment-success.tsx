@@ -1,16 +1,16 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
+// import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useAppSelector } from '@/store/hook'
 
 const PaymentSuccess = () => {
-  const searchParams = useSearchParams()
-  const amount = searchParams.get('amount')
+  //   const searchParams = useSearchParams()
+  //   const amount = searchParams.get('amount')
 
-  const { selectedAddress, tenure_info, documents } =
+  const { selectedAddress, tenure_info } =
     useAppSelector((state) => state.address) || {}
 
   return (
@@ -52,10 +52,12 @@ const PaymentSuccess = () => {
                 </p>
               </div>
               <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
-              <div className="flex items-center justify-center gap-4">
-                <div className="flex flex-col items-center justify-between">
-                    <h4 className='font-semibold text-[20px] leading-[30px]'>Title Register</h4>
-                    <p></p>
+              <div className='flex items-center justify-center gap-4'>
+                <div className='flex flex-col items-center justify-between'>
+                  <h4 className='font-semibold text-[20px] leading-[30px]'>
+                    Title Register
+                  </h4>
+                  <p></p>
                 </div>
               </div>
             </CardContent>
