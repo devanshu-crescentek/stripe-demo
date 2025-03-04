@@ -4,6 +4,7 @@ import { combineReducers, Middleware } from '@reduxjs/toolkit'
 import { getAddressAPI } from '@/store/api/get-address'
 import { getCountryAPI } from '@/store/api/get-country'
 import { getDocumentAPI } from '@/store/api/get-documents'
+import { addToCartAPI } from '@/store/api/add-to-cart'
 
 // Import all slices here
 import addressSlice from '@/store/slices/address-slice'
@@ -14,6 +15,7 @@ export const rootReducer = combineReducers({
   [getAddressAPI.reducerPath]: getAddressAPI.reducer,
   [getCountryAPI.reducerPath]: getCountryAPI.reducer,
   [getDocumentAPI.reducerPath]: getDocumentAPI.reducer,
+  [addToCartAPI.reducerPath]: addToCartAPI.reducer,
 
   address: addressSlice,
   queryParams: querySlice,
@@ -24,4 +26,5 @@ export const concatMiddleware: Middleware[] = [
   getAddressAPI.middleware,
   getCountryAPI.middleware,
   getDocumentAPI.middleware,
+  addToCartAPI.middleware,
 ]

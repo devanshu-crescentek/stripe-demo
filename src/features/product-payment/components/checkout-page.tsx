@@ -18,8 +18,11 @@ import PaymentDrawer from '@/features/product-payment/components/payment-drawer'
 import PaypalButton from '@/features/product-payment/components/paypal-button'
 
 import useDeviceType from '@/hooks/use-device-type'
+import { useAppSelector } from '@/store/hook'
 import { paymentMethods } from '@/lib/constants'
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
+
+import { useAddToCartMutation } from '@/store/api/add-to-cart'
 
 const expressCheckoutOptions = {
   buttonHeight: 40,
@@ -39,8 +42,15 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
   // const [isExpressCheckout, setIsExpressCheckout] = useState(true)
 
+  const [addToCart] = useAddToCartMutation()
+
   const deviceType = useDeviceType()
   const userEmail = watch('userEmail')
+  const selectedDocs = watch('selectedDocs')
+
+  const { selectedAddress, tenure_info, documents } = useAppSelector(
+    (state) => state.address
+  )
 
   useEffect(() => {
     if (!stripe || !amount) return
@@ -77,37 +87,80 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const onSubmit = async (
     isPayByCard: boolean
   ): Promise<JSX.Element | undefined> => {
-    setIsProcessing(true)
+    try {
+      setIsProcessing(true)
 
-    if (!stripe || !elements) {
-      return
-    }
+      if (!stripe || !elements) {
+        return
+      }
 
-    const { error: submitError } = await elements.submit()
+      const { error: submitError } = await elements.submit()
 
-    if (submitError) {
-      setErrorMessage(submitError.message!)
+      if (submitError) {
+        setErrorMessage(submitError.message!)
+        setIsProcessing(false)
+        return
+      }
+
+      const cartPayload = {
+        title_number: String(
+          tenure_info.titleNumber ? tenure_info.titleNumber : ''
+        ),
+        address_one: selectedAddress?.address,
+        city: selectedAddress?.city,
+        county: selectedAddress?.county,
+        post_code: selectedAddress?.postalCode,
+        Tenure: tenure_info.tenure,
+        customer_email: userEmail,
+        payment_status: 'pending',
+        order_status: 'pending',
+        product_data: selectedDocs.map((doc: number) => {
+          return {
+            product_id: String(doc),
+          }
+        }),
+        country: documents[0]?.country || '',
+      }
+
+      const { order_id } = await addToCart(cartPayload).unwrap()
+
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: convertToSubCurrency(amount), // Amount in cents
+          order_id, // Pass the order ID from cart response
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Payment intent creation failed')
+      }
+
+      posthog.identify(userEmail)
+      if (isPayByCard) {
+        posthog.capture('Pay by card')
+      }
+
+      const { error } = await stripe.confirmPayment({
+        elements,
+        clientSecret: data.clientSecret,
+        confirmParams: {
+          return_url: `${window.location.origin}/payment-success?amount=${amount}&order_id=${order_id}`,
+        },
+      })
+
+      if (error) {
+        setErrorMessage(error.message!)
+      }
       setIsProcessing(false)
-      return
+    } catch (error) {
+      console.log('🚀 ~ CheckoutPage ~ error:', error)
+      setIsProcessing(false)
+      setErrorMessage('Something went wrong. Please try again later.')
     }
-
-    posthog.identify(userEmail)
-    if (isPayByCard) {
-      posthog.capture('Pay by card')
-    }
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: `${window.location.origin}/payment-success?amount=${amount}`,
-      },
-    })
-
-    if (error) {
-      setErrorMessage(error.message!)
-    }
-    setIsProcessing(false)
   }
 
   const handlePaypalSuccess = (details: any) => {

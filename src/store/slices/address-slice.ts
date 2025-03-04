@@ -8,6 +8,7 @@ interface AddressState {
   selectedAddress: {
     address?: string
     city?: string
+    county?: string
     country?: string
     postalCode?: string
   } | null
@@ -45,6 +46,7 @@ const addressSlice = createSlice({
       action: PayloadAction<{
         address?: string
         city?: string
+        county?: string
         country?: string
         postalCode?: string
       } | null>

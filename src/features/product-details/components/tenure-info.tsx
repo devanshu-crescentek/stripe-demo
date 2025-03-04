@@ -23,13 +23,14 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import useDeviceType from '@/hooks/use-device-type'
 
 import { productDetailsSchema } from '@/features/product-details/schema'
-import { useAppDispatch } from '@/store/hook'
+import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { setSelectedAddress, setTenureInfo } from '@/store/slices/address-slice'
 import { useCheckCountryMutation } from '@/store/api/get-country'
 
 const TenureInfo = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
+  const { selectedAddress } = useAppSelector((state) => state.address) || false
 
   const {
     formState: { errors, dirtyFields },
@@ -47,24 +48,33 @@ const TenureInfo = () => {
 
   const [checkCountry] = useCheckCountryMutation()
 
-  const onSubmit: SubmitHandler<z.infer<typeof productDetailsSchema>> = async (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof productDetailsSchema>> = async (
+    data
+  ) => {
     try {
       if (dirtyFields.postalCode) {
-        const res = await checkCountry({ postalCode: data.postalCode }).unwrap();
-        data.country = res.result.country || data.country;
+        const res = await checkCountry({ postalCode: data.postalCode }).unwrap()
+        data.country = res.result.country || data.country
       }
-  
-      dispatch(setTenureInfo({ tenure: data.tenure, titleNumber: data.title_number || undefined }));
-      dispatch(setSelectedAddress({ ...data }));
-  
-      posthog.capture('Search document');
-      router.push('/search-result');
+
+      dispatch(
+        setTenureInfo({
+          tenure: data.tenure,
+          titleNumber: data.title_number || undefined,
+        })
+      )
+      dispatch(setSelectedAddress({ ...data, county: selectedAddress?.county }))
+
+      posthog.capture('Search document')
+      router.push('/search-result')
     } catch (error) {
-      console.error('🚀 ~ TenureInfo ~ error:', error);
-      setError('postalCode', { type: 'manual', message: 'Please enter a valid postal code.' });
+      console.error('🚀 ~ TenureInfo ~ error:', error)
+      setError('postalCode', {
+        type: 'manual',
+        message: 'Please enter a valid postal code.',
+      })
     }
-  };
-  
+  }
 
   return (
     <>

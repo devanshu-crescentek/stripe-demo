@@ -27,6 +27,7 @@ const AddressList = () => {
       const payload = {
         address: item.address ? item.address[0] : '',
         city: item.city,
+        county: item.county,
         postalCode: item.postcode,
       }
       dispatch(setSelectedAddress(payload))
