@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { setSelectedDocuments } from '@/store/slices/address-slice'
+import { setPayment, setSelectedDocuments } from '@/store/slices/address-slice'
 import {
   FUNDING,
   PayPalButtons,
@@ -105,6 +105,7 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
         fundingSource={FUNDING.PAYPAL}
         createOrder={async (_, actions) => {
           try {
+            dispatch(setPayment('paypal'))
             const orderData = await validateAndCreateOrder()
             posthog.capture('Pay by paypal', {
               amount,

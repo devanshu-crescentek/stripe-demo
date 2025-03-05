@@ -10,7 +10,7 @@ const PaymentSuccess = () => {
   const searchParams = useSearchParams()
   const amount = searchParams.get('amount')
 
-  const { selectedAddress, tenure_info, selectedDocuments, orderID } =
+  const { selectedAddress, tenure_info, selectedDocuments, orderID, payment } =
     useAppSelector((state) => state.address) || {}
 
   if (
@@ -22,6 +22,10 @@ const PaymentSuccess = () => {
   ) {
     redirect('/')
   }
+
+  const fastTrack = selectedDocuments.find(
+    (document) => document.name === 'Fast Track'
+  )
 
   return (
     <div className='flex-1 mb-10'>
@@ -95,7 +99,11 @@ const PaymentSuccess = () => {
                     <Image
                       width={30}
                       height={12}
-                      src={'/icons/Visa.svg'}
+                      src={
+                        payment === 'card'
+                          ? '/icons/Visa.svg'
+                          : '/icons/paypal.svg'
+                      }
                       alt='visa'
                       className={`w-[42px] h-auto`}
                     />
@@ -122,44 +130,53 @@ const PaymentSuccess = () => {
               </p>
               <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
               <div className='flex flex-col gap-4 justify-start items-start'>
-                <div className='flex items-start gap-2'>
-                  <div className='w-[26px] h-[29px]'>
-                    <Image
-                      src='/standard_delivery.svg'
-                      alt='standard delivery'
-                      width={100}
-                      height={100}
-                      className='w-full h-auto'
-                    />
-                  </div>
-                  <div className='flex flex-col'>
-                    <h4 className='font-medium sm:text-[24px] text-[18px] leading-[30px]'>
-                      Standard Delivery:
-                    </h4>
-                    <p className='text-[#6B6B6B] sm:text-[20px] text-[12px] sm:leading-[30px] leading-[15px]'>
-                      Arrives within 1 business day (Monday-Friday, 8 AM-5 PM).
-                    </p>
-                  </div>
-                </div>
-                <div className='flex items-start gap-2'>
-                  <div className='w-[26px] h-[29px]'>
-                    <Image
-                      src='/fast_track_delivery.svg'
-                      alt='Fast track delivery'
-                      width={100}
-                      height={100}
-                      className='w-full h-full'
-                    />
-                  </div>
-                  <div className='flex flex-col'>
-                    <h4 className='font-medium sm:text-[24px] text-[18px] leading-[30px]'>
-                      Fast Track Delivery:
-                    </h4>
-                    <p className='text-[#6B6B6B] sm:text-[20px] text-[12px] sm:leading-[30px] leading-[15px]'>
-                      Arrives within 1 business hour (Monday-Friday, 8 AM-5 PM).
-                    </p>
-                  </div>
-                </div>
+                {fastTrack ? (
+                  <>
+                    <div className='flex items-start gap-2'>
+                      <div className='w-[26px] h-[29px]'>
+                        <Image
+                          src='/fast_track_delivery.svg'
+                          alt='Fast track delivery'
+                          width={100}
+                          height={100}
+                          className='w-full h-full'
+                        />
+                      </div>
+                      <div className='flex flex-col'>
+                        <h4 className='font-medium sm:text-[24px] text-[18px] leading-[30px]'>
+                          Fast Track Delivery:
+                        </h4>
+                        <p className='text-[#6B6B6B] sm:text-[20px] text-[12px] sm:leading-[30px] leading-[15px]'>
+                          Arrives within 1 business hour (Monday-Friday, 8 AM-5
+                          PM).
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className='flex items-start gap-2'>
+                      <div className='w-[26px] h-[29px]'>
+                        <Image
+                          src='/standard_delivery.svg'
+                          alt='standard delivery'
+                          width={100}
+                          height={100}
+                          className='w-full h-auto'
+                        />
+                      </div>
+                      <div className='flex flex-col'>
+                        <h4 className='font-medium sm:text-[24px] text-[18px] leading-[30px]'>
+                          Standard Delivery:
+                        </h4>
+                        <p className='text-[#6B6B6B] sm:text-[20px] text-[12px] sm:leading-[30px] leading-[15px]'>
+                          Arrives within 1 business day (Monday-Friday, 8 AM-5
+                          PM).
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>

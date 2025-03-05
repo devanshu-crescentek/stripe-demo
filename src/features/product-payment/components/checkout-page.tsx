@@ -27,7 +27,7 @@ import {
   useAddToCartMutation,
   useUpdateCartMutation,
 } from '@/store/api/add-to-cart'
-import { setOrderID, setSelectedDocuments } from '@/store/slices/address-slice'
+import { setOrderID, setPayment, setSelectedDocuments } from '@/store/slices/address-slice'
 import { validEmailRegex } from '@/lib/utils'
 
 const expressCheckoutOptions = {
@@ -66,7 +66,14 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
 
   const addToCartHandler = useCallback(async () => {
     if (!amount) return
-
+    const res = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: convertToSubCurrency(amount),
+      }),
+    })
+    setClientSecret((await res.json()).clientSecret)
     try {
       const selectedPayloadDoc = selectedDocs.map((doc: number) => ({
         product_id: String(doc),
@@ -183,7 +190,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
           })
         }
       }
-
+      dispatch(setPayment('card'))
       dispatch(setSelectedDocuments(sDocuments))
 
       posthog.identify(userEmail)
