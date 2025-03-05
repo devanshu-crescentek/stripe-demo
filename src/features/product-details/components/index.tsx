@@ -85,19 +85,21 @@ const ProductDetails = () => {
   ])
 
   useEffect(() => {
-    const payload = {
-      ...selectedAddress,
-      country: countryFromApi,
+    if (countryFromApi && selectedAddress) {
+      const payload = {
+        ...selectedAddress,
+        country: countryFromApi,
+      }
+      dispatch(setSelectedAddress(payload))
+      posthog.capture('Selected address', {
+        address: selectedAddress?.address ? selectedAddress?.address : '',
+        city: selectedAddress?.city ? selectedAddress?.city : '',
+        country: countryFromApi,
+        postalCode: selectedAddress?.postalCode
+          ? selectedAddress?.postalCode
+          : '',
+      })
     }
-    dispatch(setSelectedAddress(payload))
-    posthog.capture('Selected address', {
-      address: selectedAddress?.address ? selectedAddress?.address : '',
-      city: selectedAddress?.city ? selectedAddress?.city : '',
-      country: countryFromApi,
-      postalCode: selectedAddress?.postalCode
-        ? selectedAddress?.postalCode
-        : '',
-    })
   }, [countryFromApi, dispatch])
 
   if (isLoading) {

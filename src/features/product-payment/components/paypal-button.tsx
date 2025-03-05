@@ -1,3 +1,5 @@
+import { useAppDispatch, useAppSelector } from '@/store/hook'
+import { setSelectedDocuments } from '@/store/slices/address-slice'
 import {
   FUNDING,
   PayPalButtons,
@@ -12,10 +14,37 @@ interface PaypalButtonProps {
 }
 
 const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
-  const { handleSubmit } = useFormContext()
+  const dispatch = useAppDispatch()
+  const { handleSubmit, watch } = useFormContext()
+
+  const { orderID, documents } = useAppSelector((state) => state.address)
+
+  const selectedDocs = watch('selectedDocs')
 
   // Function to validate form before creating order
   const validateAndCreateOrder = async () => {
+    const sDocuments = documents
+      .filter((doc) => selectedDocs.includes(doc.id))
+      .map((doc) => {
+        return {
+          id: doc.id,
+          name: doc.name,
+          price: doc.price,
+        }
+      })
+
+    if (watch('delivery') === 'express') {
+      const fastTrack = documents.find((doc) => doc.name === 'Fast Track')
+      if (fastTrack) {
+        sDocuments.push({
+          id: fastTrack.id,
+          name: 'Fast Track',
+          price: fastTrack.price,
+        })
+      }
+    }
+
+    dispatch(setSelectedDocuments(sDocuments))
     return new Promise<string>((resolve, reject) => {
       handleSubmit(
         async () => {
@@ -25,12 +54,28 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
               intent: 'CAPTURE',
               purchase_units: [
                 {
+                  reference_id: orderID,
                   amount: {
                     value: amount,
-                    currency_code: 'USD',
+                    currency_code: 'GBP',
+                    breakdown: {
+                      item_total: {
+                        currency_code: 'GBP',
+                        value: amount,
+                      },
+                    },
                   },
+                  description:'app',
+                  payment_origin: 'app',
                 },
               ],
+              application_context: {
+                user_action: 'PAY_NOW',
+                brand_name: 'Land Registry',
+                payment_origin: 'app',
+                payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
+                payment_method_selected: 'PAYPAL',
+              },
             })
           )
         },
@@ -45,7 +90,7 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
     <PayPalScriptProvider
       options={{
         clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-        currency: 'USD',
+        currency: 'GBP',
       }}
     >
       <PayPalButtons
@@ -72,14 +117,12 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
         }}
         onApprove={async (data, actions) => {
           if (!actions.order) {
-            console.error('Order actions are undefined')
             return Promise.resolve()
           }
 
           return actions.order
             .capture()
             .then((details) => {
-              console.log('🚀 ~ Order captured successfully:', details)
               if (onSuccess) {
                 onSuccess(details)
               }

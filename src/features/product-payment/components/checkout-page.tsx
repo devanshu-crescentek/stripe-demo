@@ -71,19 +71,14 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       const selectedPayloadDoc = selectedDocs.map((doc: number) => ({
         product_id: String(doc),
       }))
+      const fastTrackId =
+        watch('delivery') === 'express'
+          ? documents.find((doc) => doc.name === 'Fast Track')?.id
+          : null
+      if (fastTrackId)
+        selectedPayloadDoc.push({ product_id: String(fastTrackId) })
 
-      if (watch('delivery') === 'express') {
-        const fastTrackId = documents.find(
-          (doc) => doc.name === 'Fast Track'
-        )?.id
-        if (fastTrackId) {
-          selectedPayloadDoc.push({ product_id: String(fastTrackId) })
-        }
-      }
-
-      let cartPayload: {
-        [key: string]: any
-      } = {
+      const cartPayload = {
         title_number: String(tenure_info.titleNumber || ''),
         address_one: selectedAddress?.address || '',
         city: selectedAddress?.city || '',
@@ -95,26 +90,23 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         order_status: 'pending',
         product_data: selectedPayloadDoc,
         country: documents[0]?.country || '',
+        ...(orderID && { order_id: orderID }),
       }
 
-      if (!orderID) {
-        const { order_id } = await addToCart(cartPayload).unwrap()
-        dispatch(setOrderID(order_id))
+      const { order_id } = orderID
+        ? await updateCart(cartPayload).unwrap()
+        : await addToCart(cartPayload).unwrap()
+      if (!orderID) dispatch(setOrderID(order_id))
 
-        const res = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: convertToSubCurrency(amount),
-            order_id,
-          }),
-        })
-        const { clientSecret } = await res.json()
-        setClientSecret(clientSecret)
-      } else {
-        cartPayload = { ...cartPayload, order_id: orderID }
-        await updateCart(cartPayload).unwrap()
-      }
+      const res = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: convertToSubCurrency(amount),
+          order_id,
+        }),
+      })
+      setClientSecret((await res.json()).clientSecret)
     } catch (error) {
       console.error('🚀 ~ addToCartHandler ~ error:', error)
       dispatch(setOrderID(null))
@@ -219,8 +211,9 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   }
 
   const handlePaypalSuccess = (details: any) => {
-    console.log('🚀 ~ Paypal success:', details)
-    router.push('/payment-success?amount=' + amount)
+    if (details.status === 'COMPLETED') {
+      router.push(`/payment-success?amount=${amount}&order_id=${orderID}`)
+    }
   }
 
   if (!clientSecret || !stripe || !elements) {
