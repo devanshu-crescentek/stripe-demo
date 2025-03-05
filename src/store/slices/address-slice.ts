@@ -30,6 +30,7 @@ interface AddressState {
     price: number
     country?: string
   }[]
+  orderID: number | null
 }
 
 const initialState: AddressState = {
@@ -43,6 +44,7 @@ const initialState: AddressState = {
   },
   documents: [],
   selectedDocuments: [],
+  orderID: null,
 }
 
 const addressSlice = createSlice({
@@ -98,6 +100,9 @@ const addressSlice = createSlice({
     ) => {
       state.selectedDocuments = action.payload
     },
+    setOrderID: (state, action: PayloadAction<number | null>) => {
+      state.orderID = action.payload
+    },
     resetAddress: (state) => {
       state.data = []
       state.loading = false
@@ -109,6 +114,7 @@ const addressSlice = createSlice({
       }
       state.documents = []
       state.selectedDocuments = []
+      state.orderID = null
     },
   },
   extraReducers: (builder) => {
@@ -143,6 +149,7 @@ export const {
   setTenureInfo,
   setDocuments,
   setSelectedDocuments,
+  setOrderID,
 } = addressSlice.actions
 
 export default addressSlice.reducer

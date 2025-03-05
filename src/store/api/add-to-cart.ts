@@ -18,7 +18,14 @@ export const addToCartAPI = createApi({
         body: data,
       }),
     }),
+    updateCart: builder.mutation({
+      query: (data) => ({
+        url: `crsc-lr-update-cart`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 })
 
-export const { useAddToCartMutation } = addToCartAPI
+export const { useAddToCartMutation, useUpdateCartMutation } = addToCartAPI

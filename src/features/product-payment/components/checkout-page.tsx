@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import Image from 'next/image'
-import { JSX, useEffect, useState } from 'react'
+import { JSX, useCallback, useEffect, useState } from 'react'
 
 import {
   ExpressCheckoutElement,
@@ -22,8 +23,12 @@ import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { paymentMethods } from '@/lib/constants'
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
 
-import { useAddToCartMutation } from '@/store/api/add-to-cart'
-import { setSelectedDocuments } from '@/store/slices/address-slice'
+import {
+  useAddToCartMutation,
+  useUpdateCartMutation,
+} from '@/store/api/add-to-cart'
+import { setOrderID, setSelectedDocuments } from '@/store/slices/address-slice'
+import { validEmailRegex } from '@/lib/utils'
 
 const expressCheckoutOptions = {
   buttonHeight: 40,
@@ -42,15 +47,15 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const [clientSecret, setClientSecret] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
-  // const [isExpressCheckout, setIsExpressCheckout] = useState(true)
 
-  const [addToCart] = useAddToCartMutation()
+  const [addToCart, { isLoading: addToCartLoading }] = useAddToCartMutation()
+  const [updateCart, { isLoading: updateCartLoading }] = useUpdateCartMutation()
 
   const deviceType = useDeviceType()
   const userEmail = watch('userEmail')
   const selectedDocs = watch('selectedDocs')
 
-  const { selectedAddress, tenure_info, documents } = useAppSelector(
+  const { selectedAddress, tenure_info, documents, orderID } = useAppSelector(
     (state) => state.address
   )
 
@@ -59,25 +64,87 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
     setPaymentRequestAvailable(true)
   }, [stripe, amount])
 
-  useEffect(() => {
+  const addToCartHandler = useCallback(async () => {
     if (!amount) return
-    fetch('/api/create-payment-intent', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount: convertToSubCurrency(amount),
-      }),
-    })
-      .then(async (res) => {
+
+    try {
+      const selectedPayloadDoc = selectedDocs.map((doc: number) => ({
+        product_id: String(doc),
+      }))
+
+      if (watch('delivery') === 'express') {
+        const fastTrackId = documents.find(
+          (doc) => doc.name === 'Fast Track'
+        )?.id
+        if (fastTrackId) {
+          selectedPayloadDoc.push({ product_id: String(fastTrackId) })
+        }
+      }
+
+      let cartPayload: {
+        [key: string]: any
+      } = {
+        title_number: String(tenure_info.titleNumber || ''),
+        address_one: selectedAddress?.address || '',
+        city: selectedAddress?.city || '',
+        county: selectedAddress?.county || '',
+        post_code: selectedAddress?.postalCode || '',
+        tenure: tenure_info.tenure,
+        customer_email: watch('userEmail'),
+        payment_status: 'pending',
+        order_status: 'pending',
+        product_data: selectedPayloadDoc,
+        country: documents[0]?.country || '',
+      }
+
+      if (!orderID) {
+        const { order_id } = await addToCart(cartPayload).unwrap()
+        dispatch(setOrderID(order_id))
+
+        const res = await fetch('/api/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: convertToSubCurrency(amount),
+            order_id,
+          }),
+        })
         const { clientSecret } = await res.json()
         setClientSecret(clientSecret)
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-  }, [amount])
+      } else {
+        cartPayload = { ...cartPayload, order_id: orderID }
+        await updateCart(cartPayload).unwrap()
+      }
+    } catch (error) {
+      console.error('🚀 ~ addToCartHandler ~ error:', error)
+      dispatch(setOrderID(null))
+      setClientSecret('')
+    }
+  }, [amount, selectedAddress, tenure_info, orderID])
+
+  useEffect(() => {
+    addToCartHandler()
+  }, [addToCartHandler])
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (userEmail.match(validEmailRegex)) {
+        addToCartHandler()
+      }
+    }, 2000)
+
+    return () => clearTimeout(handler)
+  }, [userEmail, addToCartHandler])
+
+  useEffect(() => {
+    if (addToCartLoading || updateCartLoading) {
+      setIsProcessing(true)
+      setErrorMessage('Please wait a few seconds...')
+    } else {
+      setIsProcessing(false)
+      setErrorMessage('')
+    }
+  }, [addToCartLoading, updateCartLoading])
 
   const onClick = ({ resolve: resolve }: any) => {
     const options = {
@@ -104,26 +171,6 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         return
       }
 
-      const cartPayload = {
-        title_number: String(
-          tenure_info.titleNumber ? tenure_info.titleNumber : ''
-        ),
-        address_one: selectedAddress?.address,
-        city: selectedAddress?.city,
-        county: selectedAddress?.county,
-        post_code: selectedAddress?.postalCode,
-        Tenure: tenure_info.tenure,
-        customer_email: userEmail,
-        payment_status: 'pending',
-        order_status: 'pending',
-        product_data: selectedDocs.map((doc: number) => {
-          return {
-            product_id: String(doc),
-          }
-        }),
-        country: documents[0]?.country || '',
-      }
-      
       const sDocuments = documents
         .filter((doc) => selectedDocs.includes(doc.id))
         .map((doc) => {
@@ -134,24 +181,18 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
           }
         })
 
-      dispatch(setSelectedDocuments(sDocuments))
-
-      const { order_id } = await addToCart(cartPayload).unwrap()
-
-      const response = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: convertToSubCurrency(amount), // Amount in cents
-          order_id, // Pass the order ID from cart response
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Payment intent creation failed')
+      if (watch('delivery') === 'express') {
+        const fastTrack = documents.find((doc) => doc.name === 'Fast Track')
+        if (fastTrack) {
+          sDocuments.push({
+            id: fastTrack.id,
+            name: 'Fast Track',
+            price: fastTrack.price,
+          })
+        }
       }
+
+      dispatch(setSelectedDocuments(sDocuments))
 
       posthog.identify(userEmail)
       if (isPayByCard) {
@@ -160,9 +201,9 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
 
       const { error } = await stripe.confirmPayment({
         elements,
-        clientSecret: data.clientSecret,
+        clientSecret,
         confirmParams: {
-          return_url: `${window.location.origin}/payment-success?amount=${amount}&order_id=${order_id}`,
+          return_url: `${window.location.origin}/payment-success?amount=${amount}&order_id=${orderID}`,
         },
       })
 
@@ -201,27 +242,13 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
     <>
       {deviceType === 'desktop' && (
         <>
-          {/* <Card className='mb-6'>
-            <CardContent className='p-6'>
-              {clientSecret && deviceType == 'desktop' && (
-                <PaymentElement options={{ layout: 'accordion' }} />
-              )}
-              {errorMessage && deviceType == 'desktop' && (
-                <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4'>
-                  <span className='block sm:inline'>{errorMessage}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card> */}
           <Card className='mb-6'>
             <CardContent className='p-6'>
               <div className='flex items-center justify-between gap-6'>
-                {/* Secure Payment Text */}
                 <h2 className='md:text-[20px] text-[15px] font-semibold whitespace-nowrap'>
                   Secure Payment
                 </h2>
 
-                {/* Payment Icons */}
                 <div className='flex flex-wrap items-center justify-start gap-1'>
                   {paymentMethods.map((method, index) => (
                     <div
@@ -258,7 +285,6 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                 </div>
               )}
               <div className='hidden md:flex items-center justify-between'>
-                {/* Total Price */}
                 <div>
                   <p className='text-gray-500 text-sm mb-2'>Total</p>
                   <p className='text-[40px] leading-[22px] font-semibold'>
@@ -285,7 +311,6 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       )}
       {deviceType === 'mobile' && (
         <div className='flex items-center justify-between gap-6 mb-[220px]'>
-          {/* Secure Payment Text */}
           <h2 className='md:text-[20px] text-[15px] font-semibold whitespace-nowrap'>
             Secure Payment
           </h2>

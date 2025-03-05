@@ -39,7 +39,6 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 )
 
-
 const schema = z.object({
   selectedDocs: z
     .array(z.number())
@@ -131,6 +130,8 @@ const PaymentSection = () => {
     return redirect('/')
   }
 
+  const fastTrackDoc = documents.find((doc) => doc.name === 'Fast Track')
+
   const totalAmount =
     documents
       .filter((doc) => selectedDocs.includes(doc.id))
@@ -151,7 +152,6 @@ const PaymentSection = () => {
               <div className=''>
                 <Card className='mb-6'>
                   <CardContent className='p-6'>
-
                     {/* Address */}
                     <div className='flex items-start justify-between'>
                       <p className='text-[#0B0C0C] md:text-[20px] text-[18px] leading-[30px] font-normal'>
@@ -195,53 +195,58 @@ const PaymentSection = () => {
                       {documents
                         .slice() // Create a shallow copy to avoid mutating the original array
                         .sort((a, b) => a.price - b.price) // Sort by price in ascending order
-                        .map((doc) => (
-                          <FormField
-                            key={doc.id}
-                            control={form.control}
-                            name='selectedDocs'
-                            render={({ field }) => {
-                              const isChecked = field.value.includes(doc.id)
-                              return (
-                                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value.includes(doc.id)}
-                                      className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
-                                      onCheckedChange={() => {
-                                        field.onChange(
-                                          field.value.includes(doc.id)
-                                            ? field.value.filter(
-                                                (id) => id !== doc.id
-                                              )
-                                            : [...field.value, doc.id]
-                                        )
+                        .map((doc) => {
+                          if (doc.name === 'Fast Track') {
+                            return null
+                          }
+                          return (
+                            <FormField
+                              key={doc.id}
+                              control={form.control}
+                              name='selectedDocs'
+                              render={({ field }) => {
+                                const isChecked = field.value.includes(doc.id)
+                                return (
+                                  <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value.includes(doc.id)}
+                                        className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                                        onCheckedChange={() => {
+                                          field.onChange(
+                                            field.value.includes(doc.id)
+                                              ? field.value.filter(
+                                                  (id) => id !== doc.id
+                                                )
+                                              : [...field.value, doc.id]
+                                          )
 
-                                        if (isChecked) {
-                                          posthog.capture(
-                                            `De-Selected ${doc.name}`
-                                          )
-                                        } else {
-                                          posthog.capture(
-                                            `Selected ${doc.name}`
-                                          )
-                                        }
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <div className='space-y-1 leading-none'>
-                                    <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'>
-                                      {doc.name} - £{doc.price}
-                                    </FormLabel>
-                                    <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
-                                      {doc.description}
-                                    </FormDescription>
-                                  </div>
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        ))}
+                                          if (isChecked) {
+                                            posthog.capture(
+                                              `De-Selected ${doc.name}`
+                                            )
+                                          } else {
+                                            posthog.capture(
+                                              `Selected ${doc.name}`
+                                            )
+                                          }
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <div className='space-y-1 leading-none'>
+                                      <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'>
+                                        {doc.name} - £{doc.price}
+                                      </FormLabel>
+                                      <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
+                                        {doc.description}
+                                      </FormDescription>
+                                    </div>
+                                  </FormItem>
+                                )
+                              }}
+                            />
+                          )
+                        })}
                       <FormMessage>
                         {form.formState.errors.selectedDocs?.message}
                       </FormMessage>
@@ -250,58 +255,63 @@ const PaymentSection = () => {
                       {documents
                         .slice() // Create a shallow copy to avoid mutating the original array
                         .sort((a, b) => a.price - b.price) // Sort by price in ascending order
-                        .map((doc) => (
-                          <FormField
-                            key={doc.id}
-                            control={form.control}
-                            name='selectedDocs'
-                            render={({ field }) => {
-                              const isChecked = field.value.includes(doc.id)
-                              return (
-                                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4 '>
-                                  <div className='space-y-1 leading-none cursor-pointer'>
-                                    <FormLabel className='font-semibold text-[18px] mb-2 text-black'>
-                                      <p className='font-semibold text-[18px] mb-2'>
-                                        {doc.name}
-                                      </p>
+                        .map((doc) => {
+                          if (doc.name === 'Fast Track') {
+                            return null
+                          }
+                          return (
+                            <FormField
+                              key={doc.id}
+                              control={form.control}
+                              name='selectedDocs'
+                              render={({ field }) => {
+                                const isChecked = field.value.includes(doc.id)
+                                return (
+                                  <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4 '>
+                                    <div className='space-y-1 leading-none cursor-pointer'>
+                                      <FormLabel className='font-semibold text-[18px] mb-2 text-black'>
+                                        <p className='font-semibold text-[18px] mb-2'>
+                                          {doc.name}
+                                        </p>
+                                      </FormLabel>
+                                      <FormDescription className='text-sm text-gray-600'>
+                                        {doc.description}
+                                      </FormDescription>
+                                    </div>
+                                    <FormLabel className='font-semibold text-[20px] text-black'>
+                                      £{doc.price.toFixed(2)}
                                     </FormLabel>
-                                    <FormDescription className='text-sm text-gray-600'>
-                                      {doc.description}
-                                    </FormDescription>
-                                  </div>
-                                  <FormLabel className='font-semibold text-[20px] text-black'>
-                                    £{doc.price.toFixed(2)}
-                                  </FormLabel>
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value.includes(doc.id)}
-                                      className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
-                                      onCheckedChange={() => {
-                                        field.onChange(
-                                          field.value.includes(doc.id)
-                                            ? field.value.filter(
-                                                (id) => id !== doc.id
-                                              )
-                                            : [...field.value, doc.id]
-                                        )
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value.includes(doc.id)}
+                                        className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                                        onCheckedChange={() => {
+                                          field.onChange(
+                                            field.value.includes(doc.id)
+                                              ? field.value.filter(
+                                                  (id) => id !== doc.id
+                                                )
+                                              : [...field.value, doc.id]
+                                          )
 
-                                        if (isChecked) {
-                                          posthog.capture(
-                                            `De-Selected ${doc.name}`
-                                          )
-                                        } else {
-                                          posthog.capture(
-                                            `Selected ${doc.name}`
-                                          )
-                                        }
-                                      }}
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        ))}
+                                          if (isChecked) {
+                                            posthog.capture(
+                                              `De-Selected ${doc.name}`
+                                            )
+                                          } else {
+                                            posthog.capture(
+                                              `Selected ${doc.name}`
+                                            )
+                                          }
+                                        }}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )
+                              }}
+                            />
+                          )
+                        })}
                       <FormMessage>
                         {form.formState.errors.selectedDocs?.message}
                       </FormMessage>
@@ -428,7 +438,7 @@ const PaymentSection = () => {
                                 className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col`}
                                 onClick={() => setValue('delivery', 'express')}
                               >
-                                £9.99
+                                £{fastTrackDoc?.price || 9.99}
                               </span>
                             </div>
                           </Label>
@@ -498,8 +508,8 @@ const PaymentSection = () => {
                         borderRadius: '4px',
                       },
                     },
-                    amount: convertToSubCurrency(totalAmount ? totalAmount : 1), //cents
-                    currency: 'usd',
+                    amount: convertToSubCurrency(totalAmount ? totalAmount : 1000), //cents
+                    currency: 'gbp',
                     mode: 'payment',
                   }}
                 >

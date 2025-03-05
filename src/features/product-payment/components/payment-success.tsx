@@ -10,14 +10,15 @@ const PaymentSuccess = () => {
   const searchParams = useSearchParams()
   const amount = searchParams.get('amount')
 
-  const { selectedAddress, tenure_info, selectedDocuments } =
+  const { selectedAddress, tenure_info, selectedDocuments, orderID } =
     useAppSelector((state) => state.address) || {}
 
   if (
     !selectedAddress ||
     !tenure_info ||
     !selectedDocuments ||
-    selectedDocuments.length === 0
+    selectedDocuments.length === 0 ||
+    !orderID
   ) {
     redirect('/')
   }
