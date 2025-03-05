@@ -5,6 +5,7 @@ import Image from 'next/image'
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useAppSelector } from '@/store/hook'
+import { getEstimatedTime, getNextBusinessDayTime } from '@/lib/utils'
 
 const PaymentSuccess = () => {
   const searchParams = useSearchParams()
@@ -144,7 +145,10 @@ const PaymentSuccess = () => {
                       </div>
                       <div className='flex flex-col'>
                         <h4 className='font-medium sm:text-[24px] text-[18px] leading-[30px]'>
-                          Fast Track Delivery:
+                          Your Fast Track Delivery is on its way! <br />
+                          <span className='sm:text-[20px] text-[16px]'>
+                            Estimated Arrival: {getEstimatedTime()}
+                          </span>
                         </h4>
                         <p className='text-[#6B6B6B] sm:text-[20px] text-[12px] sm:leading-[30px] leading-[15px]'>
                           Arrives within 1 business hour (Monday-Friday, 8 AM-5
@@ -167,7 +171,10 @@ const PaymentSuccess = () => {
                       </div>
                       <div className='flex flex-col'>
                         <h4 className='font-medium sm:text-[24px] text-[18px] leading-[30px]'>
-                          Standard Delivery:
+                          Your Standard Delivery is on its way! <br />
+                          <span className='sm:text-[20px] text-[16px]'>
+                            Estimated Arrival: {getNextBusinessDayTime()}
+                          </span>
                         </h4>
                         <p className='text-[#6B6B6B] sm:text-[20px] text-[12px] sm:leading-[30px] leading-[15px]'>
                           Arrives within 1 business day (Monday-Friday, 8 AM-5
