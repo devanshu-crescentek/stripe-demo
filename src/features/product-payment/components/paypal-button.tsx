@@ -1,6 +1,7 @@
 import { getLondonISOString } from '@/lib/utils'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import {
+  setEmail,
   setPayment,
   setPaymentTime,
   setSelectedDocuments,
@@ -50,6 +51,7 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
     }
 
     dispatch(setSelectedDocuments(sDocuments))
+    dispatch(setEmail(watch('userEmail')))
     return new Promise<string>((resolve, reject) => {
       handleSubmit(
         async () => {

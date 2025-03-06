@@ -25,6 +25,7 @@ import convertToSubCurrency from '@/lib/convertToSubCurrency'
 
 import { useUpdateCartMutation } from '@/store/api/add-to-cart'
 import {
+  setEmail,
   setOrderID,
   setPayment,
   setPaymentTime,
@@ -191,6 +192,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       dispatch(setPayment('card'))
       dispatch(setPaymentTime(getLondonISOString()))
       dispatch(setSelectedDocuments(sDocuments))
+      dispatch(setEmail(watch('userEmail')))
 
       posthog.identify(userEmail)
       if (isPayByCard) {
