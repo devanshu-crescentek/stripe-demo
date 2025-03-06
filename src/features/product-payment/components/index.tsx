@@ -387,6 +387,7 @@ const PaymentSection = () => {
                                     <Input
                                       type='email'
                                       placeholder='Enter Your Email Address'
+                                      {...field}
                                       onChange={(e) => {
                                         field.onChange(e)
                                         if (

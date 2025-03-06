@@ -32,6 +32,7 @@ interface AddressState {
   }[]
   orderID: number | null
   payment: string | null
+  paymentTime?: string | Date | null
 }
 
 const initialState: AddressState = {
@@ -47,6 +48,7 @@ const initialState: AddressState = {
   selectedDocuments: [],
   orderID: null,
   payment: null,
+  paymentTime: null,
 }
 
 const addressSlice = createSlice({
@@ -108,6 +110,9 @@ const addressSlice = createSlice({
     setPayment: (state, action: PayloadAction<string | null>) => {
       state.payment = action.payload
     },
+    setPaymentTime: (state, action: PayloadAction<string | null>) => {
+      state.paymentTime = action.payload
+    },
     resetAddress: (state) => {
       state.data = []
       state.loading = false
@@ -121,6 +126,7 @@ const addressSlice = createSlice({
       state.selectedDocuments = []
       state.orderID = null
       state.payment = null
+      state.paymentTime = null
     },
   },
   extraReducers: (builder) => {
@@ -157,6 +163,7 @@ export const {
   setSelectedDocuments,
   setOrderID,
   setPayment,
+  setPaymentTime,
 } = addressSlice.actions
 
 export default addressSlice.reducer

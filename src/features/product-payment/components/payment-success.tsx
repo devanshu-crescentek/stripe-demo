@@ -11,8 +11,14 @@ const PaymentSuccess = () => {
   const searchParams = useSearchParams()
   const amount = searchParams.get('amount')
 
-  const { selectedAddress, tenure_info, selectedDocuments, orderID, payment } =
-    useAppSelector((state) => state.address) || {}
+  const {
+    selectedAddress,
+    tenure_info,
+    selectedDocuments,
+    orderID,
+    payment,
+    paymentTime,
+  } = useAppSelector((state) => state.address) || {}
 
   if (
     !selectedAddress ||
@@ -147,7 +153,8 @@ const PaymentSuccess = () => {
                         <h4 className='font-medium sm:text-[24px] text-[18px] leading-[30px]'>
                           Your Fast Track Delivery is on its way! <br />
                           <span className='sm:text-[20px] text-[16px]'>
-                            Estimated Arrival: {getEstimatedTime()}
+                            Estimated Arrival:{' '}
+                            {getEstimatedTime('Europe/London', new Date(paymentTime as string))}.
                           </span>
                         </h4>
                         <p className='text-[#6B6B6B] sm:text-[20px] text-[12px] sm:leading-[30px] leading-[15px]'>
@@ -173,7 +180,7 @@ const PaymentSuccess = () => {
                         <h4 className='font-medium sm:text-[24px] text-[18px] leading-[30px]'>
                           Your Standard Delivery is on its way! <br />
                           <span className='sm:text-[20px] text-[16px]'>
-                            Estimated Arrival: {getNextBusinessDayTime()}
+                            Estimated Arrival: {getNextBusinessDayTime('Europe/London', new Date(paymentTime as string))}.
                           </span>
                         </h4>
                         <p className='text-[#6B6B6B] sm:text-[20px] text-[12px] sm:leading-[30px] leading-[15px]'>

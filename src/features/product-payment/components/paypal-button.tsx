@@ -1,5 +1,10 @@
+import { getLondonISOString } from '@/lib/utils'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
-import { setPayment, setSelectedDocuments } from '@/store/slices/address-slice'
+import {
+  setPayment,
+  setPaymentTime,
+  setSelectedDocuments,
+} from '@/store/slices/address-slice'
 import {
   FUNDING,
   PayPalButtons,
@@ -65,7 +70,7 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
                       },
                     },
                   },
-                  description:'app',
+                  description: 'app',
                   payment_origin: 'app',
                 },
               ],
@@ -124,6 +129,9 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
           return actions.order
             .capture()
             .then((details) => {
+              dispatch(
+                setPaymentTime(details.create_time ?? getLondonISOString())
+              )
               if (onSuccess) {
                 onSuccess(details)
               }

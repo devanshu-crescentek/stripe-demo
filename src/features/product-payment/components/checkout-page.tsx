@@ -27,8 +27,13 @@ import {
   useAddToCartMutation,
   useUpdateCartMutation,
 } from '@/store/api/add-to-cart'
-import { setOrderID, setPayment, setSelectedDocuments } from '@/store/slices/address-slice'
-import { validEmailRegex } from '@/lib/utils'
+import {
+  setOrderID,
+  setPayment,
+  setPaymentTime,
+  setSelectedDocuments,
+} from '@/store/slices/address-slice'
+import { getLondonISOString, validEmailRegex } from '@/lib/utils'
 
 const expressCheckoutOptions = {
   buttonHeight: 40,
@@ -45,8 +50,9 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [clientSecret, setClientSecret] = useState('')
-  const [isOpen, setIsOpen] = useState(false)
   const [paymentRequestAvailable, setPaymentRequestAvailable] = useState(false)
+  const [isExpressElement, setIsExpressElement] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   const [addToCart, { isLoading: addToCartLoading }] = useAddToCartMutation()
   const [updateCart, { isLoading: updateCartLoading }] = useUpdateCartMutation()
@@ -66,14 +72,22 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
 
   const addToCartHandler = useCallback(async () => {
     if (!amount) return
-    const res = await fetch('/api/create-payment-intent', {
+
+    fetch('/api/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amount: convertToSubCurrency(amount),
       }),
     })
-    setClientSecret((await res.json()).clientSecret)
+      .then(async (res) => {
+        const { clientSecret } = await res.json()
+        setClientSecret(clientSecret)
+      })
+      .catch(() => {
+        setClientSecret('')
+      })
+
     try {
       const selectedPayloadDoc = selectedDocs.map((doc: number) => ({
         product_id: String(doc),
@@ -92,7 +106,9 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         county: selectedAddress?.county || '',
         post_code: selectedAddress?.postalCode || '',
         tenure: tenure_info.tenure,
-        customer_email: watch('userEmail'),
+        customer_email: watch('userEmail').match(validEmailRegex)
+          ? watch('userEmail')
+          : '',
         payment_status: 'pending',
         order_status: 'pending',
         product_data: selectedPayloadDoc,
@@ -100,40 +116,32 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         ...(orderID && { order_id: orderID }),
       }
 
-      const { order_id } = orderID
-        ? await updateCart(cartPayload).unwrap()
-        : await addToCart(cartPayload).unwrap()
-      if (!orderID) dispatch(setOrderID(order_id))
-
-      const res = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: convertToSubCurrency(amount),
-          order_id,
-        }),
-      })
-      setClientSecret((await res.json()).clientSecret)
+      if (orderID) {
+        const res = await updateCart(cartPayload).unwrap()
+        dispatch(setOrderID(res.order_id))
+      } else {
+        const res = await addToCart(cartPayload).unwrap()
+        dispatch(setOrderID(res.order_id))
+      }
     } catch (error) {
       console.error('🚀 ~ addToCartHandler ~ error:', error)
-      dispatch(setOrderID(null))
-      setClientSecret('')
+      // dispatch(setOrderID(null))
+      // setClientSecret('')
     }
-  }, [amount, selectedAddress, tenure_info, orderID])
+  }, [amount, orderID])
 
   useEffect(() => {
     addToCartHandler()
-  }, [addToCartHandler])
+  }, [amount])
 
   useEffect(() => {
     const handler = setTimeout(() => {
       if (userEmail.match(validEmailRegex)) {
         addToCartHandler()
       }
-    }, 2000)
-
+    }, 500)
     return () => clearTimeout(handler)
-  }, [userEmail, addToCartHandler])
+  }, [userEmail])
 
   useEffect(() => {
     if (addToCartLoading || updateCartLoading) {
@@ -191,6 +199,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         }
       }
       dispatch(setPayment('card'))
+      dispatch(setPaymentTime(getLondonISOString()))
       dispatch(setSelectedDocuments(sDocuments))
 
       posthog.identify(userEmail)
@@ -276,7 +285,16 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                     }
                     onConfirm={() => onSubmit(false)}
                     options={expressCheckoutOptions}
-                    className={`w-full gap-4 h-[40px] mb-0`}
+                    onReady={(event) => {
+                      if (event.availablePaymentMethods) {
+                        setIsExpressElement(true)
+                      } else {
+                        setIsExpressElement(false)
+                      }
+                    }}
+                    className={`w-full gap-4 h-[40px] mb-0 ${
+                      isExpressElement ? 'block' : 'hidden'
+                    }`}
                   />
                   <PaypalButton
                     amount={amount.toString()}
@@ -337,12 +355,21 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       {paymentRequestAvailable && deviceType === 'mobile' && (
         <div className='fixed block md:hidden bottom-0 left-0 w-full border shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] rounded-t-xl p-4 bg-white'>
           {/* Payment Methods */}
-          <div className='flex justify-between items-center flex-wrap gap-4 mb-3 w-full'>
+          <div className='flex justify-between items-center gap-4 mb-3 w-full'>
             <ExpressCheckoutElement
               onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
               onConfirm={() => onSubmit(false)}
               options={expressCheckoutOptions}
-              className={`w-full gap-4 h-[40px] mb-0`}
+              onReady={(event) => {
+                if (event.availablePaymentMethods) {
+                  setIsExpressElement(true)
+                } else {
+                  setIsExpressElement(false)
+                }
+              }}
+              className={`w-full gap-4 h-[40px] mb-0 ${
+                isExpressElement ? 'block' : 'hidden'
+              }`}
             />
             <PaypalButton
               amount={amount.toString()}
