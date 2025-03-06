@@ -276,7 +276,11 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                     onConfirm={() => onSubmit(false)}
                     options={{
                       buttonHeight: 40,
-                      paymentMethodOrder: ['google_pay', 'apple_pay'],
+                      paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
+                      buttonType: {
+                        googlePay: 'checkout',
+                        applePay: 'check-out'
+                      },
                     }}
                     onReady={(event) => {
                       if (event.availablePaymentMethods) {
@@ -354,7 +358,11 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
               onConfirm={() => onSubmit(false)}
               options={{
                 buttonHeight: 40,
-                paymentMethodOrder: ['google_pay', 'apple_pay'],
+                paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
+                buttonType: {
+                  googlePay: 'checkout',
+                  applePay: 'check-out',
+                },
               }}
               onReady={(event) => {
                 if (event.availablePaymentMethods) {
