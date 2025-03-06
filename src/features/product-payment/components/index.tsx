@@ -58,6 +58,7 @@ const schema = z.object({
 
 const PaymentSection = () => {
   const cardRef = useRef<HTMLDivElement | null>(null)
+  const emailRef = useRef<HTMLDivElement | null>(null)
   const router = useRouter()
 
   const queryParams = useAppSelector((state) => state.queryParams.params)
@@ -125,6 +126,39 @@ const PaymentSection = () => {
       }
     }
   }, [form.formState.errors.selectedDocs])
+
+  useEffect(() => {
+    if (form.formState.errors.userEmail) {
+      if (selectedDelivery === 'express') {
+        const input = document.getElementById('expressEmail')
+        if (input) {
+          input.focus()
+        }
+      }
+      if (selectedDelivery === 'standard') {
+        const input = document.getElementById('standardEmail')
+        if (input) {
+          input.focus()
+        }
+      }
+      // Only apply effect on screens smaller than 1024px
+      if (window.innerWidth < 1024 && emailRef.current) {
+        const rect = emailRef.current.getBoundingClientRect()
+        const windowHeight = window.innerHeight
+
+        // Check if the card is already visible in the viewport
+        const isFullyVisible = rect.top >= 0 && rect.bottom <= windowHeight
+
+        if (!isFullyVisible) {
+          emailRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          })
+      
+        }
+      }
+    }
+  }, [form.formState.errors.userEmail])
 
   if (!selectedAddress) {
     return redirect('/')
@@ -320,7 +354,7 @@ const PaymentSection = () => {
                 </Card>
               </div>
               <div className=''>
-                <Card className='mb-6'>
+                <Card className='mb-6' ref={emailRef}>
                   <CardContent className='p-6'>
                     <RadioGroup
                       defaultValue={form.getValues('delivery')}
@@ -386,6 +420,7 @@ const PaymentSection = () => {
                                   <FormControl>
                                     <Input
                                       type='email'
+                                      id='standardEmail'
                                       placeholder='Enter Your Email Address'
                                       {...field}
                                       onChange={(e) => {
@@ -464,6 +499,7 @@ const PaymentSection = () => {
                                   <FormControl>
                                     <Input
                                       type='email'
+                                      id='expressEmail'
                                       placeholder='Enter Your Email Address'
                                       {...field}
                                       onChange={(e) => {
@@ -509,7 +545,9 @@ const PaymentSection = () => {
                         borderRadius: '4px',
                       },
                     },
-                    amount: convertToSubCurrency(totalAmount ? totalAmount : 1000), //cents
+                    amount: convertToSubCurrency(
+                      totalAmount ? totalAmount : 1000
+                    ), //cents
                     currency: 'gbp',
                     mode: 'payment',
                   }}
