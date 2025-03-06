@@ -32,10 +32,6 @@ import {
 } from '@/store/slices/address-slice'
 import { getLondonISOString, validEmailRegex } from '@/lib/utils'
 
-const expressCheckoutOptions = {
-  buttonHeight: 40,
-}
-
 const CheckoutPage = ({ amount }: { amount: number }) => {
   const stripe = useStripe()
   const elements = useElements()
@@ -278,7 +274,10 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                       handleSubmit(() => onClick(resolve))()
                     }
                     onConfirm={() => onSubmit(false)}
-                    options={expressCheckoutOptions}
+                    options={{
+                      buttonHeight: 40,
+                      paymentMethodOrder: ['google_pay', 'apple_pay'],
+                    }}
                     onReady={(event) => {
                       if (event.availablePaymentMethods) {
                         setIsExpressElement(true)
@@ -353,7 +352,10 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
             <ExpressCheckoutElement
               onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
               onConfirm={() => onSubmit(false)}
-              options={expressCheckoutOptions}
+              options={{
+                buttonHeight: 40,
+                paymentMethodOrder: ['google_pay', 'apple_pay'],
+              }}
               onReady={(event) => {
                 if (event.availablePaymentMethods) {
                   setIsExpressElement(true)
