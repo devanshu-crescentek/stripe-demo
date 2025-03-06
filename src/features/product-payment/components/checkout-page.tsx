@@ -23,10 +23,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { paymentMethods } from '@/lib/constants'
 import convertToSubCurrency from '@/lib/convertToSubCurrency'
 
-import {
-  useAddToCartMutation,
-  useUpdateCartMutation,
-} from '@/store/api/add-to-cart'
+import { useUpdateCartMutation } from '@/store/api/add-to-cart'
 import {
   setOrderID,
   setPayment,
@@ -54,7 +51,6 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   const [isExpressElement, setIsExpressElement] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
-  const [addToCart, { isLoading: addToCartLoading }] = useAddToCartMutation()
   const [updateCart, { isLoading: updateCartLoading }] = useUpdateCartMutation()
 
   const deviceType = useDeviceType()
@@ -113,15 +109,13 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         order_status: 'pending',
         product_data: selectedPayloadDoc,
         country: documents[0]?.country || '',
-        ...(orderID && { order_id: orderID }),
+        order_id: orderID,
       }
 
       if (orderID) {
         const res = await updateCart(cartPayload).unwrap()
         dispatch(setOrderID(res.order_id))
-      } else {
-        const res = await addToCart(cartPayload).unwrap()
-        dispatch(setOrderID(res.order_id))
+        console.log('update')
       }
     } catch (error) {
       console.error('🚀 ~ addToCartHandler ~ error:', error)
@@ -144,14 +138,14 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
   }, [userEmail])
 
   useEffect(() => {
-    if (addToCartLoading || updateCartLoading) {
+    if (updateCartLoading) {
       setIsProcessing(true)
       setErrorMessage('Please wait a few seconds...')
     } else {
       setIsProcessing(false)
       setErrorMessage('')
     }
-  }, [addToCartLoading, updateCartLoading])
+  }, [updateCartLoading])
 
   const onClick = ({ resolve: resolve }: any) => {
     const options = {

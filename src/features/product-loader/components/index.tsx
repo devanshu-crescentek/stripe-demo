@@ -3,16 +3,20 @@ import { Suspense, useEffect } from 'react'
 
 import posthog from 'posthog-js'
 import Image from 'next/image'
-import { redirect } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { useGetDocumentListQuery } from '@/store/api/get-documents'
-import { setDocuments } from '@/store/slices/address-slice'
+import { setDocuments, setOrderID } from '@/store/slices/address-slice'
+import { useAddToCartMutation } from '@/store/api/add-to-cart'
 
 const ProductLoaderDetails = () => {
   const dispatch = useAppDispatch()
-  const { selectedAddress } = useAppSelector((state) => state.address)
+  const router = useRouter()
+  const { selectedAddress, tenure_info } = useAppSelector(
+    (state) => state.address
+  )
 
   const address = selectedAddress?.address || ''
   const city = selectedAddress?.city || ''
@@ -30,6 +34,7 @@ const ProductLoaderDetails = () => {
       refetchOnMountOrArgChange: true,
     }
   )
+  const [addToCart] = useAddToCartMutation()
 
   useEffect(() => {
     if (isDocumentListError) return redirect('/details?isCtError=error')
@@ -37,31 +42,59 @@ const ProductLoaderDetails = () => {
     if (documentList && !isDocumentListLoading) {
       dispatch(
         setDocuments(
-          documentList?.map((doc:{
-            id: string;
-            name: string;
-            price: string;
-            description: string;
-            country: string;
-          }) => {
-            return {
-              ...doc,
-              price: Number(doc.price),
+          documentList?.map(
+            (doc: {
+              id: string
+              name: string
+              price: string
+              description: string
+              country: string
+            }) => {
+              return {
+                ...doc,
+                price: Number(doc.price),
+              }
             }
-          })
+          )
         )
       )
-      setTimeout(() => {
-        posthog.capture('Order_Country_Details', { country })
-        redirect('/product-payment')
-      }, Math.random() * 1001 + 2000)
+      const cartPayload = {
+        title_number: String(tenure_info.titleNumber || ''),
+        address_one: selectedAddress?.address || '',
+        city: selectedAddress?.city || '',
+        county: selectedAddress?.county || '',
+        post_code: selectedAddress?.postalCode || '',
+        tenure: tenure_info.tenure,
+        customer_email: '',
+        payment_status: 'pending',
+        order_status: 'pending',
+        product_data: [],
+        country: '',
+      }
+
+      addToCart(cartPayload)
+        .then((res) => {
+          if (!res?.data?.order_id) return router.replace('/details')
+          dispatch(setOrderID(res.data.order_id))
+          posthog.capture('Order_Country_Details', { country })
+          router.replace('/product-payment')
+        })
+        .catch((error) => {
+          console.error('🚀 ~ addToCartHandler ~ error:', error)
+          dispatch(setOrderID(null))
+          router.replace('/details')
+        })
     }
   }, [
     country,
-    dispatch,
+    router,
+    isDocumentListLoading,
     documentList,
     isDocumentListError,
-    isDocumentListLoading,
+    dispatch,
+    tenure_info,
+    selectedAddress,
+    addToCart,
   ])
 
   return (
