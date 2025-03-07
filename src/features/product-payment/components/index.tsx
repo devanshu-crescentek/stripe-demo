@@ -10,7 +10,7 @@ import * as z from 'zod'
 
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { Edit } from 'lucide-react'
+import { Edit, Info } from 'lucide-react'
 import posthog from 'posthog-js'
 
 import { Button } from '@/components/ui/button'
@@ -154,7 +154,6 @@ const PaymentSection = () => {
             behavior: 'smooth',
             block: 'center',
           })
-      
         }
       }
     }
@@ -288,7 +287,7 @@ const PaymentSection = () => {
                     <div className='block md:hidden'>
                       {documents
                         .slice() // Create a shallow copy to avoid mutating the original array
-                        .sort((a, b) => a.price - b.price) // Sort by price in ascending order
+                        .sort((a, b) => a.price - b.price) // Sort by price in ascending orderF
                         .map((doc) => {
                           if (doc.name === 'Fast Track') {
                             return null
@@ -301,45 +300,54 @@ const PaymentSection = () => {
                               render={({ field }) => {
                                 const isChecked = field.value.includes(doc.id)
                                 return (
-                                  <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border py-4 '>
-                                    <div className='space-y-1 leading-none cursor-pointer'>
-                                      <FormLabel className='font-semibold text-[18px] mb-2 text-black'>
-                                        <p className='font-semibold text-[18px] mb-2'>
-                                          {doc.name}
-                                        </p>
+                                  <FormItem className='flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border py-4 gap-4'>
+                                    <div className='leading-none cursor-pointer flex items-start gap-2 w-3/4'>
+                                      <FormLabel className='font-semibold text-[18px] text-black w-fit leading-[25px] flex'>
+                                       <span className='mr-2'>{doc.name}</span>{' '}
+                                        <span
+                                          className='relative group mt-1'
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                          }}
+                                        >
+                                          <Info className='w-5 h-5 text-[#868686] cursor-pointer' />
+                                          <div className='z-10 absolute left-1/2 transform -translate-x-1/2 top-5 hidden group-hover:flex w-[250px] bg-white border border-[#868686] text-sm px-3 py-2 rounded-md shadow-md break-words font-normal'>
+                                            {doc.description ||
+                                              'No description available'}
+                                          </div>
+                                        </span>
                                       </FormLabel>
-                                      <FormDescription className='text-sm text-gray-600'>
-                                        {doc.description}
-                                      </FormDescription>
                                     </div>
-                                    <FormLabel className='font-semibold text-[20px] text-black'>
-                                      £{doc.price.toFixed(2)}
-                                    </FormLabel>
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value.includes(doc.id)}
-                                        className='h-7 w-7 data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
-                                        onCheckedChange={() => {
-                                          field.onChange(
-                                            field.value.includes(doc.id)
-                                              ? field.value.filter(
-                                                  (id) => id !== doc.id
-                                                )
-                                              : [...field.value, doc.id]
-                                          )
+                                    <div className='flex items-center gap-2'>
+                                      <FormLabel className='font-semibold text-[20px] text-black'>
+                                        £{doc.price.toFixed(2)}
+                                      </FormLabel>
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value.includes(doc.id)}
+                                          className='sm:h-7 sm:w-7 h-[19px] w-[19px] data-[state=checked]:bg-[#28A745] data-[state=checked]:border-[#28A745] dark:text-foreground'
+                                          onCheckedChange={() => {
+                                            field.onChange(
+                                              field.value.includes(doc.id)
+                                                ? field.value.filter(
+                                                    (id) => id !== doc.id
+                                                  )
+                                                : [...field.value, doc.id]
+                                            )
 
-                                          if (isChecked) {
-                                            posthog.capture(
-                                              `De-Selected ${doc.name}`
-                                            )
-                                          } else {
-                                            posthog.capture(
-                                              `Selected ${doc.name}`
-                                            )
-                                          }
-                                        }}
-                                      />
-                                    </FormControl>
+                                            if (isChecked) {
+                                              posthog.capture(
+                                                `De-Selected ${doc.name}`
+                                              )
+                                            } else {
+                                              posthog.capture(
+                                                `Selected ${doc.name}`
+                                              )
+                                            }
+                                          }}
+                                        />
+                                      </FormControl>
+                                    </div>
                                   </FormItem>
                                 )
                               }}

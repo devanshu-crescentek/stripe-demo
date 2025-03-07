@@ -176,6 +176,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
             id: doc.id,
             name: doc.name,
             price: doc.price,
+            description: doc.description,
           }
         })
 
@@ -186,6 +187,8 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
             id: fastTrack.id,
             name: 'Fast Track',
             price: fastTrack.price,
+            description:
+              'Your documents will be delivered via email within  1 business hour.',
           })
         }
       }
@@ -281,7 +284,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                       paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
                       buttonType: {
                         googlePay: 'checkout',
-                        applePay: 'check-out'
+                        applePay: 'check-out',
                       },
                     }}
                     onReady={(event) => {

@@ -36,6 +36,7 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
           id: doc.id,
           name: doc.name,
           price: doc.price,
+          description: doc.description,
         }
       })
 
@@ -46,6 +47,8 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
           id: fastTrack.id,
           name: 'Fast Track',
           price: fastTrack.price,
+          description:
+            'Your documents will be delivered via email within  1 business hour.',
         })
       }
     }
