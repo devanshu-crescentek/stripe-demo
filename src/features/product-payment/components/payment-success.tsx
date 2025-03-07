@@ -39,26 +39,26 @@ const PaymentSuccess = () => {
 
   return (
     <div className='flex-1 mb-10'>
-      <div className='container w-full mx-auto px-4 sm:px-6 lg:gap-12'>
-        <div className='flex sm:flex-row flex-col justify-center items-center mb-10'>
-          <div className='w-[149px] h-[115px]'>
-            <Image
-              src='/success.gif'
-              alt='Success Animation'
-              width={100}
-              height={100}
-              className='w-full h-full object-contain'
-            />
-          </div>
-          <div className='flex sm:items-start items-center flex-col'>
-            <h2 className='font-semibold sm:text-[40px] text-[26px] leading-[30px] mb-2'>
-              Order Successful!
-            </h2>
-            <p className='font-medium text-[20px] leading-[30px] capitalize'>
-              Order ID: <span className='text-[#28A745]'>{orderID}</span>
-            </p>
-          </div>
+      <div className='flex flex-row justify-center items-center sm:mb-10 mb-6'>
+        <div className='w-[149px] h-[115px]'>
+          <Image
+            src='/success.gif'
+            alt='Success Animation'
+            width={100}
+            height={100}
+            className='w-full h-full object-contain'
+          />
         </div>
+        <div className='flex flex-col pr-[8px]'>
+          <h2 className='font-semibold sm:text-start text-end sm:text-[40px] text-[26px] leading-[30px] mb-2'>
+            Order Successful!
+          </h2>
+          <p className='font-medium sm:text-start text-end text-[20px] leading-[30px] capitalize'>
+            Order ID: <span className='text-[#28A745]'>{orderID}</span>
+          </p>
+        </div>
+      </div>
+      <div className='container w-full mx-auto px-4 sm:px-6 lg:gap-12'>
         <div className='w-full md:grid lg:grid-cols-2 flex flex-col-reverse sm:gap-6 gap-4'>
           <Card>
             <CardHeader className='sm:py-6 py-4'>
@@ -82,34 +82,45 @@ const PaymentSuccess = () => {
               </div>
               <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
               <div className=''>
-                {selectedDocuments?.map((item, index) => (
-                  <div
-                    key={index}
-                    className='flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border py-4 gap-4'
-                  >
-                    <div className='leading-none cursor-pointer flex items-start gap-2 w-full'>
-                      <label className='peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-semibold text-[18px] text-black leading-[25px] flex'>
-                        <span className='mr-2'>{item.name}</span>{' '}
-                        <span
-                          className='relative group mt-1'
-                          onClick={(e) => {
-                            e.preventDefault()
-                          }}
-                        >
-                          <Info className='w-5 h-5 text-[#868686] cursor-pointer' />
-                          <div className='z-10 absolute left-1/2 transform -translate-x-1/2 top-5 hidden group-hover:flex w-[250px] bg-white border border-[#868686] text-sm px-3 py-2 rounded-md shadow-md break-words font-normal'>
-                            {item.description || 'No description available'}
+                {selectedDocuments
+                  .slice() // Create a shallow copy to avoid mutating the original array
+                  .sort((a, b) => a.price - b.price) // Sort by price in ascending orderF
+                  .map((item, index) => (
+                    <div
+                      key={index}
+                      className='flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border sm:pb-4 pb-3 gap-4'
+                    >
+                      <div className='leading-none cursor-pointer flex items-start gap-2 w-full'>
+                        <label className='peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-semibold text-[18px] text-black w-fit leading-[25px] flex items-start'>
+                          <div
+                            className={`mr-2 w-full ${
+                              item.name === 'Fast Track' ? 'min-w-[148px]' : ''
+                            } sm:max-w-full max-w-[135px]`}
+                          >
+                            {item.name === 'Fast Track'
+                              ? 'Express Delivery'
+                              : item.name}
+                          </div>{' '}
+                          <div
+                            className='relative group mt-1'
+                            onClick={(e) => {
+                              e.preventDefault()
+                            }}
+                          >
+                            <Info className='w-5 h-5 text-[#868686] cursor-pointer' />
+                            <div className='z-10 absolute left-1/2 transform -translate-x-1/2 top-5 hidden group-hover:flex w-[250px] bg-white border border-[#868686] text-sm px-3 py-2 rounded-md shadow-md break-words font-normal'>
+                              {item.description || 'No description available'}
+                            </div>
                           </div>
-                        </span>
-                      </label>
+                        </label>
+                      </div>
+                      <div className='flex items-center justify-end gap-2'>
+                        <label className='peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-semibold text-[20px] text-black'>
+                          £{item.price.toFixed(2)}
+                        </label>
+                      </div>
                     </div>
-                    <div className='flex items-end justify-end gap-2 w-full'>
-                      <label className='peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-semibold text-[20px] text-black'>
-                        £{item.price.toFixed(2)}
-                      </label>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
               <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
               <div className='flex flex-row items-center justify-between gap-4'>
@@ -190,7 +201,7 @@ const PaymentSuccess = () => {
                           Your Fast Track Delivery is on its way! should arrive
                           by
                         </h4>
-                        <p className='text-[#28A745] text-[18px] leading-[20px] '>
+                        <p className='text-[#28A745] text-[18px] font-medium leading-[20px] '>
                           {getEstimatedTime(
                             'Europe/London',
                             new Date(paymentTime as string)
@@ -215,7 +226,7 @@ const PaymentSuccess = () => {
                         <h4 className='font-medium sm:text-[26px] text-[18px] sm:leading-[30px] leading-[20px] mb-2'>
                           Your standard delivery is on its way! should arrive by
                         </h4>
-                        <p className='text-[#28A745] sm:text-[18px] text-[12px] sm:leading-[20px] leading-[15px]'>
+                        <p className='text-[#28A745] text-[18px] font-medium leading-[20px]'>
                           {getNextBusinessDayTime(
                             'Europe/London',
                             new Date(paymentTime as string)

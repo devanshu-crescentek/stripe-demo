@@ -213,17 +213,17 @@ const PaymentSection = () => {
                 </Card>
 
                 <Card
-                  className={`mb-6 transition-all duration-500 ${
+                  className={`transition-all duration-500 ${
                     form.formState.errors.selectedDocs
                       ? 'border border-red-500 shadow-md'
                       : 'border'
                   }`}
                   ref={cardRef}
                 >
-                  <CardHeader className='font-semibold md:text-[30px] text-[18px] leading-[23px] text-[#222222]'>
+                  <CardHeader className='font-semibold md:text-[30px] text-[20px] leading-[23px] text-[#222222] sm:pb-6 pb-4 sm:pt-6 pt-4'>
                     Select Your Documents
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className='sm:pb-6 pb-4'>
                     <div className='hidden md:block'>
                       {documents
                         .slice() // Create a shallow copy to avoid mutating the original array
@@ -300,8 +300,8 @@ const PaymentSection = () => {
                               render={({ field }) => {
                                 const isChecked = field.value.includes(doc.id)
                                 return (
-                                  <FormItem className='flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border py-4 gap-4'>
-                                    <div className='leading-none cursor-pointer flex items-start gap-2 w-3/4'>
+                                  <FormItem className='flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border sm:pb-4 pb-3 gap-4'>
+                                    <div className='leading-none cursor-pointer flex items-start gap-2 w-full'>
                                       <FormLabel className='font-semibold text-[18px] text-black w-fit leading-[25px] flex'>
                                        <span className='mr-2'>{doc.name}</span>{' '}
                                         <span
@@ -318,7 +318,7 @@ const PaymentSection = () => {
                                         </span>
                                       </FormLabel>
                                     </div>
-                                    <div className='flex items-center gap-2'>
+                                    <div className='flex items-center justify-end gap-2 w-full'>
                                       <FormLabel className='font-semibold text-[20px] text-black'>
                                         £{doc.price.toFixed(2)}
                                       </FormLabel>
@@ -416,8 +416,7 @@ const PaymentSection = () => {
                                 {' '}
                                 1 business day
                               </b>{' '}
-                              (Monday-Friday, 8 AM-5 PM). If you don’t receive
-                              your order, please check your junk or spam folder.
+                              (Monday-Friday, 8 AM-5 PM).
                             </p>
 
                             <FormField
@@ -495,8 +494,7 @@ const PaymentSection = () => {
                                 {' '}
                                 1 business hour
                               </b>{' '}
-                              (Monday–Friday, 8 AM–5 PM). If you don’t receive
-                              your order, please check your junk or spam folder.
+                              (Monday–Friday, 8 AM–5 PM).
                             </p>
 
                             <FormField

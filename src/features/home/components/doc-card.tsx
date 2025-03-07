@@ -62,7 +62,7 @@ const DocCard = ({
         )}
         {btnTitle && (
           <button
-            className='mt-6 w-fit p-[20px] h-[58px] md:text-[20px] text-[16px] bg-green-600  text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700'
+            className='mt-6 w-fit p-[20px] h-[58px] md:text-[20px] text-[16px] bg-[#28A745]  text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700'
             onClick={handleNavigate}
           >
             {btnTitle}

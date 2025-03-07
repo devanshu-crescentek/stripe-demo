@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -25,11 +25,11 @@ import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { resetAddress } from '@/store/slices/address-slice'
 import { setQueryParams } from '@/store/slices/query-slice'
 
-
 const Home = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const searchParams = useSearchParams()
+  const [btnLoading, setBtnLoading] = useState(false)
 
   const queryParams = useAppSelector((state) => state.queryParams.params)
 
@@ -62,7 +62,7 @@ const Home = () => {
     }
   }, [postalCode])
 
-  const [temGetAddressDetails, { isLoading }] = useGetAddressDetailsMutation()
+  const [temGetAddressDetails,] = useGetAddressDetailsMutation()
 
   const handleNavigate = () => {
     router.push('/details')
@@ -70,17 +70,20 @@ const Home = () => {
 
   const handleOnSubmit = async (data: z.infer<typeof postalCodeSchema>) => {
     try {
+      setBtnLoading(true)
       const res = await temGetAddressDetails(data.postalCode).unwrap()
       posthog.capture('Search Postcode', { postalCode: data.postalCode })
       if (res.length > 0) {
         router.push(`/search-postalCode?postalCode=${data.postalCode}`)
       } else {
+        setBtnLoading(false)
         methods.setError('postalCode', {
           type: 'manual',
           message: 'No records found',
         })
       }
     } catch (error) {
+      setBtnLoading(false)
       console.log('🚀 ~ handleOnSubmit ~ error:', error)
       methods.setError('postalCode', {
         type: 'manual',
@@ -104,7 +107,7 @@ const Home = () => {
                   <p className='md:text-[20px] text-[16px] md:leading-[30px] leading-[25px] font-semibold'>
                     Find information and access official electronic copies of
                     title deeds and documents for millions of properties in
-                    <span className='text-green-500'>
+                    <span className='text-[#28A745]'>
                       {' '}
                       England, Wales, Northern Ireland & Scotland.
                     </span>
@@ -124,7 +127,7 @@ const Home = () => {
                         <input
                           type='text'
                           {...field}
-                          placeholder='Enter your postalCode here ....'
+                          placeholder='Enter Your Postcode Here'
                           className={`mt-4 w-full p-3 border border-gray-300 rounded-md focus:outline-none ${
                             methods.formState.errors.postalCode
                               ? 'border-red-500'
@@ -153,13 +156,13 @@ const Home = () => {
                 {/* Search Button */}
                 <button
                   type='submit'
-                  className={`mt-4 w-full bg-green-600 text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
-                    isLoading
-                      ? 'bg-slate-300 opacity-50 cursor-not-allowed'
+                  className={`mt-4 w-full bg-[#28A745] text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
+                    btnLoading
+                      ? '!bg-black opacity-50 text-white cursor-not-allowed'
                       : ''
                   }`}
                 >
-                  {isLoading ? (
+                  {btnLoading ? (
                     <>
                       <span>Please wait...</span>
                     </>
@@ -173,11 +176,11 @@ const Home = () => {
 
                 <p className='mt-[15px] mb-[1.6em] text-[16px] text-gray-600'>
                   By using this service, you agree to the
-                  <a href='#' className='text-green-600 mx-1'>
+                  <a href='#' className='text-[#28A745] mx-1'>
                     terms of service
                   </a>
                   and
-                  <a href='#' className='text-green-600 mx-1'>
+                  <a href='#' className='text-[#28A745] mx-1'>
                     privacy policy
                   </a>
                   .

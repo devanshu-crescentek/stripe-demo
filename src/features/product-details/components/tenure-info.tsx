@@ -1,13 +1,14 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import posthog from 'posthog-js'
 import { SubmitHandler, useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -23,15 +24,15 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import useDeviceType from '@/hooks/use-device-type'
 
 import { productDetailsSchema } from '@/features/product-details/schema'
+import { useCheckCountryMutation } from '@/store/api/get-country'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { setSelectedAddress, setTenureInfo } from '@/store/slices/address-slice'
-import { useCheckCountryMutation } from '@/store/api/get-country'
 
 const TenureInfo = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const { selectedAddress } = useAppSelector((state) => state.address) || false
-
+  const [isLoading, setIsLoading] = useState(false)
   const {
     formState: { errors, dirtyFields },
     setValue,
@@ -52,6 +53,7 @@ const TenureInfo = () => {
     data
   ) => {
     try {
+      setIsLoading(true)
       if (dirtyFields.postalCode) {
         const res = await checkCountry({ postalCode: data.postalCode }).unwrap()
         data.country = res.result.country || data.country
@@ -68,6 +70,7 @@ const TenureInfo = () => {
       posthog.capture('Search document')
       router.push('/search-result')
     } catch (error) {
+      setIsLoading(false)
       console.error('🚀 ~ TenureInfo ~ error:', error)
       setError('postalCode', {
         type: 'manual',
@@ -79,12 +82,12 @@ const TenureInfo = () => {
   return (
     <>
       <Card className={`md:mb-4 mb-[160px]`}>
-        <CardHeader className='md:text-[30px] text-[15px] leading-[15px] font-medium'>
+        <CardHeader className='md:text-[30px] text-[15px] leading-[15px] font-semibold'>
           Tenure *
         </CardHeader>
         <CardContent>
           <RadioGroup
-            className='flex sm:items-center items-start sm:gap-4 gap-2 flex-wrap'
+            className='flex sm:items-center items-start sm:gap-4 gap-2 flex-wrap justify-between'
             defaultValue={watch('tenure')}
             onValueChange={(value) =>
               setValue('tenure', value as 'freehold' | 'leasehold' | 'not-sure')
@@ -165,7 +168,9 @@ const TenureInfo = () => {
               name='title_number'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title Number (Optional)</FormLabel>
+                  <FormLabel className='font-semibold'>
+                    Title Number (Optional)
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Enter Title Number (If known)'
@@ -226,13 +231,26 @@ const TenureInfo = () => {
                 </p>
               )}
             </div>
-            <Button
+            <button
               type='button'
+              className={`w-full bg-[#28A745] text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
+                isLoading
+                  ? '!bg-black opacity-50 text-white cursor-not-allowed'
+                  : ''
+              }`}
               onClick={handleSubmit(onSubmit)}
-              className='w-full bg-green-600 hover:bg-green-700'
             >
-              Search Now →
-            </Button>
+              {isLoading ? (
+                <>
+                  <span>Please wait...</span>
+                </>
+              ) : (
+                <>
+                  Search Now
+                  <span>&#8594;</span>
+                </>
+              )}
+            </button>
           </CardContent>
         </Card>
       )}
@@ -255,7 +273,7 @@ const TenureInfo = () => {
                     <FormLabel>
                       I agree to the{' '}
                       <Link
-                        className='text-[#89c120] font-bold'
+                        className='text-[#28A745] font-bold'
                         href='/terms-conditions'
                         target='_blank'
                       >
@@ -263,7 +281,7 @@ const TenureInfo = () => {
                       </Link>{' '}
                       and{' '}
                       <Link
-                        className='text-[#89c120] font-bold'
+                        className='text-[#28A745] font-bold'
                         href='/privacy-policy'
                         target='_blank'
                       >
@@ -281,13 +299,26 @@ const TenureInfo = () => {
             )}
           </div>
           <div className='border-t w-full border-[#000000] opacity-10 my-4'></div>
-          <Button
+          <button
             type='button'
+            className={`w-full bg-[#28A745] text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
+              isLoading
+                ? '!bg-black opacity-50 text-white cursor-not-allowed'
+                : ''
+            }`}
             onClick={handleSubmit(onSubmit)}
-            className='w-full bg-green-600 hover:bg-green-700'
           >
-            Search Now →
-          </Button>
+            {isLoading ? (
+              <>
+                <span>Please wait...</span>
+              </>
+            ) : (
+              <>
+                Search Now
+                <span>&#8594;</span>
+              </>
+            )}
+          </button>
         </div>
       )}
     </>

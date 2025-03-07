@@ -54,7 +54,7 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
       }}
     >
       <button
-        className='bg-green-500 hover:bg-green-600 text-white justify-center font-medium py-3 px-6 rounded-[4px] flex items-center space-x-2 w-[189px] h-[40px]'
+        className='bg-[#28A745] hover:bg-green-700 text-white justify-center font-medium py-3 px-6 rounded-[4px] flex items-center space-x-2 w-[189px] h-[40px]'
         onClick={handleSubmit(() => {
           posthog.capture('Initiated pay by card')
           setIsOpen(true)
@@ -87,13 +87,25 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
         </DrawerHeader>
         <DrawerFooter className='flex items-center justify-between'>
           <button
-            className='bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-[4px] flex items-center justify-center space-x-2 disabled:opacity-50 disabled:animate-pulse sm:w-[246px] w-full h-[40px]'
-            disabled={isProcessing || !stripe}
             type='button'
-            onClick={handleSubmit(() => onSubmit(true))}
+            className={`w-full bg-[#28A745] text-[18px] h-[42px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
+              isProcessing || !stripe
+                ? '!bg-black opacity-50 text-white cursor-not-allowed'
+                : ''
+            }`}
+            onClick={handleSubmit(() => onSubmit(false))}
+            disabled={isProcessing || !stripe}
           >
-            <span>Pay</span>
-            <span>→</span>
+            {isProcessing ? (
+              <>
+                <span>Please wait...</span>
+              </>
+            ) : (
+              <>
+                Pay
+                <span>&#8594;</span>
+              </>
+            )}
           </button>
           <Button
             variant='outline'

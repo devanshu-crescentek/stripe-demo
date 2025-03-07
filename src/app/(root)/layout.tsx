@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={`${poppins.variable} antialiased`}>
-        <main className='h-screen flex gap-10 flex-col'>
+        <main className='h-screen flex gap-6 flex-col'>
           <Header />
           {children}
           <FooterWrapper />
