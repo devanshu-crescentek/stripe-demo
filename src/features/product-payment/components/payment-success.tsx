@@ -184,58 +184,44 @@ const PaymentSuccess = () => {
               </div>
               <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
               <div className='flex flex-col gap-4 justify-start items-start'>
-                {fastTrack ? (
-                  <>
-                    <div className='flex items-start gap-2'>
-                      <div className='w-[43px] h-[43px]'>
-                        <Image
-                          src='/fast_track_delivery.svg'
-                          alt='Fast track delivery'
-                          width={100}
-                          height={100}
-                          className='w-full h-full'
-                        />
-                      </div>
-                      <div className='flex flex-col'>
-                        <h4 className='font-medium sm:text-[26px] text-[18px] sm:leading-[30px] leading-[20px] mb-2'>
-                          Your Fast Track Delivery is on its way! should arrive
-                          by
-                        </h4>
-                        <p className='text-[#28A745] text-[18px] font-medium leading-[20px] '>
+                <div className='flex items-start gap-2'>
+                  <div className='w-[43px] h-[43px]'>
+                    <Image
+                      src={
+                        fastTrack
+                          ? '/fast_track_delivery.svg'
+                          : '/standard_delivery.svg'
+                      }
+                      alt={fastTrack ? 'fast track' : 'standard'}
+                      width={100}
+                      height={100}
+                      className='w-full h-full'
+                    />
+                  </div>
+                  <div className='flex flex-col'>
+                    <h4 className='font-medium sm:text-[26px] text-[18px] sm:leading-[30px] leading-[20px] mb-2 capitalize'>
+                      Your {fastTrack ? 'Fast track' : 'Standard'}{' '}
+                      Delivery is on its way! should arrive by
+                    </h4>
+                    <p className='text-[#28A745] text-[18px] font-medium leading-[20px] '>
+                      {fastTrack ? (
+                        <>
                           {getEstimatedTime(
                             'Europe/London',
                             new Date(paymentTime as string)
                           )}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className='flex items-start gap-2'>
-                      <div className='w-[43px] h-[43px]'>
-                        <Image
-                          src='/standard_delivery.svg'
-                          alt='standard delivery'
-                          width={100}
-                          height={100}
-                          className='w-full h-auto'
-                        />
-                      </div>
-                      <div className='flex flex-col'>
-                        <h4 className='font-medium sm:text-[26px] text-[18px] sm:leading-[30px] leading-[20px] mb-2'>
-                          Your standard delivery is on its way! should arrive by
-                        </h4>
-                        <p className='text-[#28A745] text-[18px] font-medium leading-[20px]'>
+                        </>
+                      ) : (
+                        <>
                           {getNextBusinessDayTime(
                             'Europe/London',
                             new Date(paymentTime as string)
                           )}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
