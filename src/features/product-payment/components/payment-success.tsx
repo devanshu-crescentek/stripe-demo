@@ -39,7 +39,7 @@ const PaymentSuccess = () => {
 
   return (
     <div className='flex-1 mb-10'>
-      <div className='flex flex-row sm:justify-center justify-between items-center sm:mb-10 mb-6'>
+      <div className='flex flex-row sm:justify-center justify-start items-center sm:mb-10 mb-6'>
         <div className='w-[149px] h-[115px] sm:ml-0 -ml-4'>
           <Image
             src='/success.gif'
@@ -50,10 +50,10 @@ const PaymentSuccess = () => {
           />
         </div>
         <div className='flex flex-col pr-4'>
-          <h2 className='font-semibold sm:text-start text-end sm:text-[40px] text-[26px] leading-[30px] mb-2'>
+          <h2 className='font-semibold text-start sm:text-[40px] text-[26px] leading-[30px] mb-2'>
             Order Successful!
           </h2>
-          <p className='font-medium sm:text-start text-end text-[20px] leading-[30px] capitalize'>
+          <p className='font-medium text-start text-[20px] leading-[30px] capitalize'>
             Order ID: <span className='text-[#28A745]'>{orderID}</span>
           </p>
         </div>

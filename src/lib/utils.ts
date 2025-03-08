@@ -136,9 +136,16 @@ export const getNextBusinessDayTime = (
     estimatedMinutes = 0;
   }
 
-  // If the next business day is Saturday or Sunday, move to Tuesday
-  if (ukTime.getDay() === 6) ukTime.setDate(ukTime.getDate() + 3); // If Saturday, move to Tuesday
-  if (ukTime.getDay() === 0) ukTime.setDate(ukTime.getDate() + 2); // If Sunday, move to Tuesday
+  // If the next business day is Saturday or Sunday, move to Tuesday at 8 AM
+  if (ukTime.getDay() === 6) {
+    ukTime.setDate(ukTime.getDate() + 3); // Move to Tuesday
+    estimatedHour = officeStart;
+    estimatedMinutes = 0;
+  } else if (ukTime.getDay() === 0) {
+    ukTime.setDate(ukTime.getDate() + 2); // Move to Tuesday
+    estimatedHour = officeStart;
+    estimatedMinutes = 0;
+  }
 
   ukTime.setHours(estimatedHour, estimatedMinutes, 0);
 

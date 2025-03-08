@@ -302,6 +302,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                         paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
                       }}
                       onReady={(event) => {
+                        console.log("🚀 ~ CheckoutPage ~ event.availablePaymentMethods:", event.availablePaymentMethods)
                         if (event.availablePaymentMethods) {
                           setIsExpressElement(true)
                         } else {
@@ -382,6 +383,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                   paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
                 }}
                 onReady={(event) => {
+                  console.log("🚀 ~ CheckoutPage ~ event.availablePaymentMethods:", event.availablePaymentMethods)
                   if (event.availablePaymentMethods) {
                     setIsExpressElement(true)
                   } else {

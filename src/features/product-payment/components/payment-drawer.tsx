@@ -1,14 +1,14 @@
 import React, { JSX } from 'react'
 
+import { PaymentElement } from '@stripe/react-stripe-js'
 import { Stripe } from '@stripe/stripe-js'
+import { XIcon } from 'lucide-react'
 import posthog from 'posthog-js'
 import {
   FieldValues,
   useFormContext,
   UseFormHandleSubmit,
 } from 'react-hook-form'
-import { XIcon } from 'lucide-react'
-import { PaymentElement } from '@stripe/react-stripe-js'
 
 import {
   Drawer,
@@ -96,6 +96,7 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
                   },
                 },
               }}
+              className='otp-input'
             />
             {errorMessage && (
               <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4'>
@@ -107,7 +108,7 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
         <DrawerFooter className='flex items-center justify-between'>
           <button
             type='button'
-            className={`w-full bg-[#28A745] text-[18px] h-[42px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
+            className={`w-full bg-[#28A745] mb-5 text-[18px] h-[42px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 ${
               isProcessing || !stripe
                 ? '!bg-black opacity-50 text-white cursor-not-allowed'
                 : ''
@@ -126,18 +127,6 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
               </>
             )}
           </button>
-          {/* <Button
-            variant='outline'
-            className='sm:w-[246px] w-full h-[40px]'
-            onClick={() => {
-              setErrorMessage('')
-              setIsOpen(false)
-              posthog.capture('Cancelled pay by card')
-              setIsProcessing(false)
-            }}
-          >
-            Cancel
-          </Button> */}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
