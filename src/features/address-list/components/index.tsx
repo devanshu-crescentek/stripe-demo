@@ -1,7 +1,6 @@
 'use client'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { setSelectedAddress } from '@/store/slices/address-slice'
-import { ChevronsRight } from 'lucide-react'
 import { redirect, useRouter, useSearchParams } from 'next/navigation'
 import posthog from 'posthog-js'
 
@@ -68,10 +67,10 @@ const AddressList = () => {
         <div>
           <button
             onClick={() => handlerNavigate(false)}
-            className='bg-[#0B0C0C] max-w-[293px] max-h-[56px] w-full h-full text-white text-[13px] font-medium p-[20px] rounded-sm my-[20px] flex justify-center items-center gap-[10px]'
+            className={`my-[20px] max-w-[293px] text-[13px] font-medium bg-[#28A745] h-[58px] text-white p-[20px] rounded-md flex items-center justify-center gap-2 hover:bg-green-700 `}
           >
-            <span>Address not listed? Enter manually</span>
-            <ChevronsRight className='w-4 h-4' />
+            Address not listed? Enter manually
+            <span>&#8594;</span>
           </button>
         </div>
       </div>

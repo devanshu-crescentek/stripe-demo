@@ -206,7 +206,7 @@ const TenureInfo = () => {
                       <FormLabel>
                         I agree to the{' '}
                         <Link
-                          className='text-[#89c120] font-bold'
+                          className='text-[#28A745] font-bold'
                           href='/terms-conditions'
                           target='_blank'
                         >
@@ -214,7 +214,7 @@ const TenureInfo = () => {
                         </Link>{' '}
                         and{' '}
                         <Link
-                          className='text-[#89c120] font-bold'
+                          className='text-[#28A745] font-bold'
                           href='/privacy-policy'
                           target='_blank'
                         >

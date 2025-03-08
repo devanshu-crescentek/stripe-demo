@@ -19,7 +19,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -276,12 +275,21 @@ const PaymentSection = () => {
                                       />
                                     </FormControl>
                                     <div className='space-y-1 leading-none'>
-                                      <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'>
+                                      <FormLabel className='text-[20px] font-semibold leading-[30px] text-black peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex gap-2 w-[500px]'>
                                         {doc.name} - £{doc.price}
+                                        <span
+                                          className='relative group mt-1'
+                                          onClick={(e) => {
+                                            e.preventDefault()
+                                          }}
+                                        >
+                                          <Info className='w-5 h-5 text-[#868686] cursor-pointer' />
+                                          <div className='z-10 absolute left-1/2 transform -translate-x-1/2 top-5 hidden group-hover:flex w-[250px] bg-white border border-[#868686] text-sm px-3 py-2 rounded-md shadow-md break-words font-normal'>
+                                            {doc.description ||
+                                              'No description available'}
+                                          </div>
+                                        </span>
                                       </FormLabel>
-                                      <FormDescription className='text-[20px] leading-[30px] text-[#6B6B6B] font-normal'>
-                                        {doc.description}
-                                      </FormDescription>
                                     </div>
                                   </FormItem>
                                 )
@@ -411,7 +419,7 @@ const PaymentSection = () => {
                             <div className='flex items-center justify-between w-full cursor-pointer'>
                               Standard Delivery
                               <span
-                                className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center text-[#000000]'
+                                className='font-semibold text-[20px] flex flex-col items-center text-[#000000]'
                                 onClick={() => setValue('delivery', 'standard')}
                               >
                                 Free
@@ -489,7 +497,7 @@ const PaymentSection = () => {
                             <div className='flex items-center justify-between w-full cursor-pointer'>
                               Express Delivery
                               <span
-                                className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col text-[#000000]`}
+                                className={`font-semibold text-[20px] flex items-center flex-col text-[#000000]`}
                                 onClick={() => setValue('delivery', 'express')}
                               >
                                 £{fastTrackDoc?.price || 9.99}

@@ -30,69 +30,72 @@ export const getEstimatedTime = (
   timezone: string = 'Europe/London',
   paymentDate: Date = new Date()
 ): string => {
-  const now: Date = new Date(paymentDate)
+  const now: Date = new Date(paymentDate);
   const ukTime: Date = new Date(
     now.toLocaleString('en-US', { timeZone: timezone })
-  )
+  );
 
-  const currentHour: number = ukTime.getHours()
-  const currentMinutes: number = ukTime.getMinutes()
+  const currentHour: number = ukTime.getHours();
+  const currentMinutes: number = ukTime.getMinutes();
 
   // Add 1 hour for processing time
-  let estimatedHour: number = currentHour + 1
-  let estimatedMinutes: number = currentMinutes
+  let estimatedHour: number = currentHour + 1;
+  let estimatedMinutes: number = currentMinutes;
 
-  if (estimatedHour >= 17) {
+  // If it's Saturday or Sunday, always set delivery to Monday at 9 AM
+  if (ukTime.getDay() === 6 || ukTime.getDay() === 0) {
+    ukTime.setDate(ukTime.getDate() + (8 - ukTime.getDay())); // Move to Monday
+    estimatedHour = 9;
+    estimatedMinutes = 0;
+  } else if (estimatedHour >= 17) {
     // If it's past 4 PM, move to next working day at 9 AM
-    ukTime.setDate(ukTime.getDate() + 1)
-    estimatedHour = 9
-    estimatedMinutes = 0
-
-    // Skip weekends (Saturday & Sunday)
-    if (ukTime.getDay() === 6) ukTime.setDate(ukTime.getDate() + 2) // If Saturday, move to Monday
-    if (ukTime.getDay() === 0) ukTime.setDate(ukTime.getDate() + 1) // If Sunday, move to Monday
+    ukTime.setDate(ukTime.getDate() + 1);
+    estimatedHour = 9;
+    estimatedMinutes = 0;
   } else if (estimatedHour < 8) {
     // If it's before 8 AM, set to 9 AM
-    estimatedHour = 9
-    estimatedMinutes = 0
+    estimatedHour = 9;
+    estimatedMinutes = 0;
   }
 
+  // Ensure the next business day is not on a weekend
   if (ukTime.getDay() === 6) ukTime.setDate(ukTime.getDate() + 2); // If Saturday, move to Monday
   if (ukTime.getDay() === 0) ukTime.setDate(ukTime.getDate() + 1); // If Sunday, move to Monday
 
   // Set the estimated time
-  ukTime.setHours(estimatedHour, estimatedMinutes, 0)
+  ukTime.setHours(estimatedHour, estimatedMinutes, 0);
 
-  const day = ukTime.toLocaleString('en-GB', { weekday: 'long' })
-  const date = ukTime.getDate()
-  const month = ukTime.toLocaleString('en-GB', { month: 'long' })
-  const year = ukTime.getFullYear()
-  const time = ukTime.toLocaleString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  })
+  const day = ukTime.toLocaleString('en-GB', { weekday: 'long' });
+  const date = ukTime.getDate();
+  const month = ukTime.toLocaleString('en-GB', { month: 'long' });
+  const year = ukTime.getFullYear();
+  const time = ukTime
+    .toLocaleString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    })
+    .replace('am', 'AM')
+    .replace('pm', 'PM');
 
   // Add ordinal suffix (st, nd, rd, th)
   const getOrdinalSuffix = (n: number): string => {
-    if (n > 3 && n < 21) return 'th' // 4-20 always "th"
+    if (n > 3 && n < 21) return 'th';
     switch (n % 10) {
       case 1:
-        return 'st'
+        return 'st';
       case 2:
-        return 'nd'
+        return 'nd';
       case 3:
-        return 'rd'
+        return 'rd';
       default:
-        return 'th'
+        return 'th';
     }
-  }
-  const formattedDate = `${day}, ${date}${getOrdinalSuffix(
-    date
-  )} ${month} ${year} at ${time}`
+  };
 
-  return formattedDate
-}
+  return `${day}, ${date}${getOrdinalSuffix(date)} ${month} ${year} at ${time}`;
+};
+
 
 export const getNextBusinessDayTime = (
   timezone: string = 'Europe/London',
