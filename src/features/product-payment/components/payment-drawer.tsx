@@ -90,6 +90,11 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
                     email: watch('userEmail'),
                   },
                 },
+                fields: {
+                  billingDetails: {
+                    address: 'never',
+                  },
+                },
               }}
             />
             {errorMessage && (

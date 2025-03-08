@@ -155,13 +155,10 @@ const PaymentSuccess = () => {
               <div className='flex items-center justify-center'>
                 <button
                   type='button'
-                  className={`mt-4 w-full bg-[#28A745] text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 capitalize`}
+                  className={`w-full bg-[#28A745] sm:text-[18px] text-[16px] h-[58px] text-white font-semibold sm:p-3 p-2 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 capitalize`}
                   onClick={() => redirect('/')}
                 >
-                  <>
-                    Order Title for New Address
-                    <span>&#8594;</span>
-                  </>
+                    Order Title for <br className="sm:hidden block"/> New Address <span>&#8594;</span>
                 </button>
               </div>
             </CardContent>
