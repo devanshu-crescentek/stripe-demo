@@ -49,8 +49,14 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(resetAddress())
+    posthog.reset()
     posthog.reset(true)
   }, [dispatch])
+
+  useEffect(() => {
+    posthog.reset()
+    posthog.reset(true)
+  }, [])
 
   useEffect(() => {
     if (postalCode?.length > 0) {
@@ -62,7 +68,7 @@ const Home = () => {
     }
   }, [postalCode])
 
-  const [temGetAddressDetails,] = useGetAddressDetailsMutation()
+  const [temGetAddressDetails] = useGetAddressDetailsMutation()
 
   const handleNavigate = () => {
     router.push('/details')

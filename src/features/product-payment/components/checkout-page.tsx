@@ -196,8 +196,8 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       dispatch(setPaymentTime(getLondonISOString()))
       dispatch(setSelectedDocuments(sDocuments))
       dispatch(setEmail(watch('userEmail')))
-
-      posthog.identify(userEmail)
+      posthog.alias(userEmail, posthog.get_distinct_id()) // Link old ID to new one
+      posthog.identify(userEmail, { email: userEmail })
       if (isPayByCard) {
         posthog.capture('Pay by card')
       }
@@ -302,7 +302,10 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                         paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
                       }}
                       onReady={(event) => {
-                        console.log("🚀 ~ CheckoutPage ~ event.availablePaymentMethods:", event.availablePaymentMethods)
+                        console.log(
+                          '🚀 ~ CheckoutPage ~ event.availablePaymentMethods:',
+                          event.availablePaymentMethods
+                        )
                         if (event.availablePaymentMethods) {
                           setIsExpressElement(true)
                         } else {
@@ -383,7 +386,10 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                   paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
                 }}
                 onReady={(event) => {
-                  console.log("🚀 ~ CheckoutPage ~ event.availablePaymentMethods:", event.availablePaymentMethods)
+                  console.log(
+                    '🚀 ~ CheckoutPage ~ event.availablePaymentMethods:',
+                    event.availablePaymentMethods
+                  )
                   if (event.availablePaymentMethods) {
                     setIsExpressElement(true)
                   } else {

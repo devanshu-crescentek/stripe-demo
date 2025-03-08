@@ -22,6 +22,10 @@ const AddressList = () => {
   if (data?.length == 0 || !postalCode) return redirect('/')
 
   const handlerNavigate = (item: AddressItem | boolean) => {
+    const anonymousId = 'postal_' + postalCode
+    posthog.reset()
+    posthog.reset(true)
+    posthog.identify(anonymousId, { postal_code: postalCode })
     if (typeof item !== 'boolean') {
       const payload = {
         address: item.address ? item.address[0] : '',
