@@ -7,8 +7,7 @@ import {
   useFormContext,
   UseFormHandleSubmit,
 } from 'react-hook-form'
-
-import { Button } from '@/components/ui/button'
+import { XIcon } from 'lucide-react'
 import { PaymentElement } from '@stripe/react-stripe-js'
 
 import {
@@ -54,7 +53,7 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
       }}
     >
       <button
-        className='bg-[#28A745] hover:bg-green-700 text-white justify-center font-medium py-3 px-6 rounded-[4px] flex items-center space-x-2 w-[189px] h-[40px]'
+        className='bg-[#28A745] hover:bg-green-700 text-white justify-center font-medium sm:py-3 py-3 sm:px-6 px-4 rounded-[4px] sm:text-[18px] text-[16px] flex items-center sm:space-x-2 space-x-0 md:w-[189px] w-[full] h-[40px]'
         onClick={handleSubmit(() => {
           posthog.capture('Initiated pay by card')
           setIsOpen(true)
@@ -62,11 +61,26 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
         type='button'
       >
         <span>Pay By Card</span>
-        <span>→</span>
+        <span className='!ml-1'>→</span>
       </button>
       <DrawerContent className='z-[100]'>
         <DrawerHeader>
-          <DrawerTitle>Card</DrawerTitle>
+          <DrawerTitle>
+            <div className='flex items-center justify-between gap-4'>
+              <h2 className='text-[18px] font-semibold'>Card</h2>
+              <button
+                className='text-black hover:text-gray-700'
+                onClick={() => {
+                  setErrorMessage('')
+                  posthog.capture('Cancelled pay by card')
+                  setIsProcessing(false)
+                  setIsOpen(false)
+                }}
+              >
+                <XIcon className='size-6' />
+              </button>
+            </div>
+          </DrawerTitle>
           <DrawerDescription>
             <PaymentElement
               options={{
@@ -102,12 +116,12 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
               </>
             ) : (
               <>
-                Pay
+                Complete Order
                 <span>&#8594;</span>
               </>
             )}
           </button>
-          <Button
+          {/* <Button
             variant='outline'
             className='sm:w-[246px] w-full h-[40px]'
             onClick={() => {
@@ -118,7 +132,7 @@ const PaymentDrawer: React.FC<PaymentDrawerProps> = ({
             }}
           >
             Cancel
-          </Button>
+          </Button> */}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

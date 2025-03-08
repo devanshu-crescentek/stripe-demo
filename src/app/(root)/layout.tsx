@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 
 import Header from '@/components/shared/header'
-import FooterWrapper from '@/components/shared/footer-wrapper'
 
 import '../globals.css'
 
@@ -28,7 +27,6 @@ export default function RootLayout({
         <main className='h-screen flex gap-6 flex-col'>
           <Header />
           {children}
-          <FooterWrapper />
         </main>
       </body>
     </html>

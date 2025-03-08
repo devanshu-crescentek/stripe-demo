@@ -112,7 +112,6 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
       if (orderID) {
         const res = await updateCart(cartPayload).unwrap()
         dispatch(setOrderID(res.order_id))
-        console.log('update')
       }
     } catch (error) {
       console.error('🚀 ~ addToCartHandler ~ error:', error)
@@ -274,30 +273,30 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
               {/* Show Google Pay / Apple Pay Button if available */}
               {paymentRequestAvailable && deviceType == 'desktop' && (
                 <div className='mb-4 justify-center gap-2 hidden md:flex w-full'>
-                  <ExpressCheckoutElement
-                    onClick={(resolve) =>
-                      handleSubmit(() => onClick(resolve))()
-                    }
-                    onConfirm={() => onSubmit(false)}
-                    options={{
-                      buttonHeight: 40,
-                      paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
-                      buttonType: {
-                        googlePay: 'checkout',
-                        applePay: 'check-out',
-                      },
-                    }}
-                    onReady={(event) => {
-                      if (event.availablePaymentMethods) {
-                        setIsExpressElement(true)
-                      } else {
-                        setIsExpressElement(false)
-                      }
-                    }}
-                    className={`w-full gap-4 h-[40px] mb-0 ${
+                  <div
+                    className={`h-[40px] ${
                       isExpressElement ? 'block' : 'hidden'
                     }`}
-                  />
+                  >
+                    <ExpressCheckoutElement
+                      onClick={(resolve) =>
+                        handleSubmit(() => onClick(resolve))()
+                      }
+                      onConfirm={() => onSubmit(false)}
+                      options={{
+                        buttonHeight: 40,
+                        paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
+                      }}
+                      onReady={(event) => {
+                        if (event.availablePaymentMethods) {
+                          setIsExpressElement(true)
+                        } else {
+                          setIsExpressElement(false)
+                        }
+                      }}
+                      className={`w-full gap-4 h-[40px] mb-0 `}
+                    />
+                  </div>
                   <PaypalButton
                     amount={amount.toString()}
                     onSuccess={handlePaypalSuccess}
@@ -358,36 +357,34 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
         <div className='fixed block md:hidden bottom-0 left-0 w-full border shadow-[0px_-2px_4px_0px_rgba(0,0,0,0.12)] rounded-t-xl p-4 bg-white'>
           {/* Payment Methods */}
           <div className='flex justify-between items-center gap-4 mb-3 w-full'>
-            <ExpressCheckoutElement
-              onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
-              onConfirm={() => onSubmit(false)}
-              options={{
-                buttonHeight: 40,
-                paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
-                buttonType: {
-                  googlePay: 'checkout',
-                  applePay: 'check-out',
-                },
-              }}
-              onReady={(event) => {
-                if (event.availablePaymentMethods) {
-                  setIsExpressElement(true)
-                } else {
-                  setIsExpressElement(false)
-                }
-              }}
-              className={`w-full gap-4 h-[40px] mb-0 ${
-                isExpressElement ? 'block' : 'hidden'
-              }`}
-            />
+            <div
+              className={`!h-[40px] ${isExpressElement ? 'block' : 'hidden'}`}
+            >
+              <ExpressCheckoutElement
+                onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
+                onConfirm={() => onSubmit(false)}
+                options={{
+                  buttonHeight: 40,
+                  paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
+                }}
+                onReady={(event) => {
+                  if (event.availablePaymentMethods) {
+                    setIsExpressElement(true)
+                  } else {
+                    setIsExpressElement(false)
+                  }
+                }}
+                className={`w-full gap-4 !h-[40px] mb-0 `}
+              />
+            </div>
             <PaypalButton
               amount={amount.toString()}
               onSuccess={handlePaypalSuccess}
             />
           </div>
           {/* Total & Pay Button */}
-          <div className='flex items-center justify-between'>
-            <div>
+          <div className='grid grid-cols-2 gap-4 w-full items-center'>
+            <div className='w-full'>
               <p className='text-gray-500 text-sm'>Total</p>
               <p className='text-2xl font-bold'>£{amount ? amount : 0}</p>
             </div>

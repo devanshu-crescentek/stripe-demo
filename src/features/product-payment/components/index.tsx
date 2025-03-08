@@ -62,7 +62,7 @@ const PaymentSection = () => {
   const router = useRouter()
 
   const queryParams = useAppSelector((state) => state.queryParams.params)
-  const { selectedAddress, tenure_info, documents } =
+  const { selectedAddress, tenure_info, documents, paymentTime, payment } =
     useAppSelector((state) => state.address) || false
 
   const form = useForm<z.infer<typeof schema>>({
@@ -81,6 +81,12 @@ const PaymentSection = () => {
 
   const selectedDocs = form.watch('selectedDocs')
   const selectedDelivery = form.watch('delivery')
+
+  useEffect(() => {
+    if (paymentTime && payment) {
+      redirect('/')
+    }
+  }, [])
 
   useEffect(() => {
     if (selectedDelivery === 'express') {
@@ -165,11 +171,14 @@ const PaymentSection = () => {
 
   const fastTrackDoc = documents.find((doc) => doc.name === 'Fast Track')
 
-  const totalAmount =
-    documents
-      .filter((doc) => selectedDocs.includes(doc.id))
-      .reduce((sum, doc) => sum + doc.price, 0) +
-    (selectedDelivery === 'express' ? 9.99 : 0)
+  const totalAmount = parseFloat(
+    (
+      documents
+        .filter((doc) => selectedDocs.includes(doc.id))
+        .reduce((sum, doc) => sum + doc.price, 0) +
+      (selectedDelivery === 'express' ? 9.99 : 0)
+    ).toFixed(2)
+  )
 
   const goToDetailsPage = () => {
     posthog.capture('Edit address on payment page')
@@ -186,7 +195,7 @@ const PaymentSection = () => {
                 <Card className='mb-6'>
                   <CardContent className='p-6'>
                     {/* Address */}
-                    <div className='flex items-start justify-between'>
+                    <div className='flex items-start justify-between gap-4'>
                       <p className='text-[#0B0C0C] md:text-[20px] text-[18px] leading-[30px] font-normal'>
                         {selectedAddress.address &&
                           `${selectedAddress.address}, `}
@@ -302,8 +311,10 @@ const PaymentSection = () => {
                                 return (
                                   <FormItem className='flex flex-row items-center justify-between space-x-3 space-y-0 rounded-md border sm:pb-4 pb-3 gap-4'>
                                     <div className='leading-none cursor-pointer flex items-start gap-2 w-full'>
-                                      <FormLabel className='font-semibold text-[18px] text-black w-fit leading-[25px] flex'>
-                                       <span className='mr-2'>{doc.name}</span>{' '}
+                                      <FormLabel
+                                        className={`font-semibold text-[18px] text-black w-full leading-[25px] flex min-w-[146px]`}
+                                      >
+                                        <span className='mr-2'>{doc.name}</span>{' '}
                                         <span
                                           className='relative group mt-1'
                                           onClick={(e) => {
@@ -400,7 +411,7 @@ const PaymentSection = () => {
                             <div className='flex items-center justify-between w-full cursor-pointer'>
                               Standard Delivery
                               <span
-                                className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center'
+                                className='font-medium md:text-[20px] text-[16px]  leading-[30px] flex flex-col items-center text-[#000000]'
                                 onClick={() => setValue('delivery', 'standard')}
                               >
                                 Free
@@ -478,7 +489,7 @@ const PaymentSection = () => {
                             <div className='flex items-center justify-between w-full cursor-pointer'>
                               Express Delivery
                               <span
-                                className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col`}
+                                className={`font-medium md:text-[20px] text-[16px] leading-[30px] flex items-center flex-col text-[#000000]`}
                                 onClick={() => setValue('delivery', 'express')}
                               >
                                 £{fastTrackDoc?.price || 9.99}

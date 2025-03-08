@@ -57,6 +57,9 @@ export const getEstimatedTime = (
     estimatedMinutes = 0
   }
 
+  if (ukTime.getDay() === 6) ukTime.setDate(ukTime.getDate() + 2); // If Saturday, move to Monday
+  if (ukTime.getDay() === 0) ukTime.setDate(ukTime.getDate() + 1); // If Sunday, move to Monday
+
   // Set the estimated time
   ukTime.setHours(estimatedHour, estimatedMinutes, 0)
 
@@ -95,42 +98,51 @@ export const getNextBusinessDayTime = (
   timezone: string = 'Europe/London',
   paymentDate: Date = new Date()
 ): string => {
-  const now: Date = new Date(paymentDate)
+  const now: Date = new Date(paymentDate);
   const ukTime: Date = new Date(
     now.toLocaleString('en-US', { timeZone: timezone })
-  )
+  );
 
-  const currentHour: number = ukTime.getHours()
-  const currentMinutes: number = ukTime.getMinutes()
+  const officeStart = 8;
+  const officeEnd = 17;
+  const businessHours = officeEnd - officeStart; // 9 hours (8 AM - 5 PM)
 
-  // Define office hours
-  const officeStart = 8
-  const officeEnd = 17
+  let estimatedHour = ukTime.getHours();
+  let estimatedMinutes = ukTime.getMinutes();
 
-  let estimatedHour: number = currentHour
-  let estimatedMinutes: number = currentMinutes
+  // Calculate remaining business hours for today
+  const remainingHoursToday = officeEnd - estimatedHour;
 
-  // If order is placed outside office hours, start at 8 AM next business day
-  if (currentHour >= officeEnd) {
-    ukTime.setDate(ukTime.getDate() + 1) // Move to next day
-    estimatedHour = officeStart
-    estimatedMinutes = 0
+  if (estimatedHour >= officeEnd) {
+    // After 5 PM: Move to next business day at 8 AM
+    ukTime.setDate(ukTime.getDate() + 1);
+    estimatedHour = officeStart;
+    estimatedMinutes = 0;
+  } else if (estimatedHour < officeStart) {
+    // Before 8 AM: Start at 8 AM today
+    estimatedHour = officeStart;
+    estimatedMinutes = 0;
+  } else if (remainingHoursToday >= 9) {
+    // If there's a full 9-hour window, add 9 hours
+    estimatedHour += businessHours;
+  } else {
+    // If not enough hours left today, carry over to the next business day
+    const remainingTimeNeeded = businessHours - remainingHoursToday;
+    ukTime.setDate(ukTime.getDate() + 1); // Move to next business day
+    estimatedHour = officeStart + remainingTimeNeeded;
+    estimatedMinutes = 0;
   }
 
-  // Move exactly one business day ahead (counting only office hours)
-  ukTime.setDate(ukTime.getDate() + 1)
+  // If the next business day is Saturday or Sunday, move to Tuesday
+  if (ukTime.getDay() === 6) ukTime.setDate(ukTime.getDate() + 3); // If Saturday, move to Tuesday
+  if (ukTime.getDay() === 0) ukTime.setDate(ukTime.getDate() + 2); // If Sunday, move to Tuesday
 
-  // Skip weekends (Saturday & Sunday)
-  if (ukTime.getDay() === 6) ukTime.setDate(ukTime.getDate() + 2) // If Saturday, move to Monday
-  if (ukTime.getDay() === 0) ukTime.setDate(ukTime.getDate() + 1) // If Sunday, move to Monday
+  ukTime.setHours(estimatedHour, estimatedMinutes, 0);
 
-  // Apply the estimated time
-  ukTime.setHours(estimatedHour, estimatedMinutes, 0)
-
-  const day = ukTime.toLocaleString('en-GB', { weekday: 'long' })
-  const date = ukTime.getDate()
-  const month = ukTime.toLocaleString('en-GB', { month: 'long' })
-  const year = ukTime.getFullYear()
+  const day = ukTime.toLocaleString('en-GB', { weekday: 'long' });
+  const date = ukTime.getDate();
+  const month = ukTime.toLocaleString('en-GB', { month: 'long' });
+  const year = ukTime.getFullYear();
   const time = ukTime
     .toLocaleString('en-GB', {
       hour: '2-digit',
@@ -138,26 +150,22 @@ export const getNextBusinessDayTime = (
       hour12: true,
     })
     .replace('am', 'AM')
-    .replace('pm', 'PM')
+    .replace('pm', 'PM');
 
   // Add ordinal suffix (st, nd, rd, th)
   const getOrdinalSuffix = (n: number): string => {
-    if (n > 3 && n < 21) return 'th' // 4-20 always "th"
+    if (n > 3 && n < 21) return 'th';
     switch (n % 10) {
       case 1:
-        return 'st'
+        return 'st';
       case 2:
-        return 'nd'
+        return 'nd';
       case 3:
-        return 'rd'
+        return 'rd';
       default:
-        return 'th'
+        return 'th';
     }
-  }
+  };
 
-  const formattedDate = `${day}, ${date}${getOrdinalSuffix(
-    date
-  )} ${month} ${year} at ${time}`
-
-  return formattedDate
-}
+  return `${day}, ${date}${getOrdinalSuffix(date)} ${month} ${year} at ${time}`;
+};

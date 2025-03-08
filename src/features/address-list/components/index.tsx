@@ -41,7 +41,7 @@ const AddressList = () => {
   return (
     <div className='flex-1'>
       <div className='container mx-auto  w-full px-4 sm:px-6 lg:gap-12'>
-        <h3 className='text-[1.5em] font-bold mb-[20px] mt-[40px]'>
+        <h3 className='text-[1.5em] font-bold mb-[20px]'>
           Search Result For : {postalCode}
         </h3>
         <h5 className='text-[1.1875rem] font-normal leading-[1.3157894737] mb-[20px]'>

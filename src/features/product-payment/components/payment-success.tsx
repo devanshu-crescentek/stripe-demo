@@ -58,7 +58,7 @@ const PaymentSuccess = () => {
           </p>
         </div>
       </div>
-      <div className='container w-full mx-auto px-4 sm:px-6 lg:gap-12'>
+      <div className='container w-full mx-auto px-4 sm:px-6 lg:gap-12 mb-[30px]'>
         <div className='w-full md:grid lg:grid-cols-2 flex flex-col-reverse sm:gap-6 gap-4'>
           <Card>
             <CardHeader className='sm:py-6 py-4'>
@@ -151,6 +151,19 @@ const PaymentSuccess = () => {
                   </h2>
                 </div>
               </div>
+              <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
+              <div className='flex items-center justify-center'>
+                <button
+                  type='button'
+                  className={`mt-4 w-full bg-[#28A745] text-[18px] h-[58px] text-white font-semibold py-3 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 capitalize`}
+                  onClick={() => redirect('/')}
+                >
+                  <>
+                    Order Title for New Address
+                    <span>&#8594;</span>
+                  </>
+                </button>
+              </div>
             </CardContent>
           </Card>
           <Card>
@@ -200,8 +213,8 @@ const PaymentSuccess = () => {
                   </div>
                   <div className='flex flex-col'>
                     <h4 className='font-medium sm:text-[26px] text-[18px] sm:leading-[30px] leading-[20px] mb-2 capitalize'>
-                      Your {fastTrack ? 'Fast track' : 'Standard'}{' '}
-                      Delivery is on its way! should arrive by
+                      Your {fastTrack ? 'Fast track' : 'Standard'} Delivery is
+                      on its way! should arrive by
                     </h4>
                     <p className='text-[#28A745] text-[18px] font-medium leading-[20px] '>
                       {fastTrack ? (

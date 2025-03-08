@@ -1,6 +1,7 @@
 'use client'
 import { FC, ReactNode, useEffect } from 'react'
 
+import { usePathname } from 'next/navigation'
 //posthog package
 import posthog from 'posthog-js'
 
@@ -26,11 +27,17 @@ if (typeof window !== 'undefined') {
 }
 
 const AppProvider: FC<AppProviderProps> = ({ children }) => {
+  const pathname = usePathname()
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       posthog.capture('$pageview') // Automatically track page views
     }
   }, [])
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
 
   return (
     <>
