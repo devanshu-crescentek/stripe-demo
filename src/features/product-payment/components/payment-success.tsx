@@ -62,7 +62,7 @@ const PaymentSuccess = () => {
         <div className='w-full md:grid lg:grid-cols-2 flex flex-col-reverse sm:gap-6 gap-4'>
           <Card>
             <CardHeader className='sm:py-6 py-4'>
-              <h3 className='sm:text-[40px] text-[18px] leading-[30px] font-semibold'>
+              <h3 className='sm:text-[24px] text-[18px] leading-[20px] font-semibold'>
                 Property Details
               </h3>
             </CardHeader>
@@ -146,7 +146,7 @@ const PaymentSuccess = () => {
                   <h2 className='font-normal sm:text-[20px] text-[18px] leading-[30px] text-[#868686]'>
                     Order Total
                   </h2>
-                  <h2 className='font-semibold sm:text-[30px] text-[22px] leading-[30px]'>
+                  <h2 className='font-semibold sm:text-[24px] text-[22px] leading-[30px]'>
                     £{amount}
                   </h2>
                 </div>
@@ -165,77 +165,79 @@ const PaymentSuccess = () => {
             </CardContent>
           </Card>
           <Card>
-            <CardContent className='p-6'>
-              <div className='flex items-start   gap-2'>
-                <div className='sm:w-[43px] w-[27px] sm:h-[43px] h-[27px]'>
-                  <Image
-                    src='/mail.svg'
-                    alt='mail'
-                    width={30}
-                    height={30}
-                    className='w-full h-full object-contain'
-                  />
-                </div>
-                <div className='flex flex-col items-start'>
-                  <h4 className='font-medium sm:text-[26px] text-[18px] sm:leading-[30px] leading-[23px] mb-1 capitalize'>
-                    Your documents will be delivered via email
-                  </h4>
-                  <a
-                    href={`mailto:${email}`}
-                    target='_blank'
-                    className='text-[#28A745] font-medium sm:text-[20px] text-[14px] leading-[20px] mb-2'
-                  >
-                    {email}
-                  </a>
-                  <p className='text-[#868686] font-medium sm:text-[20px] text-[14px] leading-[20px]'>
-                    (If not in inbox,{' '}
-                    <span className='text-[#28A745]'>check junk/spam</span>)
-                  </p>
-                </div>
-              </div>
-              <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
-              <div className='flex flex-col gap-4 justify-start items-start'>
+            <CardContent className='p-6 flex flex-col h-full items-center justify-between'>
+              <div className='w-full'>
                 <div className='flex items-start gap-2'>
-                  <div className='w-[43px] h-[43px]'>
+                  <div className='sm:w-[43px] w-[27px] sm:h-[43px] h-[27px]'>
                     <Image
-                      src={
-                        fastTrack
-                          ? '/fast_track_delivery.svg'
-                          : '/standard_delivery.svg'
-                      }
-                      alt={fastTrack ? 'fast track' : 'standard'}
-                      width={100}
-                      height={100}
-                      className='w-full h-full'
+                      src='/mail.svg'
+                      alt='mail'
+                      width={30}
+                      height={30}
+                      className='w-full h-full object-contain'
                     />
                   </div>
-                  <div className='flex flex-col'>
-                    <h4 className='font-medium sm:text-[26px] text-[18px] sm:leading-[30px] leading-[20px] mb-2 capitalize'>
-                      Your {fastTrack ? 'Fast track' : 'Standard'} Delivery is
-                      on its way! should arrive by
+                  <div className='flex flex-col items-start'>
+                    <h4 className='font-medium text-[18px] leading-[20px] mb-1 capitalize'>
+                      Your documents will be delivered via email
                     </h4>
-                    <p className='text-[#28A745] text-[18px] font-medium leading-[20px] '>
-                      {fastTrack ? (
-                        <>
-                          {getEstimatedTime(
-                            'Europe/London',
-                            new Date(paymentTime as string)
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          {getNextBusinessDayTime(
-                            'Europe/London',
-                            new Date(paymentTime as string)
-                          )}
-                        </>
-                      )}
+                    <a
+                      href={`mailto:${email}`}
+                      target='_blank'
+                      className='text-[#28A745] font-medium sm:text-[18px] text-[14px] sm:leading-[20px] leading-[18px] mb-2'
+                    >
+                      {email}
+                    </a>
+                    <p className='text-[#868686] font-medium sm:text-[18px] text-[14px] leading-[20px]'>
+                      (If not in inbox,{' '}
+                      <span className='text-[#28A745]'>check junk/spam</span>)
                     </p>
                   </div>
                 </div>
+                <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
+                <div className='flex flex-col gap-4 justify-start items-start'>
+                  <div className='flex items-start gap-2'>
+                    <div className='w-[43px] h-[43px]'>
+                      <Image
+                        src={
+                          fastTrack
+                            ? '/fast_track_delivery.svg'
+                            : '/standard_delivery.svg'
+                        }
+                        alt={fastTrack ? 'fast track' : 'standard'}
+                        width={100}
+                        height={100}
+                        className='w-full h-full'
+                      />
+                    </div>
+                    <div className='flex flex-col'>
+                      <h4 className='font-medium text-[18px] leading-[20px] mb-2 capitalize'>
+                        Your {fastTrack ? 'Fast track' : 'Standard'} Delivery is
+                        on its way! should arrive by
+                      </h4>
+                      <p className='text-[#28A745] text-[18px] font-medium leading-[20px] '>
+                        {fastTrack ? (
+                          <>
+                            {getEstimatedTime(
+                              'Europe/London',
+                              new Date(paymentTime as string)
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {getNextBusinessDayTime(
+                              'Europe/London',
+                              new Date(paymentTime as string)
+                            )}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className='border-t border-[#000000] opacity-10 my-4 w-full md:block hidden'></div>
               </div>
-              <div className='border-t border-[#000000] opacity-10 my-4 w-full md:block hidden'></div>
-              <div className='md:flex items-center justify-center hidden'>
+              <div className='md:flex w-full items-center justify-center hidden'>
                 <button
                   type='button'
                   className={`w-full bg-[#28A745] sm:text-[18px] text-[16px] h-[58px] text-white font-semibold sm:p-3 p-2 rounded-md flex items-center justify-center gap-2 hover:bg-green-700 capitalize`}

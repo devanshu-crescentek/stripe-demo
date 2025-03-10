@@ -89,21 +89,19 @@ export const getEstimatedTime = (
       minute: '2-digit',
       hour12: true,
     })
-    .replace('am', 'AM')
-    .replace('pm', 'PM')
 
   // Add ordinal suffix (st, nd, rd, th)
   const getOrdinalSuffix = (n: number): string => {
-    if (n > 3 && n < 21) return 'th'
+    if (n > 3 && n < 21) return 'ᵗʰ' // Special case for 11th-13th
     switch (n % 10) {
       case 1:
-        return 'st'
+        return 'ˢᵗ'
       case 2:
-        return 'nd'
+        return 'ⁿᵈ'
       case 3:
-        return 'rd'
+        return 'ʳᵈ'
       default:
-        return 'th'
+        return 'ᵗʰ'
     }
   }
 
@@ -148,7 +146,7 @@ export const getNextBusinessDayTime = (
     const remainingTimeNeeded = businessHours - remainingHoursToday
     ukTime.setDate(ukTime.getDate() + 1) // Move to next business day
     estimatedHour = officeStart + remainingTimeNeeded
-    estimatedMinutes = 0
+    // estimatedMinutes = 0
   }
 
   if (estimatedHour === officeEnd && estimatedMinutes > 0) {
@@ -179,21 +177,19 @@ export const getNextBusinessDayTime = (
       minute: '2-digit',
       hour12: true,
     })
-    .replace('am', 'AM')
-    .replace('pm', 'PM')
 
   // Add ordinal suffix (st, nd, rd, th)
   const getOrdinalSuffix = (n: number): string => {
-    if (n > 3 && n < 21) return 'th'
+    if (n > 3 && n < 21) return 'ᵗʰ' // Special case for 11th-13th
     switch (n % 10) {
       case 1:
-        return 'st'
+        return 'ˢᵗ'
       case 2:
-        return 'nd'
+        return 'ⁿᵈ'
       case 3:
-        return 'rd'
+        return 'ʳᵈ'
       default:
-        return 'th'
+        return 'ᵗʰ'
     }
   }
 

@@ -148,11 +148,14 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
     const options = {
       emailRequired: true,
     }
+    posthog.capture('Pay by external link', {
+      amount,
+    })
     resolve(options)
   }
 
   const onSubmit = async (
-    isPayByCard: boolean
+    isPayByCard: boolean | string
   ): Promise<JSX.Element | undefined> => {
     try {
       setIsProcessing(true)
@@ -288,7 +291,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
               {paymentRequestAvailable && deviceType == 'desktop' && (
                 <div className='mb-4 justify-center gap-2 hidden md:flex w-full'>
                   <div
-                    className={`h-[40px] ${
+                    className={`h-[40px] w-full ${
                       isExpressElement ? 'block' : 'hidden'
                     }`}
                   >
@@ -302,10 +305,6 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                         paymentMethodOrder: ['google_pay', 'apple_pay', 'card'],
                       }}
                       onReady={(event) => {
-                        console.log(
-                          '🚀 ~ CheckoutPage ~ event.availablePaymentMethods:',
-                          event.availablePaymentMethods
-                        )
                         if (event.availablePaymentMethods) {
                           setIsExpressElement(true)
                         } else {
@@ -321,7 +320,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
                   />
                 </div>
               )}
-              <div className='hidden md:flex items-center justify-between'>
+              <div className='hidden md:flex items-end justify-between'>
                 <div>
                   <p className='text-gray-500 text-sm mb-2'>Total</p>
                   <p className='text-[40px] leading-[22px] font-semibold'>
@@ -376,7 +375,9 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
           {/* Payment Methods */}
           <div className='flex justify-between items-center gap-4 mb-3 w-full'>
             <div
-              className={`!h-[40px] ${isExpressElement ? 'block' : 'hidden'}`}
+              className={`!h-[40px] w-full ${
+                isExpressElement ? 'block' : 'hidden'
+              }`}
             >
               <ExpressCheckoutElement
                 onClick={(resolve) => handleSubmit(() => onClick(resolve))()}
@@ -405,7 +406,7 @@ const CheckoutPage = ({ amount }: { amount: number }) => {
             />
           </div>
           {/* Total & Pay Button */}
-          <div className='grid grid-cols-2 gap-4 w-full items-center'>
+          <div className='grid grid-cols-2 gap-4 w-full items-end'>
             <div className='w-full'>
               <p className='text-gray-500 text-sm'>Total</p>
               <p className='text-2xl font-bold'>£{amount ? amount : 0}</p>
