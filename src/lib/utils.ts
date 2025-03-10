@@ -122,9 +122,9 @@ export const getNextBusinessDayTime = (
   const remainingHoursToday = officeEnd - estimatedHour
 
   if (estimatedHour >= officeEnd) {
-    // After 5 PM: Move to next business day at 8 AM
+    // After 5 PM: Move to next business day at 5 PM
     ukTime.setDate(ukTime.getDate() + 1)
-    estimatedHour = officeStart
+    estimatedHour = officeEnd
     estimatedMinutes = 0
   } else if (remainingHoursToday >= businessHours) {
     // If there's a full 9-hour window, add 9 hours
