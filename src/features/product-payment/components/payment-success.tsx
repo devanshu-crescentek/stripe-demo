@@ -18,7 +18,7 @@ const PaymentSuccess = () => {
     tenure_info,
     selectedDocuments,
     orderID,
-    payment,
+    // payment,
     paymentTime,
     email,
   } = useAppSelector((state) => state.address) || {}
@@ -124,7 +124,7 @@ const PaymentSuccess = () => {
               </div>
               <div className='border-t border-[#000000] opacity-10 my-4 w-full'></div>
               <div className='flex flex-row items-center justify-between gap-4'>
-                <div className='flex flex-col w-full items-start mb-4 gap-2'>
+                {/* <div className='flex flex-col w-full items-start mb-4 gap-2'>
                   <h4 className='font-normal sm:text-[20px] text-[18px] leading-[30px] text-[#868686] '>
                     Payment Method
                   </h4>
@@ -141,8 +141,8 @@ const PaymentSuccess = () => {
                       className={`w-[56px] h-auto`}
                     />
                   </div>
-                </div>
-                <div className='flex flex-col w-full items-end mb-4'>
+                </div> */}
+                <div className='flex flex-row w-full items-center justify-between mb-4'>
                   <h2 className='font-normal sm:text-[20px] text-[18px] leading-[30px] text-[#868686]'>
                     Order Total
                   </h2>

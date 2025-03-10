@@ -1,4 +1,5 @@
 'use client'
+import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { setSelectedAddress } from '@/store/slices/address-slice'
 import { redirect, useRouter, useSearchParams } from 'next/navigation'
@@ -19,13 +20,17 @@ const AddressList = () => {
   const router = useRouter()
   const postalCode = searchParams.get('postalCode')
 
-  if (data?.length == 0 || !postalCode) return redirect('/')
-
-  const handlerNavigate = (item: AddressItem | boolean) => {
-    const anonymousId = 'postal_' + postalCode
+  useEffect(() => {
+    if (data?.length == 0 || !postalCode) return redirect('/')
+    const anonymousId = `${postalCode}-${String(Date.now()).slice(-5)}`
     posthog.reset()
     posthog.reset(true)
     posthog.identify(anonymousId, { postal_code: postalCode })
+  }, [data?.length, postalCode])
+
+  if (data?.length == 0 || !postalCode) return redirect('/')
+
+  const handlerNavigate = (item: AddressItem | boolean) => {
     if (typeof item !== 'boolean') {
       const payload = {
         address: item.address ? item.address[0] : '',

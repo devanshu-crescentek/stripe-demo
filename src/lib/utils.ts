@@ -112,6 +112,12 @@ export const getNextBusinessDayTime = (
   let estimatedHour = ukTime.getHours()
   let estimatedMinutes = ukTime.getMinutes()
 
+  // If the current time is before office hours, start at 8 AM today
+  if (estimatedHour < officeStart) {
+    estimatedHour = officeStart
+    estimatedMinutes = 0
+  }
+
   // Calculate remaining business hours for today
   const remainingHoursToday = officeEnd - estimatedHour
 
@@ -120,11 +126,7 @@ export const getNextBusinessDayTime = (
     ukTime.setDate(ukTime.getDate() + 1)
     estimatedHour = officeStart
     estimatedMinutes = 0
-  } else if (estimatedHour < officeStart) {
-    // Before 8 AM: Start at 8 AM today
-    estimatedHour = officeStart
-    estimatedMinutes = 0
-  } else if (remainingHoursToday >= 9) {
+  } else if (remainingHoursToday >= businessHours) {
     // If there's a full 9-hour window, add 9 hours
     estimatedHour += businessHours
   } else {
@@ -135,13 +137,13 @@ export const getNextBusinessDayTime = (
     estimatedMinutes = 0
   }
 
-  // If the next business day is Saturday or Sunday, move to monday at 5 pM
+  // If the next business day is Saturday or Sunday, move to Monday at 5 PM
   if (ukTime.getDay() === 6) {
-    ukTime.setDate(ukTime.getDate() + 2) // Move to monday
+    ukTime.setDate(ukTime.getDate() + 2) // Move to Monday
     estimatedHour = officeEnd
     estimatedMinutes = 0
   } else if (ukTime.getDay() === 0) {
-    ukTime.setDate(ukTime.getDate() + 1) // Move to monday
+    ukTime.setDate(ukTime.getDate() + 1) // Move to Monday
     estimatedHour = officeEnd
     estimatedMinutes = 0
   }

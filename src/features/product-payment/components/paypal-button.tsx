@@ -26,6 +26,7 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
   const { orderID, documents } = useAppSelector((state) => state.address)
 
   const selectedDocs = watch('selectedDocs')
+  const userEmail = watch('userEmail')
 
   // Function to validate form before creating order
   const validateAndCreateOrder = async () => {
@@ -120,6 +121,8 @@ const PaypalButton = ({ amount, onSuccess }: PaypalButtonProps) => {
             posthog.capture('Pay by paypal', {
               amount,
             })
+            posthog.alias(userEmail, posthog.get_distinct_id()) // Link old ID to new one
+            posthog.identify(userEmail, { email: userEmail })
             return actions.order.create(JSON.parse(orderData))
           } catch (error) {
             console.log('🚀 ~ Error creating order:', error)

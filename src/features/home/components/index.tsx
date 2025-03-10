@@ -54,11 +54,6 @@ const Home = () => {
   }, [dispatch])
 
   useEffect(() => {
-    posthog.reset()
-    posthog.reset(true)
-  }, [])
-
-  useEffect(() => {
     if (postalCode?.length > 0) {
       const timeout = setTimeout(() => {
         posthog.capture('Enter Postcode', { postalCode })
