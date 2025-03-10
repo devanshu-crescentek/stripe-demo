@@ -151,6 +151,11 @@ export const getNextBusinessDayTime = (
     estimatedMinutes = 0
   }
 
+  if (estimatedHour === officeEnd && estimatedMinutes > 0) {
+    const remainingTimeNeeded = businessHours - remainingHoursToday
+    estimatedHour = officeStart + remainingTimeNeeded
+  }
+
   // If the next business day is Saturday or Sunday, move to Monday at 5 PM
   if (ukTime.getDay() === 6) {
     ukTime.setDate(ukTime.getDate() + 2) // Move to Monday
