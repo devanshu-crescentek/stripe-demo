@@ -25,13 +25,12 @@ import useDeviceType from '@/hooks/use-device-type'
 
 import { productDetailsSchema } from '@/features/product-details/schema'
 import { useCheckCountryMutation } from '@/store/api/get-country'
-import { useAppDispatch, useAppSelector } from '@/store/hook'
+import { useAppDispatch } from '@/store/hook'
 import { setSelectedAddress, setTenureInfo } from '@/store/slices/address-slice'
 
 const TenureInfo = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const { selectedAddress } = useAppSelector((state) => state.address) || false
   const [isLoading, setIsLoading] = useState(false)
   const {
     formState: { errors, dirtyFields },
@@ -65,7 +64,7 @@ const TenureInfo = () => {
           titleNumber: data.title_number || undefined,
         })
       )
-      dispatch(setSelectedAddress({ ...data, county: selectedAddress?.county }))
+      dispatch(setSelectedAddress({ ...data }))
 
       posthog.capture('Search document')
       router.push('/search-result')

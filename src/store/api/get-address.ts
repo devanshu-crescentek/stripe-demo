@@ -6,7 +6,7 @@ export const getAddressAPI = createApi({
   reducerPath: 'api',
   baseQuery: createBaseQueryWithReAuth({
     authCheck: false,
-    baseUrl: 'https://api.addressian.co.uk/v2/',
+    baseUrl: process.env.NEXT_PUBLIC_ADDRESSIAN_BASE_URL,
     apiKey: process.env.NEXT_PUBLIC_ADDRESS_SECRET_KEY || '',
   }),
   endpoints: (builder) => ({

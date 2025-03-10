@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const productDetailsSchema = z.object({
   address: z.string().nonempty('Address is required'),
   city: z.string().nonempty('City is required'),
+  county: z.string().nonempty('County is required'),
   country: z.string().nonempty('Country is required'),
   postalCode: z.string().nonempty('Postcode is required'),
   tenure: z.enum(['freehold', 'leasehold', 'not-sure'], {

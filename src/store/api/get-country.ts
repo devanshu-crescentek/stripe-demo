@@ -6,7 +6,7 @@ export const getCountryAPI = createApi({
   reducerPath: 'country-api',
   baseQuery: createBaseQueryWithReAuth({
     authCheck: false,
-    baseUrl: 'https://api.postcodes.io/',
+    baseUrl: process.env.NEXT_PUBLIC_POSTCODE_BASE_URL,
   }),
   endpoints: (builder) => ({
     getCountryDetails: builder.query({

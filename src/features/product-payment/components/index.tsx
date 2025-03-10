@@ -199,8 +199,8 @@ const PaymentSection = () => {
                         {selectedAddress.address &&
                           `${selectedAddress.address}, `}
                         {selectedAddress.city && `${selectedAddress.city}, `}
-                        {selectedAddress.country &&
-                          `${selectedAddress.country}`}
+                        {selectedAddress.county &&
+                          `${selectedAddress.county}`}
                         <br />
                         {selectedAddress.postalCode &&
                           selectedAddress.postalCode}

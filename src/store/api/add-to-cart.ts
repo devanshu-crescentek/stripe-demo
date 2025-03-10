@@ -6,8 +6,7 @@ export const addToCartAPI = createApi({
   reducerPath: 'add-cart-api',
   baseQuery: createBaseQueryWithReAuth({
     authCheck: false,
-    baseUrl:
-      'https://phpstack-1400660-5285689.cloudwaysapps.com/wp-json/crsc/v1/',
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
     timeout: 65000,
   }),
   endpoints: (builder) => ({

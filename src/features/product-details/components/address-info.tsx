@@ -25,45 +25,33 @@ const AddressInfo = () => {
   const isCountryError = searchParams.get('isCtError')
 
   const { control, formState, watch, setError } = useFormContext()
-  const { selectedAddress } = useAppSelector((state) => state.address) || {};
+  const { selectedAddress } = useAppSelector((state) => state.address) || {}
 
   useEffect(() => {
-    if (!selectedAddress) {
-      setIsEdit(true);
-      return;
+    if (
+      !selectedAddress ||
+      isEditParams === 'true' ||
+      isCountryError === 'true'
+    ) {
+      setIsEdit(true)
+      if (isCountryError === 'true') {
+        setError('postalCode', {
+          message: 'Please enter a valid postcode',
+          type: 'manual',
+        })
+      }
+      return
     }
-  
+
     const requiredFields: (keyof typeof selectedAddress)[] = [
-      "address",
-      "city",
-      "country",
-      "postalCode",
-    ];
-  
-    const isValidAddress = requiredFields.every(
-      (key) => selectedAddress[key] && selectedAddress[key]!.length > 0
-    );
-  
-    if(!isValidAddress) {
-      setIsEdit(false);
-    }
-  }, [selectedAddress]);
+      'address',
+      'city',
+      'county',
+      'postalCode',
+    ]
 
-  useEffect(() => {
-    if (isEditParams === 'true') {
-      setIsEdit(true)
-    }
-  }, [isEditParams])
-
-  useEffect(() => {
-    if (isCountryError === 'true') {
-      setError('country', {
-        type: 'manual',
-        message: 'Please enter a valid country.',
-      })
-      setIsEdit(true)
-    }
-  }, [isCountryError, setError])
+    setIsEdit(!requiredFields.every((key) => selectedAddress[key]?.length))
+  }, [selectedAddress, isEditParams, isCountryError, setError])
 
   return (
     <Card>
@@ -85,7 +73,7 @@ const AddressInfo = () => {
             <p className='text-[##0B0C0C] md:text-[20px] text-[14px] md:leading-[30px] leading-[21px] font-normal w-full'>
               {watch('address') && `${watch('address')}, `}
               {watch('city') && `${watch('city')}, `}
-              {watch('country') && `${watch('country')} `}
+              {watch('county') && `${watch('county')} `}
               <br />
               {watch('postalCode') && watch('postalCode')}
             </p>
@@ -152,7 +140,7 @@ const AddressInfo = () => {
               <div className='mb-4'>
                 <FormField
                   control={control}
-                  name='country'
+                  name='county'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>County*</FormLabel>
@@ -161,7 +149,7 @@ const AddressInfo = () => {
                           placeholder='Enter County'
                           {...field}
                           className={`w-full border bg-white mt-2 h-[44px] rounded-md px-4 py-2 text-gray-700 focus:outline-none focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-0 ${
-                            formState.errors.country ? 'border-red-500' : ''
+                            formState.errors.county ? 'border-red-500' : ''
                           }`}
                         />
                       </FormControl>

@@ -27,7 +27,7 @@ const ProductDetails = () => {
     defaultValues: {
       address: '',
       city: '',
-      country: '',
+      county: '',
       postalCode: '',
       tenure:
         (tenure_info.tenure as 'freehold' | 'leasehold' | 'not-sure') ||
@@ -46,7 +46,7 @@ const ProductDetails = () => {
     }
   )
 
-  const countryFromApi = data?.result?.country || selectedAddress?.country
+  const countryFromApi = data?.result?.country || ''
 
   useEffect(() => {
     if (selectedAddress && !isLoading) {
@@ -58,6 +58,7 @@ const ProductDetails = () => {
         'city',
         selectedAddress?.city ? selectedAddress?.city : ''
       )
+      methods.setValue('county', selectedAddress.county ? selectedAddress?.county : '')
       methods.setValue('country', countryFromApi)
       methods.setValue(
         'postalCode',
@@ -94,6 +95,7 @@ const ProductDetails = () => {
       posthog.capture('Selected address', {
         address: selectedAddress?.address ? selectedAddress?.address : '',
         city: selectedAddress?.city ? selectedAddress?.city : '',
+        county: selectedAddress?.county ? selectedAddress?.county : '',
         country: countryFromApi,
         postalCode: selectedAddress?.postalCode
           ? selectedAddress?.postalCode
